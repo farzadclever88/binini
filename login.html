@@ -703,6 +703,10 @@ function clearMessage(){
    CONTROLLED FETCH
 ========================================================= */
 
+/* =========================================================
+   CONTROLLED API REQUEST
+========================================================= */
+
 async function apiRequest(
     path,
     options = {}
@@ -713,8 +717,23 @@ async function apiRequest(
         path;
 
 
+    console.log(
+        "NiniTo API REQUEST:",
+        {
+            url,
+            method:
+                options.method ||
+                "GET"
+        }
+    );
+
+
     let response;
 
+
+    /* =====================================================
+       FETCH
+    ===================================================== */
 
     try{
 
@@ -742,16 +761,48 @@ async function apiRequest(
     catch(error){
 
         console.error(
-            "NiniTo API connection error:",
+            "NiniTo FETCH ERROR:",
             error
         );
 
+
+        /*
+         * این خطای واقعی را دیگر مخفی نمی‌کنیم.
+         */
+
         throw new Error(
-            "ارتباط با سرور برقرار نشد. لطفاً اتصال اینترنت و آدرس Worker را بررسی کنید."
+
+            "ارتباط با Worker برقرار نشد.\n\n" +
+
+            "آدرس:\n" +
+            url +
+
+            "\n\n" +
+
+            "خطای مرورگر:\n" +
+            (
+                error?.message ||
+                "Unknown fetch error"
+            )
+
         );
 
     }
 
+
+    /* =====================================================
+       HTTP STATUS
+    ===================================================== */
+
+    console.log(
+        "NiniTo API STATUS:",
+        response.status
+    );
+
+
+    /* =====================================================
+       READ RESPONSE
+    ===================================================== */
 
     let data;
 
@@ -766,16 +817,36 @@ async function apiRequest(
     catch(error){
 
         console.error(
-            "Invalid API response:",
+            "NiniTo INVALID JSON:",
             error
         );
 
+
         throw new Error(
-            "پاسخ دریافت‌شده از سرور معتبر نیست."
+
+            "Worker پاسخ معتبری برنگرداند.\n\n" +
+
+            "HTTP Status: " +
+            response.status
+
         );
 
     }
 
+
+    /* =====================================================
+       DEBUG
+    ===================================================== */
+
+    console.log(
+        "NiniTo API RESPONSE:",
+        data
+    );
+
+
+    /* =====================================================
+       API ERROR
+    ===================================================== */
 
     if(
         !response.ok ||
@@ -786,10 +857,25 @@ async function apiRequest(
             data?.error;
 
 
+        const code =
+            apiError?.code ||
+            "UNKNOWN";
+
+
+        const message =
+            apiError?.message ||
+            "عملیات با خطا مواجه شد.";
+
+
         throw new Error(
 
-            apiError?.message ||
-            "عملیات با خطا مواجه شد."
+            message +
+
+            "\n\nکد خطا: " +
+            code +
+
+            "\nHTTP: " +
+            response.status
 
         );
 
@@ -798,8 +884,9 @@ async function apiRequest(
 
     return data;
 
-}
+    }
 
+    
 
 /* =========================================================
    CHECK EXISTING SESSION
