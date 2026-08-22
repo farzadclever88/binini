@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>NiniTo API Test</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+
+    margin:0;
+
+    padding:20px;
+
+    font-family:
+        Tahoma,
+        Arial,
+        sans-serif;
+
+    background:#f3f5f7;
+
+    color:#222;
+
+}
+
+.container{
+
+    max-width:800px;
+
+    margin:auto;
+
+}
+
+h1{
+
+    margin-top:0;
+
+    font-size:24px;
+
+}
+
+.card{
+
+    background:white;
+
+    border-radius:14px;
+
+    padding:18px;
+
+    margin-bottom:15px;
+
+    box-shadow:
+        0 3px 12px
+        rgba(0,0,0,.08);
+
+}
+
+label{
+
+    display:block;
+
+    margin-bottom:6px;
+
+    font-weight:bold;
+
+}
+
+input{
+
+    width:100%;
+
+    padding:13px;
+
+    border:1px solid #ccc;
+
+    border-radius:8px;
+
+    font-size:16px;
+
+    margin-bottom:12px;
+
+    direction:ltr;
+
+    text-align:left;
+
+}
+
+button{
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:9px;
+
+    background:#1976d2;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    margin-top:8px;
+
+}
+
+button:active{
+
+    transform:scale(.99);
+
+}
+
+button.secondary{
+
+    background:#555;
+
+}
+
+button.danger{
+
+    background:#c62828;
+
+}
+
+.status{
+
+    padding:12px;
+
+    border-radius:8px;
+
+    margin-top:10px;
+
+    font-weight:bold;
+
+}
+
+.waiting{
+
+    background:#fff3cd;
+
+    color:#856404;
+
+}
+
+.success{
+
+    background:#d4edda;
+
+    color:#155724;
+
+}
+
+.error{
+
+    background:#f8d7da;
+
+    color:#721c24;
+
+}
+
+pre{
+
+    direction:ltr;
+
+    text-align:left;
+
+    white-space:pre-wrap;
+
+    word-break:break-word;
+
+    background:#111;
+
+    color:#00ff88;
+
+    padding:15px;
+
+    border-radius:10px;
+
+    overflow:auto;
+
+    font-size:13px;
+
+    line-height:1.6;
+
+}
+
+.test-row{
+
+    border:1px solid #ddd;
+
+    border-radius:10px;
+
+    padding:12px;
+
+    margin-bottom:10px;
+
+}
+
+.test-title{
+
+    font-weight:bold;
+
+    margin-bottom:7px;
+
+}
+
+.test-result{
+
+    font-size:14px;
+
+}
+
+.small{
+
+    font-size:13px;
+
+    color:#666;
+
+    line-height:1.7;
+
+}
+
+.badge{
+
+    display:inline-block;
+
+    padding:4px 8px;
+
+    border-radius:6px;
+
+    font-size:12px;
+
+    background:#eee;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<!-- ===================================================== -->
+<!-- HEADER -->
+<!-- ===================================================== -->
+
+<div class="card">
+
+<h1>
+NiniTo API Diagnostic
+</h1>
+
+<div class="small">
+
+ابزار تست ارتباط سایت با Cloudflare Worker و D1
+
+<br>
+
+Worker:
+
+<span class="badge">
+ninitoapp
+</span>
+
+<br>
+
+Database:
+
+<span class="badge">
+ninitodb
+</span>
+
+<br>
+
+Binding:
+
+<span class="badge">
+DB
+</span>
+
+</div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- CONFIG -->
+<!-- ===================================================== -->
+
+<div class="card">
+
+<h3>
+تنظیمات اتصال
+</h3>
+
+<label>
+Worker URL
+</label>
+
+<input
+    id="workerUrl"
+    value="https://ninitoapp.farzadclever88.workers.dev"
+>
+
+
+<label>
+نام کاربری
+</label>
+
+<input
+    id="username"
+    type="text"
+    autocomplete="username"
+    placeholder="نام کاربری"
+>
+
+
+<label>
+رمز عبور
+</label>
+
+<input
+    id="password"
+    type="password"
+    autocomplete="current-password"
+    placeholder="رمز عبور"
+>
+
+
+<button
+    onclick="runAllTests()"
+>
+شروع تست کامل
+</button>
+
+
+<button
+    class="secondary"
+    onclick="testHealth()"
+>
+فقط تست Health
+</button>
+
+
+<button
+    class="secondary"
+    onclick="testLogin()"
+>
+فقط تست Login
+</button>
+
+
+<button
+    class="secondary"
+    onclick="testMe()"
+>
+فقط تست /api/me
+</button>
+
+
+<button
+    class="danger"
+    onclick="clearResults()"
+>
+پاک کردن نتایج
+</button>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- GENERAL STATUS -->
+<!-- ===================================================== -->
+
+<div class="card">
+
+<h3>
+وضعیت کلی
+</h3>
+
+<div
+    id="overallStatus"
+    class="status waiting"
+>
+هنوز تستی اجرا نشده است.
+</div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- TEST RESULTS -->
+<!-- ===================================================== -->
+
+<div class="card">
+
+<h3>
+نتایج تست
+</h3>
+
+
+<div class="test-row">
+
+<div class="test-title">
+1. دسترسی به Worker
+</div>
+
+<div
+    id="testWorker"
+    class="test-result"
+>
+در انتظار...
+</div>
+
+</div>
+
+
+<div class="test-row">
+
+<div class="test-title">
+2. API Health
+</div>
+
+<div
+    id="testHealth"
+    class="test-result"
+>
+در انتظار...
+</div>
+
+</div>
+
+
+<div class="test-row">
+
+<div class="test-title">
+3. Login
+</div>
+
+<div
+    id="testLogin"
+    class="test-result"
+>
+در انتظار...
+</div>
+
+</div>
+
+
+<div class="test-row">
+
+<div class="test-title">
+4. دریافت Token
+</div>
+
+<div
+    id="testToken"
+    class="test-result"
+>
+در انتظار...
+</div>
+
+</div>
+
+
+<div class="test-row">
+
+<div class="test-title">
+5. Authentication /api/me
+</div>
+
+<div
+    id="testMe"
+    class="test-result"
+>
+در انتظار...
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- RAW RESPONSE -->
+<!-- ===================================================== -->
+
+<div class="card">
+
+<h3>
+Response واقعی Worker
+</h3>
+
+<pre id="rawResponse">
+هنوز پاسخی دریافت نشده است.
+</pre>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- DEBUG -->
+<!-- ===================================================== -->
+
+<div class="card">
+
+<h3>
+اطلاعات Debug
+</h3>
+
+<pre id="debug">
+هنوز اطلاعاتی ثبت نشده است.
+</pre>
+
+</div>
+
+
+</div>
+
+
+<script>
+
+
+// ============================================================
+// CONFIGURATION
+// ============================================================
+
+const DEFAULT_WORKER_URL =
+    "https://ninitoapp.farzadclever88.workers.dev";
+
+
+let authToken = null;
+
+let debugLines = [];
+
+
+// ============================================================
+// ELEMENT
+// ============================================================
+
+function el(id){
+
+    return document.getElementById(id);
+
+}
+
+
+// ============================================================
+// DEBUG
+// ============================================================
+
+function debug(message){
+
+    const time =
+        new Date()
+            .toLocaleTimeString();
+
+    debugLines.push(
+        `[${time}] ${message}`
+    );
+
+    el("debug").textContent =
+        debugLines.join("\n");
+
+}
+
+
+// ============================================================
+// RAW RESPONSE
+// ============================================================
+
+function showRaw(data){
+
+    try{
+
+        el("rawResponse").textContent =
+            JSON.stringify(
+                data,
+                null,
+                4
+            );
+
+    }
+
+    catch{
+
+        el("rawResponse").textContent =
+            String(data);
+
+    }
+
+}
+
+
+// ============================================================
+// STATUS
+// ============================================================
+
+function setResult(
+    id,
+    success,
+    message
+){
+
+    const box =
+        el(id);
+
+    box.textContent =
+        success
+            ? "✅ " + message
+            : "❌ " + message;
+
+    box.style.color =
+        success
+            ? "#155724"
+            : "#721c24";
+
+}
+
+
+// ============================================================
+// OVERALL
+// ============================================================
+
+function setOverall(
+    success,
+    message
+){
+
+    const box =
+        el("overallStatus");
+
+    box.textContent =
+        message;
+
+    box.className =
+        "status " +
+        (
+            success
+                ? "success"
+                : "error"
+        );
+
+}
+
+
+// ============================================================
+// WORKER URL
+// ============================================================
+
+function getWorkerUrl(){
+
+    let url =
+        el("workerUrl")
+            .value
+            .trim();
+
+    if(!url){
+
+        url =
+            DEFAULT_WORKER_URL;
+
+    }
+
+    return url.replace(
+        /\/+$/,
+        ""
+    );
+
+}
+
+
+// ============================================================
+// FETCH JSON
+// ============================================================
+
+async function apiFetch(
+    path,
+    options = {}
+){
+
+    const baseUrl =
+        getWorkerUrl();
+
+    const url =
+        baseUrl + path;
+
+    debug(
+        `REQUEST ${options.method || "GET"} ${url}`
+    );
+
+    const headers = {
+
+        "Accept":
+            "application/json"
+
+    };
+
+
+    if(options.body){
+
+        headers[
+            "Content-Type"
+        ] =
+            "application/json";
+
+    }
+
+
+    if(
+        options.token
+    ){
+
+        headers[
+            "Authorization"
+        ] =
+            "Bearer " +
+            options.token;
+
+    }
+
+
+    let response;
+
+
+    try{
+
+        response =
+            await fetch(
+
+                url,
+
+                {
+
+                    method:
+                        options.method ||
+                        "GET",
+
+                    headers,
+
+                    body:
+                        options.body
+                            ? JSON.stringify(
+                                options.body
+                            )
+                            : undefined
+
+                }
+
+            );
+
+    }
+
+    catch(error){
+
+        debug(
+            "FETCH ERROR: " +
+            error.message
+        );
+
+        throw {
+
+            type:
+                "FETCH_ERROR",
+
+            message:
+                error.message,
+
+            url
+
+        };
+
+    }
+
+
+    debug(
+        `HTTP STATUS ${response.status}`
+    );
+
+
+    const text =
+        await response.text();
+
+
+    debug(
+        "RAW RESPONSE: " +
+        text
+    );
+
+
+    let data;
+
+
+    try{
+
+        data =
+            text
+                ? JSON.parse(text)
+                : {};
+
+    }
+
+    catch{
+
+        data = {
+
+            success:false,
+
+            error:{
+
+                code:
+                    "INVALID_JSON",
+
+                message:
+                    "Worker پاسخ JSON معتبر برنگرداند.",
+
+                raw:
+                    text
+
+            }
+
+        };
+
+    }
+
+
+    showRaw(data);
+
+
+    return {
+
+        response,
+
+        data
+
+    };
+
+}
+
+
+// ============================================================
+// TEST 1
+// WORKER ACCESS
+// ============================================================
+
+async function testWorkerAccess(){
+
+    setResult(
+        "testWorker",
+        true,
+        "در حال بررسی..."
+    );
+
+
+    try{
+
+        const result =
+            await apiFetch(
+                "/api/health"
+            );
+
+
+        setResult(
+
+            "testWorker",
+
+            true,
+
+            "Worker قابل دسترسی است."
+
+        );
+
+
+        return result;
+
+    }
+
+    catch(error){
+
+        setResult(
+
+            "testWorker",
+
+            false,
+
+            formatFetchError(
+                error
+            )
+
+        );
+
+        throw error;
+
+    }
+
+}
+
+
+// ============================================================
+// TEST 2
+// HEALTH
+// ============================================================
+
+async function testHealth(){
+
+    debug(
+        "===== HEALTH TEST ====="
+    );
+
+
+    setResult(
+        "testHealth",
+        true,
+        "در حال تست..."
+    );
+
+
+    try{
+
+        const result =
+            await apiFetch(
+                "/api/health"
+            );
+
+
+        if(
+            result.data?.success === true
+        ){
+
+            const data =
+                result.data;
+
+
+            setResult(
+
+                "testHealth",
+
+                true,
+
+                `Worker آنلاین است. ` +
+                `Service: ${data.service || "-"} | ` +
+                `Version: ${data.version || "-"}`
+
+            );
+
+
+            setOverall(
+
+                true,
+
+                "✅ ارتباط با Worker برقرار است."
+
+            );
+
+
+            return true;
+
+        }
+
+
+        setResult(
+
+            "testHealth",
+
+            false,
+
+            getApiError(
+                result.data
+            )
+
+        );
+
+
+        return false;
+
+    }
+
+    catch(error){
+
+        setResult(
+
+            "testHealth",
+
+            false,
+
+            formatFetchError(
+                error
+            )
+
+        );
+
+        setOverall(
+
+            false,
+
+            "❌ دسترسی به Worker با خطا مواجه شد."
+
+        );
+
+        return false;
+
+    }
+
+}
+
+
+// ============================================================
+// TEST 3
+// LOGIN
+// ============================================================
+
+async function testLogin(){
+
+    debug(
+        "===== LOGIN TEST ====="
+    );
+
+
+    setResult(
+
+        "testLogin",
+
+        true,
+
+        "در حال ورود..."
+
+    );
+
+
+    setResult(
+
+        "testToken",
+
+        true,
+
+        "در انتظار..."
+
+    );
+
+
+    const username =
+        el("username")
+            .value
+            .trim();
+
+
+    const password =
+        el("password")
+            .value;
+
+
+    if(!username){
+
+        setResult(
+
+            "testLogin",
+
+            false,
+
+            "نام کاربری وارد نشده است."
+
+        );
+
+        return false;
+
+    }
+
+
+    if(!password){
+
+        setResult(
+
+            "testLogin",
+
+            false,
+
+            "رمز عبور وارد نشده است."
+
+        );
+
+        return false;
+
+    }
+
+
+    try{
+
+        const result =
+            await apiFetch(
+
+                "/api/login",
+
+                {
+
+                    method:
+                        "POST",
+
+                    body:{
+
+                        username,
+
+                        password
+
+                    }
+
+                }
+
+            );
+
+
+        if(
+            result.data?.success === true
+        ){
+
+            authToken =
+                result.data.token;
+
+
+            if(authToken){
+
+                setResult(
+
+                    "testToken",
+
+                    true,
+
+                    "Token با موفقیت دریافت شد."
+
+                );
+
+            }
+
+            else{
+
+                setResult(
+
+                    "testToken",
+
+                    false,
+
+                    "Login موفق بود ولی Token دریافت نشد."
+
+                );
+
+            }
+
+
+            setResult(
+
+                "testLogin",
+
+                true,
+
+                result.data.message ||
+                "ورود موفق بود."
+
+            );
+
+
+            return true;
+
+        }
+
+
+        setResult(
+
+            "testLogin",
+
+            false,
+
+            getApiError(
+                result.data
+            )
+
+        );
+
+
+        setResult(
+
+            "testToken",
+
+            false,
+
+            "Token دریافت نشد."
+
+        );
+
+
+        return false;
+
+    }
+
+    catch(error){
+
+        setResult(
+
+            "testLogin",
+
+            false,
+
+            formatFetchError(
+                error
+            )
+
+        );
+
+
+        setResult(
+
+            "testToken",
+
+            false,
+
+            "به دلیل خطای ارتباطی Token دریافت نشد."
+
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+// ============================================================
+// TEST 4
+// /api/me
+// ============================================================
+
+async function testMe(){
+
+    debug(
+        "===== /api/me TEST ====="
+    );
+
+
+    setResult(
+
+        "testMe",
+
+        true,
+
+        "در حال بررسی..."
+
+    );
+
+
+    if(!authToken){
+
+        setResult(
+
+            "testMe",
+
+            false,
+
+            "ابتدا Login را با موفقیت انجام دهید."
+
+        );
+
+        return false;
+
+    }
+
+
+    try{
+
+        const result =
+            await apiFetch(
+
+                "/api/me",
+
+                {
+
+                    method:
+                        "GET",
+
+                    token:
+                        authToken
+
+                }
+
+            );
+
+
+        if(
+            result.data?.success === true
+        ){
+
+            const user =
+                result.data.user;
+
+
+            if(user){
+
+                setResult(
+
+                    "testMe",
+
+                    true,
+
+                    `احراز هویت موفق است. ` +
+                    `کاربر: ${user.username || "-"} | ` +
+                    `نقش: ${user.role || "-"}`
+
+                );
+
+            }
+
+            else{
+
+                setResult(
+
+                    "testMe",
+
+                    true,
+
+                    "API پاسخ موفق داد."
+
+                );
+
+            }
+
+
+            return true;
+
+        }
+
+
+        setResult(
+
+            "testMe",
+
+            false,
+
+            getApiError(
+                result.data
+            )
+
+        );
+
+
+        return false;
+
+    }
+
+    catch(error){
+
+        setResult(
+
+            "testMe",
+
+            false,
+
+            formatFetchError(
+                error
+            )
+
+        );
+
+        return false;
+
+    }
+
+}
+
+
+// ============================================================
+// ALL TESTS
+// ============================================================
+
+async function runAllTests(){
+
+    debugLines = [];
+
+    el("debug").textContent = "";
+
+    el("rawResponse").textContent =
+        "در حال اجرای تست...";
+
+
+    authToken = null;
+
+
+    setOverall(
+
+        true,
+
+        "⏳ در حال اجرای تست‌ها..."
+
+    );
+
+
+    setResult(
+        "testWorker",
+        true,
+        "در انتظار..."
+    );
+
+    setResult(
+        "testHealth",
+        true,
+        "در انتظار..."
+    );
+
+    setResult(
+        "testLogin",
+        true,
+        "در انتظار..."
+    );
+
+    setResult(
+        "testToken",
+        true,
+        "در انتظار..."
+    );
+
+    setResult(
+        "testMe",
+        true,
+        "در انتظار..."
+    );
+
+
+    // --------------------------------------------------------
+    // HEALTH
+    // --------------------------------------------------------
+
+    const healthOk =
+        await testHealth();
+
+
+    if(!healthOk){
+
+        setResult(
+
+            "testWorker",
+
+            false,
+
+            "Worker یا API Health قابل دسترسی نیست."
+
+        );
+
+
+        setOverall(
+
+            false,
+
+            "❌ تست متوقف شد: ابتدا باید Health درست شود."
+
+        );
+
+
+        return;
+
+    }
+
+
+    setResult(
+
+        "testWorker",
+
+        true,
+
+        "Worker قابل دسترسی است."
+
+    );
+
+
+    // --------------------------------------------------------
+    // LOGIN
+    // --------------------------------------------------------
+
+    const loginOk =
+        await testLogin();
+
+
+    if(!loginOk){
+
+        setOverall(
+
+            false,
+
+            "❌ Worker سالم است، اما Login ناموفق بود."
+
+        );
+
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // ME
+    // --------------------------------------------------------
+
+    const meOk =
+        await testMe();
+
+
+    if(meOk){
+
+        setOverall(
+
+            true,
+
+            "✅ تمام تست‌های اصلی با موفقیت انجام شد."
+
+        );
+
+    }
+
+    else{
+
+        setOverall(
+
+            false,
+
+            "❌ Login موفق بود ولی احراز هویت /api/me مشکل دارد."
+
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// API ERROR
+// ============================================================
+
+function getApiError(
+    data
+){
+
+    if(
+        data?.error
+    ){
+
+        const code =
+            data.error.code ||
+            "UNKNOWN";
+
+        const message =
+            data.error.message ||
+            "خطای نامشخص";
+
+        let text =
+            `Code: ${code} — ${message}`;
+
+
+        if(
+            data.error.details
+        ){
+
+            text +=
+                " | Details: " +
+                JSON.stringify(
+                    data.error.details
+                );
+
+        }
+
+
+        return text;
+
+    }
+
+
+    if(
+        data?.message
+    ){
+
+        return data.message;
+
+    }
+
+
+    return "Worker پاسخ ناموفق برگرداند.";
+
+}
+
+
+// ============================================================
+// FETCH ERROR FORMAT
+// ============================================================
+
+function formatFetchError(
+    error
+){
+
+    if(
+        error?.type ===
+        "FETCH_ERROR"
+    ){
+
+        return (
+
+            "اتصال Fetch به Worker برقرار نشد. " +
+
+            "ممکن است مشکل CORS، HTTPS، آدرس Worker یا " +
+
+            "مسدود شدن درخواست توسط مرورگر باشد. " +
+
+            "URL: " +
+
+            error.url
+
+        );
+
+    }
+
+
+    return (
+
+        "خطای ارتباطی: " +
+
+        (
+            error?.message ||
+            String(error)
+        )
+
+    );
+
+}
+
+
+// ============================================================
+// CLEAR
+// ============================================================
+
+function clearResults(){
+
+    debugLines = [];
+
+    authToken = null;
+
+
+    el("overallStatus").textContent =
+        "هنوز تستی اجرا نشده است.";
+
+
+    el("overallStatus").className =
+        "status waiting";
+
+
+    [
+
+        "testWorker",
+
+        "testHealth",
+
+        "testLogin",
+
+        "testToken",
+
+        "testMe"
+
+    ].forEach(
+
+        id => {
+
+            el(id).textContent =
+                "در انتظار...";
+
+            el(id).style.color =
+                "";
+
+        }
+
+    );
+
+
+    el("rawResponse").textContent =
+        "هنوز پاسخی دریافت نشده است.";
+
+
+    el("debug").textContent =
+        "هنوز اطلاعاتی ثبت نشده است.";
+
+}
+
+
+// ============================================================
+// INITIAL
+// ============================================================
+
+el("workerUrl").value =
+    DEFAULT_WORKER_URL;
+
+
+</script>
+
+
+</body>
+
+</html>
