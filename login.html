@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>NiniTo | ورود به سامانه</title>
+
+
+<!-- =====================================================
+     jQuery
+===================================================== -->
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+
+<!-- =====================================================
+     jQuery UI
+===================================================== -->
+
+<link
+    rel="stylesheet"
+    href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css"
+>
+
+<script
+    src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js">
+</script>
+
+
+<style>
+
+:root{
+
+    --bg:
+        #f4f6f9;
+
+    --card:
+        #ffffff;
+
+    --text:
+        #1f2937;
+
+    --muted:
+        #6b7280;
+
+    --primary:
+        #7c3aed;
+
+    --primary-dark:
+        #5b21b6;
+
+    --border:
+        #e5e7eb;
+
+    --danger:
+        #dc2626;
+
+    --success:
+        #16a34a;
+
+}
+
+
+*{
+
+    box-sizing:
+        border-box;
+
+}
+
+
+html,
+body{
+
+    margin:
+        0;
+
+    padding:
+        0;
+
+    width:
+        100%;
+
+    min-height:
+        100%;
+
+}
+
+
+body{
+
+    font-family:
+        Tahoma,
+        Arial,
+        sans-serif;
+
+    background:
+        var(--bg);
+
+    color:
+        var(--text);
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        20px;
+
+}
+
+
+.login-wrapper{
+
+    width:
+        100%;
+
+    max-width:
+        430px;
+
+}
+
+
+.login-card{
+
+    background:
+        var(--card);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        24px;
+
+    padding:
+        32px;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.08);
+
+}
+
+
+.logo{
+
+    width:
+        78px;
+
+    height:
+        78px;
+
+    margin:
+        0 auto 18px;
+
+    border-radius:
+        22px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-dark)
+        );
+
+    color:
+        white;
+
+    font-size:
+        28px;
+
+    font-weight:
+        bold;
+
+}
+
+
+h1{
+
+    text-align:
+        center;
+
+    margin:
+        0;
+
+    font-size:
+        25px;
+
+}
+
+
+.subtitle{
+
+    text-align:
+        center;
+
+    color:
+        var(--muted);
+
+    margin:
+        10px 0 28px;
+
+    font-size:
+        14px;
+
+}
+
+
+.form-group{
+
+    margin-bottom:
+        18px;
+
+}
+
+
+label{
+
+    display:
+        block;
+
+    margin-bottom:
+        7px;
+
+    font-size:
+        14px;
+
+    font-weight:
+        bold;
+
+}
+
+
+input{
+
+    width:
+        100%;
+
+    height:
+        48px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:
+        12px;
+
+    padding:
+        0 14px;
+
+    font-family:
+        inherit;
+
+    font-size:
+        15px;
+
+    outline:
+        none;
+
+    transition:
+        .2s;
+
+}
+
+
+input:focus{
+
+    border-color:
+        var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(124,58,237,.10);
+
+}
+
+
+.login-button{
+
+    width:
+        100%;
+
+    height:
+        50px;
+
+    border:
+        none;
+
+    border-radius:
+        13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-dark)
+        );
+
+    color:
+        white;
+
+    font-family:
+        inherit;
+
+    font-size:
+        16px;
+
+    font-weight:
+        bold;
+
+    cursor:
+        pointer;
+
+    transition:
+        .2s;
+
+}
+
+
+.login-button:hover{
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+.login-button:disabled{
+
+    opacity:
+        .6;
+
+    cursor:
+        not-allowed;
+
+    transform:
+        none;
+
+}
+
+
+.message{
+
+    display:
+        none;
+
+    margin-bottom:
+        18px;
+
+    padding:
+        13px;
+
+    border-radius:
+        12px;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.8;
+
+}
+
+
+.message.error{
+
+    display:
+        block;
+
+    color:
+        #991b1b;
+
+    background:
+        #fef2f2;
+
+    border:
+        1px solid #fecaca;
+
+}
+
+
+.message.success{
+
+    display:
+        block;
+
+    color:
+        #166534;
+
+    background:
+        #f0fdf4;
+
+    border:
+        1px solid #bbf7d0;
+
+}
+
+
+.footer{
+
+    text-align:
+        center;
+
+    color:
+        var(--muted);
+
+    font-size:
+        12px;
+
+    margin-top:
+        18px;
+
+}
+
+
+.loader{
+
+    display:
+        inline-block;
+
+    width:
+        17px;
+
+    height:
+        17px;
+
+    border:
+        2px solid
+        rgba(255,255,255,.4);
+
+    border-top-color:
+        white;
+
+    border-radius:
+        50%;
+
+    animation:
+        spin .7s linear infinite;
+
+    vertical-align:
+        middle;
+
+    margin-left:
+        7px;
+
+}
+
+
+@keyframes spin{
+
+    to{
+
+        transform:
+            rotate(360deg);
+
+    }
+
+}
+
+
+@media(max-width:480px){
+
+    body{
+
+        padding:
+            12px;
+
+    }
+
+    .login-card{
+
+        padding:
+            24px 18px;
+
+        border-radius:
+            20px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="login-wrapper">
+
+
+    <div class="login-card">
+
+
+        <div class="logo">
+
+            NT
+
+        </div>
+
+
+        <h1>
+
+            سامانه نی نی تو
+
+        </h1>
+
+
+        <div class="subtitle">
+
+            مدیریت تولید و انبار
+
+        </div>
+
+
+        <div
+            id="message"
+            class="message">
+        </div>
+
+
+        <form
+            id="loginForm"
+            autocomplete="off"
+        >
+
+
+            <div class="form-group">
+
+                <label for="username">
+
+                    نام کاربری
+
+                </label>
+
+                <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    autocomplete="username"
+                    maxlength="50"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="password">
+
+                    رمز عبور
+
+                </label>
+
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    maxlength="100"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                id="loginButton"
+                class="login-button"
+                type="submit"
+            >
+
+                ورود به سامانه
+
+            </button>
+
+
+        </form>
+
+
+        <div class="footer">
+
+            NiniTo
+            |
+            Version 1.0.0
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   NINIT0 LOGIN
+========================================================= */
+
+
+/* ---------------------------------------------------------
+   IMPORTANT
+   ---------------------------------------------------------
+   این آدرس را بعد از Deploy Worker با آدرس واقعی Worker
+   جایگزین می‌کنیم.
+
+   مثال:
+
+   https://ninitoapp.your-subdomain.workers.dev
+--------------------------------------------------------- */
+
+const API_BASE_URL =
+    "https://ninitoapp.farzadclever88.workers.dev";
+
+
+/* =========================================================
+   STORAGE KEY
+========================================================= */
+
+const TOKEN_KEY =
+    "NiniToToken";
+
+const USER_KEY =
+    "NiniToUser";
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const loginForm =
+    document.getElementById(
+        "loginForm"
+    );
+
+const loginButton =
+    document.getElementById(
+        "loginButton"
+    );
+
+const messageBox =
+    document.getElementById(
+        "message"
+    );
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+function showMessage(
+    message,
+    type = "error"
+){
+
+    messageBox.className =
+        "message " + type;
+
+    messageBox.textContent =
+        message;
+
+}
+
+
+function clearMessage(){
+
+    messageBox.className =
+        "message";
+
+    messageBox.textContent =
+        "";
+
+}
+
+
+/* =========================================================
+   CONTROLLED FETCH
+========================================================= */
+
+async function apiRequest(
+    path,
+    options = {}
+){
+
+    const url =
+        API_BASE_URL +
+        path;
+
+
+    let response;
+
+
+    try{
+
+        response =
+            await fetch(
+                url,
+                {
+
+                    ...options,
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        ...(options.headers || {})
+
+                    }
+
+                }
+            );
+
+    }
+
+    catch(error){
+
+        console.error(
+            "NiniTo API connection error:",
+            error
+        );
+
+        throw new Error(
+            "ارتباط با سرور برقرار نشد. لطفاً اتصال اینترنت و آدرس Worker را بررسی کنید."
+        );
+
+    }
+
+
+    let data;
+
+
+    try{
+
+        data =
+            await response.json();
+
+    }
+
+    catch(error){
+
+        console.error(
+            "Invalid API response:",
+            error
+        );
+
+        throw new Error(
+            "پاسخ دریافت‌شده از سرور معتبر نیست."
+        );
+
+    }
+
+
+    if(
+        !response.ok ||
+        data.success === false
+    ){
+
+        const apiError =
+            data?.error;
+
+
+        throw new Error(
+
+            apiError?.message ||
+            "عملیات با خطا مواجه شد."
+
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+/* =========================================================
+   CHECK EXISTING SESSION
+========================================================= */
+
+function checkExistingSession(){
+
+    const token =
+        localStorage.getItem(
+            TOKEN_KEY
+        );
+
+
+    if(!token){
+
+        return;
+
+    }
+
+
+    window.location.href =
+        "index.html";
+
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+loginForm.addEventListener(
+    "submit",
+    async function(event){
+
+        event.preventDefault();
+
+
+        clearMessage();
+
+
+        const username =
+            document
+                .getElementById(
+                    "username"
+                )
+                .value
+                .trim();
+
+
+        const password =
+            document
+                .getElementById(
+                    "password"
+                )
+                .value;
+
+
+        if(!username){
+
+            showMessage(
+                "نام کاربری را وارد کنید."
+            );
+
+            return;
+
+        }
+
+
+        if(!password){
+
+            showMessage(
+                "رمز عبور را وارد کنید."
+            );
+
+            return;
+
+        }
+
+
+        loginButton.disabled =
+            true;
+
+
+        loginButton.innerHTML =
+            '<span class="loader"></span>در حال ورود...';
+
+
+        try{
+
+
+            const result =
+                await apiRequest(
+
+                    "/api/login",
+
+                    {
+
+                        method:
+                            "POST",
+
+                        body:
+                            JSON.stringify({
+
+                                username,
+
+                                password
+
+                            })
+
+                    }
+
+                );
+
+
+            if(
+                !result.token
+            ){
+
+                throw new Error(
+                    "توکن ورود از سرور دریافت نشد."
+                );
+
+            }
+
+
+            localStorage.setItem(
+
+                TOKEN_KEY,
+
+                result.token
+
+            );
+
+
+            if(
+                result.user
+            ){
+
+                localStorage.setItem(
+
+                    USER_KEY,
+
+                    JSON.stringify(
+                        result.user
+                    )
+
+                );
+
+            }
+
+
+            showMessage(
+
+                "ورود با موفقیت انجام شد. در حال انتقال...",
+
+                "success"
+
+            );
+
+
+            setTimeout(
+
+                function(){
+
+                    window.location.href =
+                        "index.html";
+
+                },
+
+                500
+
+            );
+
+
+        }
+
+        catch(error){
+
+            console.error(
+                "LOGIN_ERROR",
+                error
+            );
+
+
+            showMessage(
+
+                error.message ||
+                "ورود انجام نشد."
+
+            );
+
+        }
+
+        finally{
+
+            loginButton.disabled =
+                false;
+
+            loginButton.textContent =
+                "ورود به سامانه";
+
+        }
+
+    }
+
+);
+
+
+/* =========================================================
+   ENTER KEY
+========================================================= */
+
+document
+    .getElementById("username")
+    .focus();
+
+
+/* =========================================================
+   START
+========================================================= */
+
+checkExistingSession();
+
+</script>
+
+
+</body>
+
+  </html>
