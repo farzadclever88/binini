@@ -7875,8 +7875,31 @@ async function apiRequest(
 
 ) {
 
+    /* --------------------------------------------------------
+       OPTIONS
+    -------------------------------------------------------- */
+
+    const {
+
+        method = "GET",
+
+        body = null,
+
+        auth = true,
+
+        loadingText =
+            "در حال ارتباط با سامانه..."
+
+    } = options;
+
+
+    /* --------------------------------------------------------
+       TIMEOUT
+    -------------------------------------------------------- */
+
     const controller =
         new AbortController();
+
 
     const timeout =
         setTimeout(
@@ -7892,9 +7915,17 @@ async function apiRequest(
         );
 
 
+    /* --------------------------------------------------------
+       TOKEN
+    -------------------------------------------------------- */
+
     const token =
         getToken();
 
+
+    /* --------------------------------------------------------
+       HEADERS
+    -------------------------------------------------------- */
 
     const headers = {
 
@@ -7906,17 +7937,45 @@ async function apiRequest(
     };
 
 
-    if (token) {
+    if (
+        auth &&
+        token
+    ) {
 
         headers.Authorization =
-            `Bearer ${token}`;
+            "Bearer " +
+            token;
 
     }
 
 
+    /* --------------------------------------------------------
+       LOADING
+    -------------------------------------------------------- */
+
+    if (
+        typeof setLoading ===
+        "function"
+    ) {
+
+        setLoading(
+            true,
+            loadingText
+        );
+
+    }
+
+
+    let response;
+
+
+    /* --------------------------------------------------------
+       FETCH
+    -------------------------------------------------------- */
+
     try {
 
-        const response =
+        response =
             await fetch(
 
                 NINI_CONFIG.API_BASE_URL +
@@ -7926,7 +7985,16 @@ async function apiRequest(
 
                     ...options,
 
+                    method,
+
                     headers,
+
+                    body:
+                        body === null
+                            ? undefined
+                            : JSON.stringify(
+                                body
+                            ),
 
                     signal:
                         controller.signal
@@ -7934,92 +8002,6 @@ async function apiRequest(
                 }
 
             );
-
-
-        clearTimeout(
-            timeout
-        );
-
-
-        let payload =
-            null;
-
-
-        try {
-
-            payload =
-                await response.json();
-
-        }
-
-        catch {
-
-            throw {
-
-                code:
-                    "API-JSON",
-
-                message:
-                    "پاسخ دریافتی از سرور قابل خواندن نیست.",
-
-                details:
-                    null
-
-            };
-
-        }
-
-
-        if (!response.ok) {
-
-            const apiError =
-                payload?.error;
-
-
-            throw {
-
-                code:
-                    apiError?.code ||
-                    `HTTP-${response.status}`,
-
-                message:
-                    apiError?.message ||
-                    "عملیات در سرور انجام نشد.",
-
-                details:
-                    apiError?.details ||
-                    null
-
-            };
-
-        }
-
-
-        if (
-            payload &&
-            payload.success === false
-        ) {
-
-            throw {
-
-                code:
-                    payload.error?.code ||
-                    "API-ERROR",
-
-                message:
-                    payload.error?.message ||
-                    "عملیات انجام نشد.",
-
-                details:
-                    payload.error?.details ||
-                    null
-
-            };
-
-        }
-
-
-        return payload;
 
     }
 
@@ -8029,6 +8011,22 @@ async function apiRequest(
             timeout
         );
 
+
+        if (
+            typeof setLoading ===
+            "function"
+        ) {
+
+            setLoading(
+                false
+            );
+
+        }
+
+
+        /* ----------------------------------------------------
+           TIMEOUT
+        ---------------------------------------------------- */
 
         if (
             error?.name ===
@@ -8051,14 +8049,9 @@ async function apiRequest(
         }
 
 
-        if (
-            error?.code
-        ) {
-
-            throw error;
-
-        }
-
+        /* ----------------------------------------------------
+           NETWORK ERROR
+        ---------------------------------------------------- */
 
         console.error(
             "NINI_TO_API_ERROR",
@@ -8081,8 +8074,161 @@ async function apiRequest(
 
     }
 
-}
 
+    clearTimeout(
+        timeout
+    );
+
+
+    /* --------------------------------------------------------
+       LOADING OFF
+    -------------------------------------------------------- */
+
+    if (
+        typeof setLoading ===
+        "function"
+    ) {
+
+        setLoading(
+            false
+        );
+
+    }
+
+
+    /* --------------------------------------------------------
+       READ RESPONSE
+    -------------------------------------------------------- */
+
+    let payload =
+        null;
+
+
+    try {
+
+        payload =
+            await response.json();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "NINI_TO_API_JSON_ERROR",
+            error
+        );
+
+
+        throw {
+
+            code:
+                "API-JSON",
+
+            message:
+                "پاسخ دریافتی از سرور قابل خواندن نیست.",
+
+            details:
+                null
+
+        };
+
+    }
+
+
+    /* --------------------------------------------------------
+       HTTP ERROR
+    -------------------------------------------------------- */
+
+    if (
+        !response.ok
+    ) {
+
+        const apiError =
+            payload?.error;
+
+
+        const code =
+            apiError?.code ||
+            `HTTP-${response.status}`;
+
+
+        const message =
+            apiError?.message ||
+            "عملیات در سرور انجام نشد.";
+
+
+        const details =
+            apiError?.details ||
+            null;
+
+
+        /* ----------------------------------------------------
+           UNAUTHORIZED
+        ---------------------------------------------------- */
+
+        if (
+            response.status ===
+            401
+        ) {
+
+            clearAuthentication();
+
+        }
+
+
+        throw {
+
+            code,
+
+            message,
+
+            details
+
+        };
+
+    }
+
+
+    /* --------------------------------------------------------
+       APPLICATION ERROR
+       success:false
+    -------------------------------------------------------- */
+
+    if (
+        payload &&
+        payload.success === false
+    ) {
+
+        const apiError =
+            payload.error;
+
+
+        throw {
+
+            code:
+                apiError?.code ||
+                "API-ERROR",
+
+            message:
+                apiError?.message ||
+                "عملیات انجام نشد.",
+
+            details:
+                apiError?.details ||
+                null
+
+        };
+
+    }
+
+
+    /* --------------------------------------------------------
+       SUCCESS
+    -------------------------------------------------------- */
+
+    return payload;
+
+    }
 
 /* ============================================================
    API GET
