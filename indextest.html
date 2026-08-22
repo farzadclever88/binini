@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>NiniTo</title>
+
+<style>
+
+body{
+    font-family:Tahoma,Arial,sans-serif;
+    margin:0;
+    padding:20px;
+    background:#f5f5f5;
+}
+
+h1{
+    margin-bottom:10px;
+}
+
+#status{
+    padding:12px;
+    margin-bottom:20px;
+    background:white;
+    border-radius:8px;
+}
+
+#data{
+    display:grid;
+    gap:10px;
+}
+
+.item{
+    background:white;
+    padding:15px;
+    border-radius:8px;
+    border:1px solid #ddd;
+}
+
+.error{
+    color:#b91c1c;
+}
+
+.success{
+    color:#15803d;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<h1>
+    سامانه نی نی تو
+</h1>
+
+
+<div id="status">
+    در حال دریافت اطلاعات...
+</div>
+
+
+<div id="data">
+</div>
+
+
+<script>
+
+/* =====================================================
+   CONFIG
+===================================================== */
+
+const API_BASE_URL =
+    "https://ninitoapp.farzadclever88.workers.dev";
+
+
+const TOKEN_KEY =
+    "NiniToToken";
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const statusBox =
+    document.getElementById("status");
+
+
+const dataBox =
+    document.getElementById("data");
+
+
+/* =====================================================
+   API REQUEST
+===================================================== */
+
+async function apiRequest(
+    path,
+    options = {}
+){
+
+    const token =
+        localStorage.getItem(
+            TOKEN_KEY
+        );
+
+
+    const headers = {
+
+        "Content-Type":
+            "application/json"
+
+    };
+
+
+    if(token){
+
+        headers.Authorization =
+            "Bearer " + token;
+
+    }
+
+
+    const response =
+        await fetch(
+
+            API_BASE_URL + path,
+
+            {
+
+                ...options,
+
+                headers
+
+            }
+
+        );
+
+
+    const data =
+        await response.json();
+
+
+    console.log(
+        "API:",
+        path,
+        data
+    );
+
+
+    if(
+        !response.ok ||
+        data.success === false
+    ){
+
+        throw new Error(
+
+            data?.error?.message ||
+            "خطا در دریافت اطلاعات"
+
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+/* =====================================================
+   LOAD
+===================================================== */
+
+async function loadData(){
+
+    try{
+
+        statusBox.textContent =
+            "در حال بررسی احراز هویت...";
+
+
+        /* ابتدا کاربر فعلی را بررسی می‌کنیم */
+
+        const me =
+            await apiRequest(
+                "/api/me"
+            );
+
+
+        console.log(
+            "CURRENT USER:",
+            me
+        );
+
+
+        statusBox.innerHTML =
+            '<span class="success">' +
+            'ورود موفق: ' +
+            me.user.username +
+            '</span>';
+
+
+        /*
+         * مرحله بعد:
+         * دریافت اطلاعات دیتابیس
+         */
+
+    }
+
+    catch(error){
+
+        console.error(
+            "INDEX ERROR:",
+            error
+        );
+
+
+        statusBox.innerHTML =
+            '<span class="error">' +
+            error.message +
+            '</span>';
+
+    }
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+loadData();
+
+</script>
+
+</body>
+
+</html>
+<script>
+
+/* =====================================================
+   DATABASE / API TEST
+===================================================== */
+
+async function testDatabaseAPI(){
+
+    dataBox.innerHTML =
+        "<div class='item'>در حال دریافت اطلاعات دیتابیس...</div>";
+
+
+    /*
+     * =================================================
+     * مهم
+     * =================================================
+     *
+     * این Route باید همان Route دریافت اطلاعات
+     * اصلی باشد که در workers.js تعریف کرده‌ای.
+     *
+     * فعلاً از /api/users شروع می‌کنیم.
+     */
+
+    try{
+
+        const result =
+            await apiRequest(
+                "/api/users"
+            );
+
+
+        console.log(
+            "DATABASE RESULT:",
+            result
+        );
+
+
+        /*
+         * نمایش پاسخ کامل API
+         */
+
+        dataBox.innerHTML = `
+
+            <div class="item">
+
+                <h3>
+                    پاسخ کامل API
+                </h3>
+
+                <pre style="
+                    white-space:pre-wrap;
+                    direction:ltr;
+                    text-align:left;
+                    overflow:auto;
+                ">${escapeHtml(
+                    JSON.stringify(
+                        result,
+                        null,
+                        2
+                    )
+                )}</pre>
+
+            </div>
+
+        `;
+
+
+        statusBox.innerHTML =
+            '<span class="success">' +
+            '✅ اتصال به API و دریافت اطلاعات موفق بود.' +
+            '</span>';
+
+    }
+
+    catch(error){
+
+        console.error(
+            "DATABASE TEST ERROR:",
+            error
+        );
+
+
+        dataBox.innerHTML = `
+
+            <div class="item">
+
+                <h3 class="error">
+                    ❌ خطا
+                </h3>
+
+                <p>
+                    ${escapeHtml(
+                        error.message
+                    )}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =====================================================
+   HTML ESCAPE
+===================================================== */
+
+function escapeHtml(
+    value
+){
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =====================================================
+   START DATABASE TEST
+===================================================== */
+
+testDatabaseAPI();
+
+</script>
+
+</body>
+
+</html>
