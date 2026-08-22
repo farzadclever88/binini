@@ -1,0 +1,5147 @@
+
+// ============================================================
+// NINIT0 / NINI TO
+// CLOUDFLARE WORKER API
+// ============================================================
+//
+// Worker Name:
+// ninitoapp
+//
+// Cloudflare D1 Database:
+// ninitodb
+//
+// D1 Binding:
+// DB
+//
+// GitHub Repository:
+// farzadclever88/binini
+//
+// SYSTEM SCOPE
+// ------------------------------------------------------------
+// Product
+//      ↓
+// BOM
+//      ↓
+// BOM Details / Parts
+//      ↓
+// Raw Material Warehouse
+//      ↓
+// Production Planning
+//      ↓
+// Production
+//      ↓
+// Material Consumption
+//      ↓
+// Finished Product Warehouse
+//
+// NOT INCLUDED YET
+// ------------------------------------------------------------
+// Store
+// Sales
+// Customers
+// Orders
+// Delivery
+// Shipping
+//
+// ============================================================
+
+
+// ============================================================
+// CONFIGURATION
+// ============================================================
+
+const APP_NAME = "NiniTo";
+
+const APP_VERSION = "1.0.0";
+
+const WORKER_NAME = "ninitoapp";
+
+const DATABASE_NAME = "ninitodb";
+
+
+// Session duration
+// 12 hours
+
+const SESSION_HOURS = 12;
+
+
+// ============================================================
+// RESPONSE HELPERS
+// ============================================================
+
+function responseHeaders(origin = "*") {
+
+    return {
+
+        "Content-Type":
+            "application/json; charset=UTF-8",
+
+        "Cache-Control":
+            "no-store",
+
+        "Access-Control-Allow-Origin":
+            origin,
+
+        "Access-Control-Allow-Headers":
+            "Content-Type, Authorization",
+
+        "Access-Control-Allow-Methods":
+            "GET, POST, PUT, DELETE, OPTIONS",
+
+        "Access-Control-Max-Age":
+            "86400"
+
+    };
+
+}
+
+
+function jsonResponse(
+    payload,
+    status = 200,
+    origin = "*"
+) {
+
+    return new Response(
+
+        JSON.stringify(payload),
+
+        {
+
+            status,
+
+            headers:
+                responseHeaders(origin)
+
+        }
+
+    );
+
+}
+
+
+function successResponse(
+    data = {},
+    status = 200,
+    origin = "*"
+) {
+
+    return jsonResponse(
+
+        {
+
+            success: true,
+
+            ...data
+
+        },
+
+        status,
+
+        origin
+
+    );
+
+}
+
+
+function errorResponse(
+    code,
+    message,
+    status = 400,
+    details = null,
+    origin = "*"
+) {
+
+    return jsonResponse(
+
+        {
+
+            success: false,
+
+            error: {
+
+                code,
+
+                message,
+
+                details
+
+            }
+
+        },
+
+        status,
+
+        origin
+
+    );
+
+}
+
+
+// ============================================================
+// CONTROLLED ERROR
+// ============================================================
+
+class AppError extends Error {
+
+    constructor(
+        code,
+        message,
+        status = 400,
+        details = null
+    ) {
+
+        super(message);
+
+        this.code =
+            code;
+
+        this.status =
+            status;
+
+        this.details =
+            details;
+
+    }
+
+}
+
+
+// ============================================================
+// HASH
+// ============================================================
+
+async function sha256(value) {
+
+    const data =
+        new TextEncoder()
+            .encode(
+                String(value)
+            );
+
+    const hash =
+        await crypto.subtle.digest(
+            "SHA-256",
+            data
+        );
+
+    return Array
+        .from(
+            new Uint8Array(hash)
+        )
+        .map(
+            byte =>
+                byte
+                    .toString(16)
+                    .padStart(2, "0")
+        )
+        .join("");
+
+}
+
+
+// ============================================================
+// RANDOM TOKEN
+// ============================================================
+
+function generateToken() {
+
+    const bytes =
+        new Uint8Array(32);
+
+    crypto.getRandomValues(
+        bytes
+    );
+
+    return Array
+        .from(bytes)
+        .map(
+            byte =>
+                byte
+                    .toString(16)
+                    .padStart(2, "0")
+        )
+        .join("");
+
+}
+
+
+// ============================================================
+// JSON BODY
+// ============================================================
+
+async function readJson(request) {
+
+    try {
+
+        return await request.json();
+
+    }
+
+    catch {
+
+        throw new AppError(
+
+            "REQ-001",
+
+            "اطلاعات ارسالی معتبر نیست.",
+
+            400
+
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// BASIC VALIDATORS
+// ============================================================
+
+function requiredText(
+    value,
+    fieldName,
+    code
+) {
+
+    const text =
+        String(value ?? "")
+            .trim();
+
+    if (!text) {
+
+        throw new AppError(
+
+            code,
+
+            `${fieldName} الزامی است.`,
+
+            400
+
+        );
+
+    }
+
+    return text;
+
+}
+
+
+function positiveNumber(
+    value,
+    fieldName,
+    code
+) {
+
+    const number =
+        Number(value);
+
+    if (
+        !Number.isFinite(number) ||
+        number <= 0
+    ) {
+
+        throw new AppError(
+
+            code,
+
+            `${fieldName} باید عددی بزرگ‌تر از صفر باشد.`,
+
+            400
+
+        );
+
+    }
+
+    return number;
+
+}
+
+
+function nonNegativeNumber(
+    value,
+    fieldName,
+    code
+) {
+
+    const number =
+        Number(value);
+
+    if (
+        !Number.isFinite(number) ||
+        number < 0
+    ) {
+
+        throw new AppError(
+
+            code,
+
+            `${fieldName} باید عدد صفر یا بزرگ‌تر باشد.`,
+
+            400
+
+        );
+
+    }
+
+    return number;
+
+}
+
+
+function positiveId(
+    value,
+    fieldName,
+    code
+) {
+
+    const id =
+        Number(value);
+
+    if (
+        !Number.isInteger(id) ||
+        id <= 0
+    ) {
+
+        throw new AppError(
+
+            code,
+
+            `${fieldName} معتبر نیست.`,
+
+            400
+
+        );
+
+    }
+
+    return id;
+
+}
+
+
+// ============================================================
+// DATE VALIDATION
+// ============================================================
+//
+// Frontend will send Persian date:
+//
+// 1405/05/31
+//
+// Worker keeps it as text because D1 does not natively
+// understand Persian calendar.
+//
+// ============================================================
+
+function validatePersianDate(
+    value,
+    fieldName = "تاریخ",
+    code = "DATE-001"
+) {
+
+    const date =
+        String(value ?? "")
+            .trim();
+
+    const pattern =
+        /^\d{4}\/\d{2}\/\d{2}$/;
+
+    if (!pattern.test(date)) {
+
+        throw new AppError(
+
+            code,
+
+            `${fieldName} باید به شکل 1405/05/31 وارد شود.`,
+
+            400
+
+        );
+
+    }
+
+    const parts =
+        date.split("/");
+
+    const year =
+        Number(parts[0]);
+
+    const month =
+        Number(parts[1]);
+
+    const day =
+        Number(parts[2]);
+
+    if (
+        year < 1300 ||
+        year > 1600 ||
+        month < 1 ||
+        month > 12 ||
+        day < 1 ||
+        day > 31
+    ) {
+
+        throw new AppError(
+
+            code,
+
+            `${fieldName} معتبر نیست.`,
+
+            400
+
+        );
+
+    }
+
+    return date;
+
+}
+
+
+// ============================================================
+// AUTHORIZATION HEADER
+// ============================================================
+
+function getBearerToken(request) {
+
+    const header =
+        request.headers.get(
+            "Authorization"
+        ) || "";
+
+    if (
+        !header.startsWith(
+            "Bearer "
+        )
+    ) {
+
+        return null;
+
+    }
+
+    return header
+        .substring(7)
+        .trim();
+
+}
+
+
+// ============================================================
+// AUTHENTICATION
+// ============================================================
+
+async function authenticate(
+    request,
+    env
+) {
+
+    const token =
+        getBearerToken(
+            request
+        );
+
+    if (!token) {
+
+        throw new AppError(
+
+            "AUTH-001",
+
+            "برای انجام این عملیات باید وارد سیستم شوید.",
+
+            401
+
+        );
+
+    }
+
+    const tokenHash =
+        await sha256(token);
+
+    const user =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    u.id,
+
+                    u.username,
+
+                    u.full_name,
+
+                    u.email,
+
+                    u.role,
+
+                    u.status
+
+                FROM user_sessions s
+
+                INNER JOIN users u
+
+                    ON u.id = s.user_id
+
+                WHERE
+
+                    s.token_hash = ?
+
+                    AND
+
+                    s.expires_at >
+                    datetime('now')
+
+                    AND
+
+                    u.status = 'active'
+
+                LIMIT 1
+
+            `)
+
+            .bind(
+                tokenHash
+            )
+
+            .first();
+
+    if (!user) {
+
+        throw new AppError(
+
+            "AUTH-002",
+
+            "نشست شما معتبر نیست یا منقضی شده است. لطفاً دوباره وارد شوید.",
+
+            401
+
+        );
+
+    }
+
+    return user;
+
+}
+
+
+// ============================================================
+// ROLE CHECK
+// ============================================================
+
+function requireRole(
+    user,
+    roles
+) {
+
+    if (!Array.isArray(roles)) {
+
+        roles = [roles];
+
+    }
+
+    if (
+        !roles.includes(
+            user.role
+        )
+    ) {
+
+        throw new AppError(
+
+            "AUTH-003",
+
+            "شما مجوز انجام این عملیات را ندارید.",
+
+            403
+
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// AUDIT LOG
+// ============================================================
+
+async function writeAudit(
+    env,
+    userId,
+    action,
+    entity,
+    entityId = null,
+    details = null
+) {
+
+    try {
+
+        await env.DB
+            .prepare(`
+
+                INSERT INTO audit_logs
+                (
+
+                    user_id,
+
+                    action,
+
+                    entity,
+
+                    entity_id,
+
+                    details
+
+                )
+
+                VALUES
+
+                (?, ?, ?, ?, ?)
+
+            `)
+
+            .bind(
+
+                userId || null,
+
+                action,
+
+                entity || null,
+
+                entityId || null,
+
+                details
+                    ? JSON.stringify(
+                        details
+                    )
+                    : null
+
+            )
+
+            .run();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "AUDIT_ERROR",
+            error
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// GENERIC DATABASE ERROR
+// ============================================================
+
+function databaseError(
+    error,
+    defaultCode,
+    defaultMessage
+) {
+
+    console.error(
+        "DATABASE_ERROR",
+        error
+    );
+
+    const message =
+        String(
+            error?.message || ""
+        );
+
+    if (
+        message.includes(
+            "UNIQUE"
+        )
+    ) {
+
+        return new AppError(
+
+            `${defaultCode}-UNIQUE`,
+
+            "اطلاعات واردشده تکراری است.",
+
+            409
+
+        );
+
+    }
+
+    if (
+        message.includes(
+            "FOREIGN KEY"
+        )
+    ) {
+
+        return new AppError(
+
+            `${defaultCode}-FK`,
+
+            "یکی از اطلاعات مرتبط پیدا نشد یا قابل استفاده نیست.",
+
+            409
+
+        );
+
+    }
+
+    return new AppError(
+
+        defaultCode,
+
+        defaultMessage,
+
+        500
+
+    );
+
+  }
+// ============================================================
+// LOOKUP / DROPDOWN APIs
+// ============================================================
+
+
+// ============================================================
+// UNITS
+// ============================================================
+
+async function getUnits(
+    env
+) {
+
+    const result =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id,
+
+                    code,
+
+                    name,
+
+                    status
+
+                FROM units
+
+                WHERE status = 'active'
+
+                ORDER BY name
+
+            `)
+            .all();
+
+    return result.results;
+
+}
+
+
+// ============================================================
+// PRODUCTS
+// ============================================================
+
+async function getProducts(
+    env
+) {
+
+    const result =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    p.id,
+
+                    p.code,
+
+                    p.name,
+
+                    p.unit_id,
+
+                    u.name AS unit_name,
+
+                    p.status
+
+                FROM products p
+
+                INNER JOIN units u
+
+                    ON u.id = p.unit_id
+
+                WHERE
+                    p.status = 'active'
+
+                ORDER BY
+                    p.name
+
+            `)
+            .all();
+
+    return result.results;
+
+}
+
+
+// ============================================================
+// PARTS
+// ============================================================
+
+async function getParts(
+    env
+) {
+
+    const result =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    p.id,
+
+                    p.code,
+
+                    p.name,
+
+                    p.unit_id,
+
+                    u.name AS unit_name,
+
+                    p.barcode,
+
+                    p.min_stock,
+
+                    p.reorder_point,
+
+                    p.status
+
+                FROM parts p
+
+                INNER JOIN units u
+
+                    ON u.id = p.unit_id
+
+                WHERE
+                    p.status = 'active'
+
+                ORDER BY
+                    p.name
+
+            `)
+            .all();
+
+    return result.results;
+
+}
+
+
+// ============================================================
+// WAREHOUSES
+// ============================================================
+
+async function getWarehouses(
+    env
+) {
+
+    const result =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id,
+
+                    code,
+
+                    name,
+
+                    warehouse_type,
+
+                    status
+
+                FROM warehouses
+
+                WHERE
+                    status = 'active'
+
+                ORDER BY
+                    name
+
+            `)
+            .all();
+
+    return result.results;
+
+}
+
+
+// ============================================================
+// BOM LIST
+// ============================================================
+
+async function getBoms(
+    env
+) {
+
+    const result =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    b.id,
+
+                    b.code,
+
+                    b.product_id,
+
+                    p.code AS product_code,
+
+                    p.name AS product_name,
+
+                    b.version,
+
+                    b.effective_from,
+
+                    b.effective_to,
+
+                    b.status
+
+                FROM bom_headers b
+
+                INNER JOIN products p
+
+                    ON p.id =
+                       b.product_id
+
+                ORDER BY
+
+                    p.name,
+
+                    b.version DESC
+
+            `)
+            .all();
+
+    return result.results;
+
+}
+
+
+// ============================================================
+// BOM DETAILS
+// ============================================================
+
+async function getBomDetails(
+    env,
+    bomId
+) {
+
+    const id =
+        positiveId(
+            bomId,
+            "شناسه BOM",
+            "BOM-001"
+        );
+
+    const result =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    d.id,
+
+                    d.bom_id,
+
+                    d.part_id,
+
+                    p.code AS part_code,
+
+                    p.name AS part_name,
+
+                    p.barcode,
+
+                    u.name AS unit_name,
+
+                    d.consumption_factor,
+
+                    d.scrap_percent,
+
+                    d.status
+
+                FROM bom_details d
+
+                INNER JOIN parts p
+
+                    ON p.id =
+                       d.part_id
+
+                INNER JOIN units u
+
+                    ON u.id =
+                       p.unit_id
+
+                WHERE
+
+                    d.bom_id = ?
+
+                ORDER BY
+
+                    d.id
+
+            `)
+
+            .bind(id)
+
+            .all();
+
+    return result.results;
+
+}
+
+
+// ============================================================
+// BARCODE SEARCH
+// ============================================================
+
+async function findPartByBarcode(
+    env,
+    barcode
+) {
+
+    const value =
+        requiredText(
+            barcode,
+            "بارکد",
+            "BARCODE-001"
+        );
+
+    const part =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    p.id,
+
+                    p.code,
+
+                    p.name,
+
+                    p.barcode,
+
+                    p.unit_id,
+
+                    u.name AS unit_name,
+
+                    p.min_stock,
+
+                    p.reorder_point
+
+                FROM parts p
+
+                INNER JOIN units u
+
+                    ON u.id =
+                       p.unit_id
+
+                WHERE
+
+                    p.barcode = ?
+
+                    AND
+
+                    p.status = 'active'
+
+                LIMIT 1
+
+            `)
+
+            .bind(value)
+
+            .first();
+
+    if (!part) {
+
+        throw new AppError(
+
+            "BARCODE-002",
+
+            "قطعه‌ای با این بارکد پیدا نشد.",
+
+            404
+
+        );
+
+    }
+
+    return part;
+
+}
+
+
+// ============================================================
+// INVENTORY
+// ============================================================
+
+async function getInventory(
+    env,
+    filters = {}
+) {
+
+    let sql = `
+
+        SELECT
+
+            i.id,
+
+            i.warehouse_id,
+
+            w.code AS warehouse_code,
+
+            w.name AS warehouse_name,
+
+            i.item_type,
+
+            i.item_id,
+
+            CASE
+
+                WHEN
+                    i.item_type = 'part'
+
+                THEN
+                    (
+
+                        SELECT
+                            name
+
+                        FROM parts
+
+                        WHERE
+                            id =
+                            i.item_id
+
+                    )
+
+                WHEN
+                    i.item_type = 'product'
+
+                THEN
+                    (
+
+                        SELECT
+                            name
+
+                        FROM products
+
+                        WHERE
+                            id =
+                            i.item_id
+
+                    )
+
+                ELSE
+                    NULL
+
+            END AS item_name,
+
+            i.quantity,
+
+            i.updated_at
+
+        FROM inventory_balances i
+
+        INNER JOIN warehouses w
+
+            ON w.id =
+               i.warehouse_id
+
+        WHERE 1 = 1
+
+    `;
+
+    const params = [];
+
+    if (
+        filters.warehouse_id
+    ) {
+
+        sql += `
+            AND i.warehouse_id = ?
+        `;
+
+        params.push(
+            Number(
+                filters.warehouse_id
+            )
+        );
+
+    }
+
+    if (
+        filters.item_type
+    ) {
+
+        sql += `
+            AND i.item_type = ?
+        `;
+
+        params.push(
+            String(
+                filters.item_type
+            )
+        );
+
+    }
+
+    sql += `
+
+        ORDER BY
+
+            w.name,
+
+            item_name
+
+    `;
+
+    const result =
+        await env.DB
+            .prepare(sql)
+            .bind(...params)
+            .all();
+
+    return result.results;
+
+}
+
+
+// ============================================================
+// INVENTORY BALANCE
+// ============================================================
+
+async function getInventoryBalance(
+    env,
+    warehouseId,
+    itemType,
+    itemId
+) {
+
+    const result =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id,
+
+                    quantity
+
+                FROM inventory_balances
+
+                WHERE
+
+                    warehouse_id = ?
+
+                    AND
+
+                    item_type = ?
+
+                    AND
+
+                    item_id = ?
+
+                LIMIT 1
+
+            `)
+
+            .bind(
+
+                warehouseId,
+
+                itemType,
+
+                itemId
+
+            )
+
+            .first();
+
+    return result
+        ? Number(
+            result.quantity
+        )
+        : 0;
+
+}
+
+
+// ============================================================
+// INVENTORY UPDATE
+// ============================================================
+
+async function changeInventory(
+    env,
+    {
+        warehouseId,
+        itemType,
+        itemId,
+        delta,
+        transactionType,
+        userId,
+        referenceType = null,
+        referenceId = null,
+        description = null
+    }
+) {
+
+    warehouseId =
+        positiveId(
+            warehouseId,
+            "انبار",
+            "INV-001"
+        );
+
+    itemId =
+        positiveId(
+            itemId,
+            "قلم انبار",
+            "INV-002"
+        );
+
+    if (
+        ![
+            "part",
+            "product"
+        ].includes(
+            itemType
+        )
+    ) {
+
+        throw new AppError(
+
+            "INV-003",
+
+            "نوع قلم انبار معتبر نیست.",
+
+            400
+
+        );
+
+    }
+
+    delta =
+        Number(delta);
+
+    if (
+        !Number.isFinite(delta) ||
+        delta === 0
+    ) {
+
+        throw new AppError(
+
+            "INV-004",
+
+            "مقدار گردش موجودی معتبر نیست.",
+
+            400
+
+        );
+
+    }
+
+    const current =
+        await getInventoryBalance(
+
+            env,
+
+            warehouseId,
+
+            itemType,
+
+            itemId
+
+        );
+
+    const next =
+        current + delta;
+
+    if (next < 0) {
+
+        throw new AppError(
+
+            "INV-005",
+
+            "موجودی کافی نیست.",
+
+            409,
+
+            {
+
+                current,
+
+                requested:
+                    Math.abs(delta),
+
+                remaining:
+                    current
+
+            }
+
+        );
+
+    }
+
+    const existing =
+        await env.DB
+            .prepare(`
+
+                SELECT
+                    id
+
+                FROM inventory_balances
+
+                WHERE
+
+                    warehouse_id = ?
+
+                    AND
+
+                    item_type = ?
+
+                    AND
+
+                    item_id = ?
+
+                LIMIT 1
+
+            `)
+
+            .bind(
+
+                warehouseId,
+
+                itemType,
+
+                itemId
+
+            )
+
+            .first();
+
+    if (existing) {
+
+        await env.DB
+            .prepare(`
+
+                UPDATE inventory_balances
+
+                SET
+
+                    quantity = ?,
+
+                    updated_at =
+                        CURRENT_TIMESTAMP
+
+                WHERE id = ?
+
+            `)
+
+            .bind(
+
+                next,
+
+                existing.id
+
+            )
+
+            .run();
+
+    }
+
+    else {
+
+        await env.DB
+            .prepare(`
+
+                INSERT INTO inventory_balances
+                (
+
+                    warehouse_id,
+
+                    item_type,
+
+                    item_id,
+
+                    quantity
+
+                )
+
+                VALUES (?, ?, ?, ?)
+
+            `)
+
+            .bind(
+
+                warehouseId,
+
+                itemType,
+
+                itemId,
+
+                next
+
+            )
+
+            .run();
+
+    }
+
+    await env.DB
+        .prepare(`
+
+            INSERT INTO inventory_transactions
+            (
+
+                transaction_type,
+
+                warehouse_id,
+
+                item_type,
+
+                item_id,
+
+                quantity,
+
+                reference_type,
+
+                reference_id,
+
+                description,
+
+                user_id
+
+            )
+
+            VALUES
+
+            (?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+        `)
+
+        .bind(
+
+            transactionType,
+
+            warehouseId,
+
+            itemType,
+
+            itemId,
+
+            Math.abs(delta),
+
+            referenceType,
+
+            referenceId,
+
+            description,
+
+            userId
+
+        )
+
+        .run();
+
+    return next;
+
+}
+
+
+// ============================================================
+// PRODUCTION BOM CALCULATION
+// ============================================================
+
+async function calculateMaterialRequirement(
+    env,
+    bomId,
+    productionQuantity
+) {
+
+    bomId =
+        positiveId(
+            bomId,
+            "BOM",
+            "BOM-010"
+        );
+
+    productionQuantity =
+        positiveNumber(
+            productionQuantity,
+            "مقدار تولید",
+            "PROD-010"
+        );
+
+    const details =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    d.id,
+
+                    d.part_id,
+
+                    p.code AS part_code,
+
+                    p.name AS part_name,
+
+                    d.consumption_factor,
+
+                    d.scrap_percent,
+
+                    u.name AS unit_name
+
+                FROM bom_details d
+
+                INNER JOIN parts p
+
+                    ON p.id =
+                       d.part_id
+
+                INNER JOIN units u
+
+                    ON u.id =
+                       p.unit_id
+
+                WHERE
+
+                    d.bom_id = ?
+
+                    AND
+
+                    d.status = 'active'
+
+                ORDER BY
+
+                    d.id
+
+            `)
+
+            .bind(bomId)
+
+            .all();
+
+    if (
+        !details.results.length
+    ) {
+
+        throw new AppError(
+
+            "BOM-011",
+
+            "برای این BOM هیچ ماده یا قطعه فعالی تعریف نشده است.",
+
+            409
+
+        );
+
+    }
+
+    return details.results.map(
+        item => {
+
+            const base =
+                Number(
+                    item.consumption_factor
+                ) *
+                productionQuantity;
+
+            const scrap =
+                Number(
+                    item.scrap_percent || 0
+                );
+
+            const required =
+                base *
+                (
+                    1 +
+                    scrap / 100
+                );
+
+            return {
+
+                part_id:
+                    item.part_id,
+
+                part_code:
+                    item.part_code,
+
+                part_name:
+                    item.part_name,
+
+                unit_name:
+                    item.unit_name,
+
+                consumption_factor:
+                    Number(
+                        item.consumption_factor
+                    ),
+
+                scrap_percent:
+                    scrap,
+
+                required_quantity:
+                    required
+
+            };
+
+        }
+    );
+
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+
+async function login(
+    request,
+    env
+) {
+
+    const body =
+        await readJson(
+            request
+        );
+
+    const username =
+        requiredText(
+            body.username,
+            "نام کاربری",
+            "AUTH-010"
+        );
+
+    const password =
+        String(
+            body.password ?? ""
+        );
+
+    if (!password) {
+
+        throw new AppError(
+
+            "AUTH-011",
+
+            "رمز عبور الزامی است.",
+
+            400
+
+        );
+
+    }
+
+    const passwordHash =
+        await sha256(
+            password
+        );
+
+    const user =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id,
+
+                    username,
+
+                    full_name,
+
+                    email,
+
+                    role,
+
+                    status
+
+                FROM users
+
+                WHERE
+
+                    username = ?
+
+                    AND
+
+                    password_hash = ?
+
+                    AND
+
+                    status = 'active'
+
+                LIMIT 1
+
+            `)
+
+            .bind(
+
+                username,
+
+                passwordHash
+
+            )
+
+            .first();
+
+    if (!user) {
+
+        throw new AppError(
+
+            "AUTH-012",
+
+            "نام کاربری یا رمز عبور صحیح نیست.",
+
+            401
+
+        );
+
+    }
+
+    const token =
+        generateToken();
+
+    const tokenHash =
+        await sha256(
+            token
+        );
+
+    await env.DB
+        .prepare(`
+
+            INSERT INTO user_sessions
+            (
+
+                user_id,
+
+                token_hash,
+
+                expires_at
+
+            )
+
+            VALUES
+
+            (
+
+                ?,
+
+                ?,
+
+                datetime(
+                    'now',
+                    '+${SESSION_HOURS} hours'
+                )
+
+            )
+
+        `)
+
+        .bind(
+
+            user.id,
+
+            tokenHash
+
+        )
+
+        .run();
+
+    await writeAudit(
+
+        env,
+
+        user.id,
+
+        "LOGIN",
+
+        "users",
+
+        user.id
+
+    );
+
+    return {
+
+        token,
+
+        user
+
+    };
+
+}
+
+
+// ============================================================
+// LOGOUT
+// ============================================================
+
+async function logout(
+    request,
+    env
+) {
+
+    const token =
+        getBearerToken(
+            request
+        );
+
+    if (token) {
+
+        await env.DB
+            .prepare(`
+
+                DELETE FROM user_sessions
+
+                WHERE
+
+                    token_hash = ?
+
+            `)
+
+            .bind(
+                await sha256(token)
+            )
+
+            .run();
+
+    }
+
+    return {
+
+        message:
+            "با موفقیت از سیستم خارج شدید."
+
+    };
+
+}
+
+
+// ============================================================
+// CREATE UNIT
+// ============================================================
+
+async function createUnit(
+    request,
+    env,
+    user
+) {
+
+    const body =
+        await readJson(
+            request
+        );
+
+    const code =
+        requiredText(
+            body.code,
+            "کد واحد",
+            "UNIT-001"
+        );
+
+    const name =
+        requiredText(
+            body.name,
+            "نام واحد",
+            "UNIT-002"
+        );
+
+    try {
+
+        const result =
+            await env.DB
+                .prepare(`
+
+                    INSERT INTO units
+                    (
+                        code,
+                        name,
+                        status
+                    )
+
+                    VALUES
+                    (
+                        ?,
+                        ?,
+                        'active'
+                    )
+
+                `)
+
+                .bind(
+                    code,
+                    name
+                )
+
+                .run();
+
+        await writeAudit(
+
+            env,
+
+            user.id,
+
+            "CREATE",
+
+            "units",
+
+            result.meta.last_row_id,
+
+            body
+
+        );
+
+        return {
+
+            id:
+                result.meta.last_row_id,
+
+            message:
+                "واحد با موفقیت ثبت شد."
+
+        };
+
+    }
+
+    catch (error) {
+
+        throw databaseError(
+
+            error,
+
+            "UNIT-003",
+
+            "ثبت واحد انجام نشد."
+
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// CREATE PRODUCT
+// ============================================================
+
+async function createProduct(
+    request,
+    env,
+    user
+) {
+
+    const body =
+        await readJson(
+            request
+        );
+
+    const code =
+        requiredText(
+            body.code,
+            "کد محصول",
+            "PRODUCT-001"
+        );
+
+    const name =
+        requiredText(
+            body.name,
+            "نام محصول",
+            "PRODUCT-002"
+        );
+
+    const unitId =
+        positiveId(
+            body.unit_id,
+            "واحد محصول",
+            "PRODUCT-003"
+        );
+
+    const unit =
+        await env.DB
+            .prepare(`
+
+                SELECT id
+
+                FROM units
+
+                WHERE
+
+                    id = ?
+
+                    AND
+
+                    status = 'active'
+
+                LIMIT 1
+
+            `)
+
+            .bind(unitId)
+
+            .first();
+
+    if (!unit) {
+
+        throw new AppError(
+
+            "PRODUCT-004",
+
+            "واحد انتخاب‌شده وجود ندارد.",
+
+            404
+
+        );
+
+    }
+
+    try {
+
+        const result =
+            await env.DB
+                .prepare(`
+
+                    INSERT INTO products
+                    (
+
+                        code,
+
+                        name,
+
+                        unit_id,
+
+                        status,
+
+                        created_by
+
+                    )
+
+                    VALUES
+
+                    (
+
+                        ?,
+
+                        ?,
+
+                        ?,
+
+                        'active',
+
+                        ?
+
+                    )
+
+                `)
+
+                .bind(
+
+                    code,
+
+                    name,
+
+                    unitId,
+
+                    user.id
+
+                )
+
+                .run();
+
+        await writeAudit(
+
+            env,
+
+            user.id,
+
+            "CREATE",
+
+            "products",
+
+            result.meta.last_row_id,
+
+            body
+
+        );
+
+        return {
+
+            id:
+                result.meta.last_row_id,
+
+            message:
+                "محصول با موفقیت ثبت شد."
+
+        };
+
+    }
+
+    catch (error) {
+
+        throw databaseError(
+
+            error,
+
+            "PRODUCT-005",
+
+            "ثبت محصول انجام نشد."
+
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// CREATE PART
+// ============================================================
+
+async function createPart(
+    request,
+    env,
+    user
+) {
+
+    const body =
+        await readJson(
+            request
+        );
+
+    const code =
+        requiredText(
+            body.code,
+            "کد قطعه",
+            "PART-001"
+        );
+
+    const name =
+        requiredText(
+            body.name,
+            "شرح قطعه",
+            "PART-002"
+        );
+
+    const unitId =
+        positiveId(
+            body.unit_id,
+            "واحد قطعه",
+            "PART-003"
+        );
+
+    const barcode =
+        body.barcode
+            ? String(
+                body.barcode
+            ).trim()
+            : null;
+
+    const minStock =
+        nonNegativeNumber(
+            body.min_stock ?? 0,
+            "حداقل موجودی",
+            "PART-004"
+        );
+
+    const reorderPoint =
+        nonNegativeNumber(
+            body.reorder_point ?? 0,
+            "نقطه سفارش",
+            "PART-005"
+        );
+
+    const unit =
+        await env.DB
+            .prepare(`
+
+                SELECT id
+
+                FROM units
+
+                WHERE
+
+                    id = ?
+
+                    AND
+
+                    status = 'active'
+
+                LIMIT 1
+
+            `)
+
+            .bind(unitId)
+
+            .first();
+
+    if (!unit) {
+
+        throw new AppError(
+
+            "PART-006",
+
+            "واحد انتخاب‌شده وجود ندارد.",
+
+            404
+
+        );
+
+    }
+
+    try {
+
+        const result =
+            await env.DB
+                .prepare(`
+
+                    INSERT INTO parts
+                    (
+
+                        code,
+
+                        name,
+
+                        unit_id,
+
+                        barcode,
+
+                        min_stock,
+
+                        reorder_point,
+
+                        status,
+
+                        created_by
+
+                    )
+
+                    VALUES
+
+                    (
+
+                        ?,
+
+                        ?,
+
+                        ?,
+
+                        ?,
+
+                        ?,
+
+                        ?,
+
+                        'active',
+
+                        ?
+
+                    )
+
+                `)
+
+                .bind(
+
+                    code,
+
+                    name,
+
+                    unitId,
+
+                    barcode || null,
+
+                    minStock,
+
+                    reorderPoint,
+
+                    user.id
+
+                )
+
+                .run();
+
+        await writeAudit(
+
+            env,
+
+            user.id,
+
+            "CREATE",
+
+            "parts",
+
+            result.meta.last_row_id,
+
+            body
+
+        );
+
+        return {
+
+            id:
+                result.meta.last_row_id,
+
+            message:
+                "قطعه با موفقیت ثبت شد."
+
+        };
+
+    }
+
+    catch (error) {
+
+        throw databaseError(
+
+            error,
+
+            "PART-007",
+
+            "ثبت قطعه انجام نشد."
+
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// CREATE BOM
+// ============================================================
+
+async function createBom(
+    request,
+    env,
+    user
+) {
+
+    const body =
+        await readJson(
+            request
+        );
+
+    const code =
+        requiredText(
+            body.code,
+            "کد BOM",
+            "BOM-020"
+        );
+
+    const productId =
+        positiveId(
+            body.product_id,
+            "محصول",
+            "BOM-021"
+        );
+
+    const version =
+        Number(
+            body.version ?? 1
+        );
+
+    if (
+        !Number.isInteger(
+            version
+        ) ||
+        version <= 0
+    ) {
+
+        throw new AppError(
+
+            "BOM-022",
+
+            "نسخه BOM معتبر نیست.",
+
+            400
+
+        );
+
+    }
+
+    const effectiveFrom =
+        body.effective_from
+            ? validatePersianDate(
+                body.effective_from,
+                "تاریخ شروع BOM",
+                "BOM-023"
+            )
+            : null;
+
+    const effectiveTo =
+        body.effective_to
+            ? validatePersianDate(
+                body.effective_to,
+                "تاریخ پایان BOM",
+                "BOM-024"
+            )
+            : null;
+
+    const product =
+        await env.DB
+            .prepare(`
+
+                SELECT id
+
+                FROM products
+
+                WHERE
+
+                    id = ?
+
+                    AND
+
+                    status = 'active'
+
+                LIMIT 1
+
+            `)
+
+            .bind(productId)
+
+            .first();
+
+    if (!product) {
+
+        throw new AppError(
+
+            "BOM-025",
+
+            "محصول انتخاب‌شده وجود ندارد.",
+
+            404
+
+        );
+
+    }
+
+    try {
+
+        const result =
+            await env.DB
+                .prepare(`
+
+                    INSERT INTO bom_headers
+                    (
+
+                        code,
+
+                        product_id,
+
+                        version,
+
+                        effective_from,
+
+                        effective_to,
+
+                        status,
+
+                        created_by
+
+                    )
+
+                    VALUES
+
+                    (
+
+                        ?,
+
+                        ?,
+
+                        ?,
+
+                        ?,
+
+                        ?,
+
+                        'active',
+
+                        ?
+
+                    )
+
+                `)
+
+                .bind(
+
+                    code,
+
+                    productId,
+
+                    version,
+
+                    effectiveFrom,
+
+                    effectiveTo,
+
+                    user.id
+
+                )
+
+                .run();
+
+        await writeAudit(
+
+            env,
+
+            user.id,
+
+            "CREATE",
+
+            "bom_headers",
+
+            result.meta.last_row_id,
+
+            body
+
+        );
+
+        return {
+
+            id:
+                result.meta.last_row_id,
+
+            message:
+                "BOM با موفقیت ایجاد شد."
+
+        };
+
+    }
+
+    catch (error) {
+
+        throw databaseError(
+
+            error,
+
+            "BOM-026",
+
+            "ایجاد BOM انجام نشد."
+
+        );
+
+    }
+
+          }
+
+
+// ============================================================
+// ADD BOM DETAIL
+// ============================================================
+
+async function addBomDetail(
+    request,
+    env,
+    user
+) {
+
+    const body =
+        await readJson(
+            request
+        );
+
+    const bomId =
+        positiveId(
+            body.bom_id,
+            "BOM",
+            "BOMDETAIL-001"
+        );
+
+    const partId =
+        positiveId(
+            body.part_id,
+            "قطعه",
+            "BOMDETAIL-002"
+        );
+
+    const consumptionFactor =
+        positiveNumber(
+            body.consumption_factor,
+            "ضریب مصرف",
+            "BOMDETAIL-003"
+        );
+
+    const scrapPercent =
+        nonNegativeNumber(
+            body.scrap_percent ?? 0,
+            "درصد ضایعات",
+            "BOMDETAIL-004"
+        );
+
+    if (
+        scrapPercent > 100
+    ) {
+
+        throw new AppError(
+
+            "BOMDETAIL-005",
+
+            "درصد ضایعات نمی‌تواند بیشتر از 100 باشد.",
+
+            400
+
+        );
+
+    }
+
+    const bom =
+        await env.DB
+            .prepare(`
+
+                SELECT id
+
+                FROM bom_headers
+
+                WHERE
+
+                    id = ?
+
+                    AND
+
+                    status = 'active'
+
+                LIMIT 1
+
+            `)
+
+            .bind(bomId)
+
+            .first();
+
+    if (!bom) {
+
+        throw new AppError(
+
+            "BOMDETAIL-006",
+
+            "BOM انتخاب‌شده وجود ندارد یا فعال نیست.",
+
+            404
+
+        );
+
+    }
+
+    const part =
+        await env.DB
+            .prepare(`
+
+                SELECT id
+
+                FROM parts
+
+                WHERE
+
+                    id = ?
+
+                    AND
+
+                    status = 'active'
+
+                LIMIT 1
+
+            `)
+
+            .bind(partId)
+
+            .first();
+
+    if (!part) {
+
+        throw new AppError(
+
+            "BOMDETAIL-007",
+
+            "قطعه انتخاب‌شده وجود ندارد یا فعال نیست.",
+
+            404
+
+        );
+
+    }
+
+    try {
+
+        const result =
+            await env.DB
+                .prepare(`
+
+                    INSERT INTO bom_details
+                    (
+
+                        bom_id,
+
+                        part_id,
+
+                        consumption_factor,
+
+                        scrap_percent,
+
+                        status,
+
+                        created_by
+
+                    )
+
+                    VALUES
+
+                    (
+
+                        ?,
+
+                        ?,
+
+                        ?,
+
+                        ?,
+
+                        'active',
+
+                        ?
+
+                    )
+
+                `)
+
+                .bind(
+
+                    bomId,
+
+                    partId,
+
+                    consumptionFactor,
+
+                    scrapPercent,
+
+                    user.id
+
+                )
+
+                .run();
+
+        await writeAudit(
+
+            env,
+
+            user.id,
+
+            "CREATE",
+
+            "bom_details",
+
+            result.meta.last_row_id,
+
+            body
+
+        );
+
+        return {
+
+            id:
+                result.meta.last_row_id,
+
+            message:
+                "جزء BOM با موفقیت اضافه شد."
+
+        };
+
+    }
+
+    catch (error) {
+
+        throw databaseError(
+
+            error,
+
+            "BOMDETAIL-008",
+
+            "این قطعه احتمالاً قبلاً در BOM ثبت شده است."
+
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// CREATE PRODUCTION PLAN
+// ============================================================
+
+async function createProductionPlan(
+    request,
+    env,
+    user
+) {
+
+    const body =
+        await readJson(
+            request
+        );
+
+    const planDate =
+        validatePersianDate(
+            body.plan_date,
+            "تاریخ برنامه تولید",
+            "PLAN-001"
+        );
+
+    const bomId =
+        positiveId(
+            body.bom_id,
+            "BOM",
+            "PLAN-002"
+        );
+
+    const plannedQuantity =
+        positiveNumber(
+            body.planned_quantity,
+            "مقدار برنامه تولید",
+            "PLAN-003"
+        );
+
+    const bom =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id,
+
+                    product_id
+
+                FROM bom_headers
+
+                WHERE
+
+                    id = ?
+
+                    AND
+
+                    status = 'active'
+
+                LIMIT 1
+
+            `)
+
+            .bind(bomId)
+
+            .first();
+
+    if (!bom) {
+
+        throw new AppError(
+
+            "PLAN-004",
+
+            "BOM انتخاب‌شده معتبر نیست.",
+
+            404
+
+        );
+
+    }
+
+    const result =
+        await env.DB
+            .prepare(`
+
+                INSERT INTO planning_daily
+                (
+
+                    plan_date,
+
+                    bom_id,
+
+                    planned_quantity,
+
+                    status,
+
+                    created_by
+
+                )
+
+                VALUES
+
+                (
+
+                    ?,
+
+                    ?,
+
+                    ?,
+
+                    'planned',
+
+                    ?
+
+                )
+
+            `)
+
+            .bind(
+
+                planDate,
+
+                bomId,
+
+                plannedQuantity,
+
+                user.id
+
+            )
+
+            .run();
+
+    await writeAudit(
+
+        env,
+
+        user.id,
+
+        "CREATE",
+
+        "planning_daily",
+
+        result.meta.last_row_id,
+
+        body
+
+    );
+
+    return {
+
+        id:
+            result.meta.last_row_id,
+
+        message:
+            "برنامه تولید با موفقیت ثبت شد."
+
+    };
+
+}
+
+
+// ============================================================
+// GET PRODUCTION PLANS
+// ============================================================
+
+async function getProductionPlans(
+    env
+) {
+
+    const result =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    x.id,
+
+                    x.plan_date,
+
+                    x.bom_id,
+
+                    b.code AS bom_code,
+
+                    b.product_id,
+
+                    p.code AS product_code,
+
+                    p.name AS product_name,
+
+                    x.planned_quantity,
+
+                    COALESCE(
+
+                        (
+
+                            SELECT
+                                SUM(
+                                    produced_quantity
+                                )
+
+                            FROM production pr
+
+                            WHERE
+
+                                pr.planning_daily_id =
+                                x.id
+
+                                AND
+
+                                pr.status =
+                                'completed'
+
+                        ),
+
+                        0
+
+                    ) AS produced_quantity,
+
+                    x.status
+
+                FROM planning_daily x
+
+                INNER JOIN bom_headers b
+
+                    ON b.id =
+                       x.bom_id
+
+                INNER JOIN products p
+
+                    ON p.id =
+                       b.product_id
+
+                ORDER BY
+
+                    x.plan_date DESC,
+
+                    x.id DESC
+
+            `)
+            .all();
+
+    return result.results;
+
+}
+
+
+// ============================================================
+// REGISTER PRODUCTION
+// ============================================================
+
+async function registerProduction(
+    request,
+    env,
+    user
+) {
+
+    const body =
+        await readJson(
+            request
+        );
+
+    const planningId =
+        positiveId(
+            body.planning_daily_id,
+            "برنامه تولید",
+            "PROD-001"
+        );
+
+    const producedQuantity =
+        positiveNumber(
+            body.produced_quantity,
+            "مقدار تولید",
+            "PROD-002"
+        );
+
+    const productionDate =
+        validatePersianDate(
+            body.production_date,
+            "تاریخ تولید",
+            "PROD-003"
+        );
+
+    const warehouseId =
+        body.warehouse_id
+            ? positiveId(
+                body.warehouse_id,
+                "انبار مواد اولیه",
+                "PROD-004"
+            )
+            : null;
+
+
+    // --------------------------------------------------------
+    // LOAD PLAN
+    // --------------------------------------------------------
+
+    const plan =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    pl.id,
+
+                    pl.plan_date,
+
+                    pl.planned_quantity,
+
+                    pl.status,
+
+                    b.id AS bom_id,
+
+                    b.product_id
+
+                FROM planning_daily pl
+
+                INNER JOIN bom_headers b
+
+                    ON b.id =
+                       pl.bom_id
+
+                WHERE
+
+                    pl.id = ?
+
+                LIMIT 1
+
+            `)
+
+            .bind(
+                planningId
+            )
+
+            .first();
+
+    if (!plan) {
+
+        throw new AppError(
+
+            "PROD-005",
+
+            "برنامه تولید پیدا نشد.",
+
+            404
+
+        );
+
+    }
+
+    if (
+        ![
+            "planned",
+            "in_progress"
+        ].includes(
+            plan.status
+        )
+    ) {
+
+        throw new AppError(
+
+            "PROD-006",
+
+            "این برنامه تولید در وضعیت قابل ثبت تولید نیست.",
+
+            409
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // CHECK PLAN REMAINING
+    // --------------------------------------------------------
+
+    const produced =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    COALESCE(
+                        SUM(
+                            produced_quantity
+                        ),
+                        0
+                    ) AS total
+
+                FROM production
+
+                WHERE
+
+                    planning_daily_id = ?
+
+                    AND
+
+                    status = 'completed'
+
+            `)
+
+            .bind(
+                planningId
+            )
+
+            .first();
+
+    const alreadyProduced =
+        Number(
+            produced?.total || 0
+        );
+
+    const remaining =
+        Number(
+            plan.planned_quantity
+        ) -
+        alreadyProduced;
+
+    if (
+        producedQuantity >
+        remaining
+    ) {
+
+        throw new AppError(
+
+            "PROD-007",
+
+            "مقدار تولید بیشتر از مقدار باقی‌مانده برنامه است.",
+
+            409,
+
+            {
+
+                planned:
+                    Number(
+                        plan.planned_quantity
+                    ),
+
+                alreadyProduced,
+
+                remaining,
+
+                requested:
+                    producedQuantity
+
+            }
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // CALCULATE MATERIALS
+    // --------------------------------------------------------
+
+    const materials =
+        await calculateMaterialRequirement(
+
+            env,
+
+            plan.bom_id,
+
+            producedQuantity
+
+        );
+
+
+    // --------------------------------------------------------
+    // FIND RAW MATERIAL WAREHOUSE
+    // --------------------------------------------------------
+
+    let rawWarehouseId =
+        warehouseId;
+
+    if (!rawWarehouseId) {
+
+        const warehouse =
+            await env.DB
+                .prepare(`
+
+                    SELECT
+
+                        id
+
+                    FROM warehouses
+
+                    WHERE
+
+                        warehouse_type =
+                        'material'
+
+                        AND
+
+                        status =
+                        'active'
+
+                    ORDER BY id
+
+                    LIMIT 1
+
+                `)
+                .first();
+
+        if (!warehouse) {
+
+            throw new AppError(
+
+                "PROD-008",
+
+                "انبار مواد اولیه فعال پیدا نشد.",
+
+                404
+
+            );
+
+        }
+
+        rawWarehouseId =
+            warehouse.id;
+
+    }
+
+
+    // --------------------------------------------------------
+    // CHECK MATERIAL STOCK FIRST
+    // --------------------------------------------------------
+
+    const stockCheck = [];
+
+    for (
+        const material
+        of materials
+    ) {
+
+        const stock =
+            await getInventoryBalance(
+
+                env,
+
+                rawWarehouseId,
+
+                "part",
+
+                material.part_id
+
+            );
+
+        if (
+            stock <
+            material.required_quantity
+        ) {
+
+            throw new AppError(
+
+                "PROD-009",
+
+                `موجودی قطعه «${material.part_name}» برای تولید کافی نیست.`,
+
+                409,
+
+                {
+
+                    part_id:
+                        material.part_id,
+
+                    part_name:
+                        material.part_name,
+
+                    available:
+                        stock,
+
+                    required:
+                        material.required_quantity,
+
+                    shortage:
+                        material.required_quantity -
+                        stock
+
+                }
+
+            );
+
+        }
+
+        stockCheck.push({
+
+            part_id:
+                material.part_id,
+
+            available:
+                stock,
+
+            required:
+                material.required_quantity
+
+        });
+
+    }
+
+
+    // --------------------------------------------------------
+    // INSERT PRODUCTION RECORD
+    // --------------------------------------------------------
+
+    const productionResult =
+        await env.DB
+            .prepare(`
+
+                INSERT INTO production
+                (
+
+                    product_id,
+
+                    planning_daily_id,
+
+                    produced_quantity,
+
+                    production_date,
+
+                    status,
+
+                    created_by
+
+                )
+
+                VALUES
+
+                (
+
+                    ?,
+
+                    ?,
+
+                    ?,
+
+                    ?,
+
+                    'completed',
+
+                    ?
+
+                )
+
+            `)
+
+            .bind(
+
+                plan.product_id,
+
+                planningId,
+
+                producedQuantity,
+
+                productionDate,
+
+                user.id
+
+            )
+
+            .run();
+
+    const productionId =
+        productionResult
+            .meta
+            .last_row_id;
+
+
+    // --------------------------------------------------------
+    // CONSUME MATERIALS
+    // --------------------------------------------------------
+
+    for (
+        const material
+        of materials
+    ) {
+
+        await changeInventory(
+
+            env,
+
+            {
+
+                warehouseId:
+                    rawWarehouseId,
+
+                itemType:
+                    "part",
+
+                itemId:
+                    material.part_id,
+
+                delta:
+                    -material.required_quantity,
+
+                transactionType:
+                    "PRODUCTION_CONSUMPTION",
+
+                userId:
+                    user.id,
+
+                referenceType:
+                    "production",
+
+                referenceId:
+                    productionId,
+
+                description:
+                    `مصرف برای تولید ${producedQuantity} واحد`
+
+            }
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // FIND FINISHED GOODS WAREHOUSE
+    // --------------------------------------------------------
+
+    const finishedWarehouse =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id
+
+                FROM warehouses
+
+                WHERE
+
+                    warehouse_type =
+                    'finished'
+
+                    AND
+
+                    status =
+                    'active'
+
+                ORDER BY id
+
+                LIMIT 1
+
+            `)
+            .first();
+
+    if (!finishedWarehouse) {
+
+        throw new AppError(
+
+            "PROD-010",
+
+            "انبار محصول تولیدشده فعال پیدا نشد.",
+
+            404
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // RECEIPT FINISHED PRODUCT
+    // --------------------------------------------------------
+
+    await changeInventory(
+
+        env,
+
+        {
+
+            warehouseId:
+                finishedWarehouse.id,
+
+            itemType:
+                "product",
+
+            itemId:
+                plan.product_id,
+
+            delta:
+                producedQuantity,
+
+            transactionType:
+                "PRODUCTION_RECEIPT",
+
+            userId:
+                user.id,
+
+            referenceType:
+                "production",
+
+            referenceId:
+                productionId,
+
+            description:
+                "ورود محصول تولیدشده به انبار محصول"
+
+        }
+
+    );
+
+
+    // --------------------------------------------------------
+    // UPDATE PLAN STATUS
+    // --------------------------------------------------------
+
+    const newProduced =
+        alreadyProduced +
+        producedQuantity;
+
+    const newStatus =
+        newProduced >=
+        Number(
+            plan.planned_quantity
+        )
+            ? "completed"
+            : "in_progress";
+
+    await env.DB
+        .prepare(`
+
+            UPDATE planning_daily
+
+            SET
+
+                status = ?
+
+            WHERE
+
+                id = ?
+
+        `)
+
+        .bind(
+
+            newStatus,
+
+            planningId
+
+        )
+
+        .run();
+
+
+    // --------------------------------------------------------
+    // AUDIT
+    // --------------------------------------------------------
+
+    await writeAudit(
+
+        env,
+
+        user.id,
+
+        "PRODUCTION",
+
+        "production",
+
+        productionId,
+
+        {
+
+            planningId,
+
+            producedQuantity,
+
+            productionDate,
+
+            materials
+
+        }
+
+    );
+
+
+    return {
+
+        production_id:
+            productionId,
+
+        message:
+            "تولید ثبت شد، مواد اولیه طبق BOM مصرف شد و محصول وارد انبار محصول شد.",
+
+        produced_quantity:
+            producedQuantity,
+
+        total_produced:
+            newProduced,
+
+        remaining:
+            Number(
+                plan.planned_quantity
+            ) -
+            newProduced,
+
+        status:
+            newStatus,
+
+        materials
+
+    };
+
+          }
+
+// ============================================================
+// GET REQUEST ROUTER
+// ============================================================
+
+async function handleGet(
+    request,
+    env,
+    user,
+    path,
+    url
+) {
+
+
+    // --------------------------------------------------------
+    // CURRENT USER
+    // --------------------------------------------------------
+
+    if (
+        path === "/api/me"
+    ) {
+
+        return {
+
+            user
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // UNITS
+    // --------------------------------------------------------
+
+    if (
+        path === "/api/units"
+    ) {
+
+        return {
+
+            items:
+                await getUnits(
+                    env
+                )
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // PRODUCTS
+    // --------------------------------------------------------
+
+    if (
+        path === "/api/products"
+    ) {
+
+        return {
+
+            items:
+                await getProducts(
+                    env
+                )
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // PARTS
+    // --------------------------------------------------------
+
+    if (
+        path === "/api/parts"
+    ) {
+
+        return {
+
+            items:
+                await getParts(
+                    env
+                )
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // PART BY BARCODE
+    // --------------------------------------------------------
+
+    if (
+        path ===
+        "/api/parts/barcode"
+    ) {
+
+        const barcode =
+            url.searchParams.get(
+                "barcode"
+            );
+
+        return {
+
+            item:
+                await findPartByBarcode(
+                    env,
+                    barcode
+                )
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // WAREHOUSES
+    // --------------------------------------------------------
+
+    if (
+        path === "/api/warehouses"
+    ) {
+
+        return {
+
+            items:
+                await getWarehouses(
+                    env
+                )
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // BOMS
+    // --------------------------------------------------------
+
+    if (
+        path === "/api/boms"
+    ) {
+
+        return {
+
+            items:
+                await getBoms(
+                    env
+                )
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // BOM DETAILS
+    // --------------------------------------------------------
+
+    if (
+        path ===
+        "/api/bom-details"
+    ) {
+
+        const bomId =
+            url.searchParams.get(
+                "bom_id"
+            );
+
+        return {
+
+            items:
+                await getBomDetails(
+                    env,
+                    bomId
+                )
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // INVENTORY
+    // --------------------------------------------------------
+
+    if (
+        path === "/api/inventory"
+    ) {
+
+        return {
+
+            items:
+                await getInventory(
+
+                    env,
+
+                    {
+
+                        warehouse_id:
+                            url.searchParams.get(
+                                "warehouse_id"
+                            ),
+
+                        item_type:
+                            url.searchParams.get(
+                                "item_type"
+                            )
+
+                    }
+
+                )
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // PRODUCTION PLANS
+    // --------------------------------------------------------
+
+    if (
+        path === "/api/planning"
+    ) {
+
+        return {
+
+            items:
+                await getProductionPlans(
+                    env
+                )
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // CALCULATE MATERIAL REQUIREMENT
+    // --------------------------------------------------------
+    //
+    // This endpoint is extremely important for Index.html.
+    //
+    // User selects:
+    //
+    // BOM
+    // +
+    // Production Quantity
+    //
+    // Worker returns required materials.
+    //
+    // No inventory is changed here.
+    //
+    // --------------------------------------------------------
+
+    if (
+        path ===
+        "/api/production/material-requirement"
+    ) {
+
+        const bomId =
+            url.searchParams.get(
+                "bom_id"
+            );
+
+        const quantity =
+            url.searchParams.get(
+                "quantity"
+            );
+
+        return {
+
+            items:
+                await calculateMaterialRequirement(
+
+                    env,
+
+                    bomId,
+
+                    quantity
+
+                )
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // UNKNOWN GET
+    // --------------------------------------------------------
+
+    throw new AppError(
+
+        "API-404",
+
+        "مسیر GET موردنظر وجود ندارد.",
+
+        404,
+
+        {
+
+            path
+
+        }
+
+    );
+
+}
+
+
+// ============================================================
+// POST REQUEST ROUTER
+// ============================================================
+
+async function handlePost(
+    request,
+    env,
+    user,
+    path
+) {
+
+
+    // --------------------------------------------------------
+    // UNITS
+    // --------------------------------------------------------
+
+    if (
+        path === "/api/units"
+    ) {
+
+        return await createUnit(
+
+            request,
+
+            env,
+
+            user
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // PRODUCTS
+    // --------------------------------------------------------
+
+    if (
+        path === "/api/products"
+    ) {
+
+        return await createProduct(
+
+            request,
+
+            env,
+
+            user
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // PARTS
+    // --------------------------------------------------------
+
+    if (
+        path === "/api/parts"
+    ) {
+
+        return await createPart(
+
+            request,
+
+            env,
+
+            user
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // BOM
+    // --------------------------------------------------------
+
+    if (
+        path === "/api/boms"
+    ) {
+
+        return await createBom(
+
+            request,
+
+            env,
+
+            user
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // BOM DETAIL
+    // --------------------------------------------------------
+
+    if (
+        path ===
+        "/api/bom-details"
+    ) {
+
+        return await addBomDetail(
+
+            request,
+
+            env,
+
+            user
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // PRODUCTION PLAN
+    // --------------------------------------------------------
+
+    if (
+        path ===
+        "/api/planning"
+    ) {
+
+        return await createProductionPlan(
+
+            request,
+
+            env,
+
+            user
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // PRODUCTION
+    // --------------------------------------------------------
+
+    if (
+        path ===
+        "/api/production"
+    ) {
+
+        return await registerProduction(
+
+            request,
+
+            env,
+
+            user
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // INVENTORY RECEIPT
+    // --------------------------------------------------------
+
+    if (
+        path ===
+        "/api/inventory/receipt"
+    ) {
+
+        const body =
+            await readJson(
+                request
+            );
+
+        const warehouseId =
+            positiveId(
+
+                body.warehouse_id,
+
+                "انبار",
+
+                "INV-100"
+
+            );
+
+        const partId =
+            positiveId(
+
+                body.part_id,
+
+                "قطعه",
+
+                "INV-101"
+
+            );
+
+        const quantity =
+            positiveNumber(
+
+                body.quantity,
+
+                "مقدار ورود",
+
+                "INV-102"
+
+            );
+
+        const balance =
+            await changeInventory(
+
+                env,
+
+                {
+
+                    warehouseId,
+
+                    itemType:
+                        "part",
+
+                    itemId:
+                        partId,
+
+                    delta:
+                        quantity,
+
+                    transactionType:
+                        "RECEIPT",
+
+                    userId:
+                        user.id,
+
+                    referenceType:
+                        body.reference_type ||
+                        "manual",
+
+                    referenceId:
+                        body.reference_id ||
+                        null,
+
+                    description:
+                        body.description ||
+                        "ورود مواد اولیه"
+
+                }
+
+            );
+
+        await writeAudit(
+
+            env,
+
+            user.id,
+
+            "INVENTORY_RECEIPT",
+
+            "parts",
+
+            partId,
+
+            body
+
+        );
+
+        return {
+
+            message:
+                "ورود موجودی با موفقیت ثبت شد.",
+
+            balance
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // INVENTORY ISSUE
+    // --------------------------------------------------------
+
+    if (
+        path ===
+        "/api/inventory/issue"
+    ) {
+
+        const body =
+            await readJson(
+                request
+            );
+
+        const warehouseId =
+            positiveId(
+
+                body.warehouse_id,
+
+                "انبار",
+
+                "INV-110"
+
+            );
+
+        const partId =
+            positiveId(
+
+                body.part_id,
+
+                "قطعه",
+
+                "INV-111"
+
+            );
+
+        const quantity =
+            positiveNumber(
+
+                body.quantity,
+
+                "مقدار مصرف",
+
+                "INV-112"
+
+            );
+
+        const balance =
+            await changeInventory(
+
+                env,
+
+                {
+
+                    warehouseId,
+
+                    itemType:
+                        "part",
+
+                    itemId:
+                        partId,
+
+                    delta:
+                        -quantity,
+
+                    transactionType:
+                        "ISSUE",
+
+                    userId:
+                        user.id,
+
+                    referenceType:
+                        body.reference_type ||
+                        "manual",
+
+                    referenceId:
+                        body.reference_id ||
+                        null,
+
+                    description:
+                        body.description ||
+                        "خروج مواد اولیه"
+
+                }
+
+            );
+
+        await writeAudit(
+
+            env,
+
+            user.id,
+
+            "INVENTORY_ISSUE",
+
+            "parts",
+
+            partId,
+
+            body
+
+        );
+
+        return {
+
+            message:
+                "خروج موجودی با موفقیت ثبت شد.",
+
+            balance
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // UNKNOWN POST
+    // --------------------------------------------------------
+
+    throw new AppError(
+
+        "API-405",
+
+        "عملیات POST موردنظر وجود ندارد.",
+
+        404,
+
+        {
+
+            path
+
+        }
+
+    );
+
+}
+
+
+// ============================================================
+// DELETE SESSION / FUTURE DELETE ROUTES
+// ============================================================
+
+async function handleDelete(
+    request,
+    env,
+    user,
+    path
+) {
+
+    throw new AppError(
+
+        "API-405",
+
+        "عملیات حذف در این نسخه برای این مسیر فعال نشده است.",
+
+        405,
+
+        {
+
+            path
+
+        }
+
+    );
+
+}
+
+
+// ============================================================
+// MAIN WORKER
+// ============================================================
+
+export default {
+
+    async fetch(
+        request,
+        env
+    ) {
+
+        const origin =
+            request.headers.get(
+                "Origin"
+            ) || "*";
+
+        // ----------------------------------------------------
+        // CORS PREFLIGHT
+        // ----------------------------------------------------
+
+        if (
+            request.method ===
+            "OPTIONS"
+        ) {
+
+            return new Response(
+                null,
+                {
+
+                    status: 204,
+
+                    headers:
+                        responseHeaders(
+                            origin
+                        )
+
+                }
+            );
+
+        }
+
+
+        const url =
+            new URL(
+                request.url
+            );
+
+        const path =
+            url.pathname
+                .replace(
+                    /\/+$/,
+                    ""
+                ) || "/";
+
+
+        try {
+
+
+            // =================================================
+            // HEALTH
+            // =================================================
+
+            if (
+                path ===
+                "/api/health"
+                &&
+                request.method ===
+                "GET"
+            ) {
+
+                return successResponse(
+
+                    {
+
+                        service:
+                            APP_NAME,
+
+                        worker:
+                            WORKER_NAME,
+
+                        database:
+                            DATABASE_NAME,
+
+                        binding:
+                            "DB",
+
+                        version:
+                            API_VERSION,
+
+                        status:
+                            "online"
+
+                    },
+
+                    200,
+
+                    origin
+
+                );
+
+            }
+
+
+            // =================================================
+            // LOGIN
+            // =================================================
+
+            if (
+                path ===
+                "/api/login"
+                &&
+                request.method ===
+                "POST"
+            ) {
+
+                const result =
+                    await login(
+
+                        request,
+
+                        env
+
+                    );
+
+                return successResponse(
+
+                    {
+
+                        message:
+                            "ورود با موفقیت انجام شد.",
+
+                        token:
+                            result.token,
+
+                        user:
+                            result.user
+
+                    },
+
+                    200,
+
+                    origin
+
+                );
+
+            }
+
+
+            // =================================================
+            // LOGOUT
+            // =================================================
+
+            if (
+                path ===
+                "/api/logout"
+                &&
+                request.method ===
+                "POST"
+            ) {
+
+                const result =
+                    await logout(
+
+                        request,
+
+                        env
+
+                    );
+
+                return successResponse(
+
+                    result,
+
+                    200,
+
+                    origin
+
+                );
+
+            }
+
+
+            // =================================================
+            // EVERYTHING ELSE
+            // REQUIRES AUTHENTICATION
+            // =================================================
+
+            const user =
+                await authenticate(
+
+                    request,
+
+                    env
+
+                );
+
+
+            // =================================================
+            // GET
+            // =================================================
+
+            if (
+                request.method ===
+                "GET"
+            ) {
+
+                const result =
+                    await handleGet(
+
+                        request,
+
+                        env,
+
+                        user,
+
+                        path,
+
+                        url
+
+                    );
+
+                return successResponse(
+
+                    result,
+
+                    200,
+
+                    origin
+
+                );
+
+            }
+
+
+            // =================================================
+            // POST
+            // =================================================
+
+            if (
+                request.method ===
+                "POST"
+            ) {
+
+                const result =
+                    await handlePost(
+
+                        request,
+
+                        env,
+
+                        user,
+
+                        path
+
+                    );
+
+                return successResponse(
+
+                    result,
+
+                    201,
+
+                    origin
+
+                );
+
+            }
+
+
+            // =================================================
+            // DELETE
+            // =================================================
+
+            if (
+                request.method ===
+                "DELETE"
+            ) {
+
+                const result =
+                    await handleDelete(
+
+                        request,
+
+                        env,
+
+                        user,
+
+                        path
+
+                    );
+
+                return successResponse(
+
+                    result,
+
+                    200,
+
+                    origin
+
+                );
+
+            }
+
+
+            // =================================================
+            // METHOD NOT ALLOWED
+            // =================================================
+
+            throw new AppError(
+
+                "API-405",
+
+                "این نوع درخواست برای مسیر موردنظر مجاز نیست.",
+
+                405,
+
+                {
+
+                    method:
+                        request.method,
+
+                    path
+
+                }
+
+            );
+
+        }
+
+
+        // =====================================================
+        // CONTROLLED ERROR HANDLER
+        // =====================================================
+
+        catch (error) {
+
+            console.error(
+
+                "NINIT0_API_ERROR",
+
+                {
+
+                    path,
+
+                    method:
+                        request.method,
+
+                    error
+
+                }
+
+            );
+
+
+            if (
+                error instanceof
+                AppError
+            ) {
+
+                return errorResponse(
+
+                    error.code,
+
+                    error.message,
+
+                    error.status,
+
+                    error.details,
+
+                    origin
+
+                );
+
+            }
+
+
+            // -------------------------------------------------
+            // DATABASE ERROR
+            // -------------------------------------------------
+
+            if (
+                error?.message
+            ) {
+
+                const text =
+                    String(
+                        error.message
+                    );
+
+
+                if (
+                    text.includes(
+                        "no such table"
+                    )
+                ) {
+
+                    return errorResponse(
+
+                        "DB-001",
+
+                        "جدول موردنیاز در دیتابیس پیدا نشد. ابتدا فایل Schema را روی D1 اجرا کنید.",
+
+                        500,
+
+                        null,
+
+                        origin
+
+                    );
+
+                }
+
+
+                if (
+                    text.includes(
+                        "no such column"
+                    )
+                ) {
+
+                    return errorResponse(
+
+                        "DB-002",
+
+                        "ساختار ستون‌های دیتابیس با نسخه Worker هماهنگ نیست. Schema را بررسی کنید.",
+
+                        500,
+
+                        null,
+
+                        origin
+
+                    );
+
+                }
+
+
+                if (
+                    text.includes(
+                        "UNIQUE constraint"
+                    )
+                ) {
+
+                    return errorResponse(
+
+                        "DB-003",
+
+                        "اطلاعات تکراری است و امکان ثبت آن وجود ندارد.",
+
+                        409,
+
+                        null,
+
+                        origin
+
+                    );
+
+                }
+
+
+                if (
+                    text.includes(
+                        "FOREIGN KEY constraint"
+                    )
+                ) {
+
+                    return errorResponse(
+
+                        "DB-004",
+
+                        "اطلاعات مرتبط پیدا نشد و عملیات قابل انجام نیست.",
+
+                        409,
+
+                        null,
+
+                        origin
+
+                    );
+
+                }
+
+            }
+
+
+            // -------------------------------------------------
+            // UNKNOWN SYSTEM ERROR
+            // -------------------------------------------------
+
+            return errorResponse(
+
+                "SYS-001",
+
+                "خطای غیرمنتظره‌ای در سامانه رخ داد. لطفاً دوباره تلاش کنید.",
+
+                500,
+
+                null,
+
+                origin
+
+            );
+
+        }
+
+    }
+
+};
