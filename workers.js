@@ -49,10 +49,11 @@
 // ============================================================
 // CONFIGURATION
 // ============================================================
-
 const APP_NAME = "NiniTo";
 
 const APP_VERSION = "1.0.0";
+
+const API_VERSION = "1.0.0";
 
 const WORKER_NAME = "ninitoapp";
 
