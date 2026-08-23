@@ -29,10 +29,7 @@
     href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
 >
     
-<link
-    rel="stylesheet"
-    href="css/persian-datepicker.css"
->
+<link rel="stylesheet" href="css/bootstrap-datepicker.min.css" />
     
 <style>
 
@@ -1864,10 +1861,16 @@ textarea.form-control{
 
    
 <script>
+
+    $(document).ready(function () {
+            $(".jalali-date").datepicker({
+              showButtonPanel: true
+            });
+        });
+
+
     
 "use strict";
-
-
 /* ============================================================
    CONFIG
 ============================================================ */
@@ -10540,13 +10543,11 @@ else{
 ========================================d==================== */
 
 </script>
-
- <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-
-<script src="js/persian-datepicker.js"></script>
-   </body>
+<script src="js/bootstrap-datepicker.min.js"></script>
+<script src="js/bootstrap-datepicker.fa.min.js"></script>
+</body>
 
 </html>
 
