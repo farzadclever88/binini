@@ -549,9 +549,23 @@ const value =
                Validate Format
             ------------------------------------------------ */
 
-            const valid =
-                /^\d{4}\/\d{2}\/\d{2}$/
-                    .test(value);
+            const normalizedValue =
+    value
+        .replace(/۰/g, "0")
+        .replace(/۱/g, "1")
+        .replace(/۲/g, "2")
+        .replace(/۳/g, "3")
+        .replace(/۴/g, "4")
+        .replace(/۵/g, "5")
+        .replace(/۶/g, "6")
+        .replace(/۷/g, "7")
+        .replace(/۸/g, "8")
+        .replace(/۹/g, "9");
+
+
+const valid =
+    /^\d{4}\/\d{2}\/\d{2}$/
+        .test(normalizedValue);
 
 
             if(!valid){
@@ -584,29 +598,29 @@ const value =
 
             result.innerHTML =
 
-    "✅ DatePicker درست کار می‌کند."
+    "✅ DatePicker کاملاً درست کار می‌کند."
     +
     "<br><br>"
     +
-    "مقدار اصلی:"
-    +
-    "<br>"
-    +
-    "<strong>"
-    +
-    rawValue
-    +
-    "</strong>"
-    +
-    "<br><br>"
-    +
-    "مقدار استاندارد:"
+    "تاریخ انتخاب‌شده:"
     +
     "<br>"
     +
     "<strong>"
     +
     value
+    +
+    "</strong>"
+    +
+    "<br><br>"
+    +
+    "فرمت استاندارد:"
+    +
+    "<br>"
+    +
+    "<strong>"
+    +
+    normalizedValue
     +
     "</strong>";
 
