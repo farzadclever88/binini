@@ -3956,18 +3956,19 @@ function apiDateToJalali(
    Persian / Jalali Date Inputs
 ============================================================ */
 
-function initPersianDatePickers(){
+/* ============================================================
+   PERSIAN DATEPICKER
+   Global Jalali Date Picker
+============================================================ */
 
-    /* --------------------------------------------------------
-       jQuery
-    -------------------------------------------------------- */
+function initPersianDatePickers(){
 
     if(
         typeof window.jQuery ===
         "undefined"
     ){
 
-        console.warn(
+        console.error(
             "Persian DatePicker: jQuery is not loaded."
         );
 
@@ -3976,27 +3977,19 @@ function initPersianDatePickers(){
     }
 
 
-    /* --------------------------------------------------------
-       jQuery UI Datepicker
-    -------------------------------------------------------- */
-
     if(
-        typeof jQuery.fn.datepicker !==
+        typeof jQuery.fn.pDatepicker !==
         "function"
     ){
 
-        console.warn(
-            "Persian DatePicker: jQuery UI Datepicker is not loaded."
+        console.error(
+            "Persian DatePicker: persian-datepicker is not loaded."
         );
 
         return;
 
     }
 
-
-    /* --------------------------------------------------------
-       پیدا کردن تمام Input های تاریخ
-    -------------------------------------------------------- */
 
     const inputs = [
 
@@ -4017,34 +4010,19 @@ function initPersianDatePickers(){
     ];
 
 
-    /* --------------------------------------------------------
-       حذف موارد تکراری
-    -------------------------------------------------------- */
-
     const uniqueInputs =
         [...new Set(inputs)];
 
 
-    /* --------------------------------------------------------
-       Initialize
-    -------------------------------------------------------- */
-
     uniqueInputs.forEach(
         input => {
 
-            if(
-                !input ||
-                input.dataset.dateReady
-            ){
+            if(!input){
 
                 return;
 
             }
 
-
-            /* ------------------------------------------------
-               فقط TextBox
-            ------------------------------------------------ */
 
             if(
                 input.tagName !==
@@ -4067,8 +4045,18 @@ function initPersianDatePickers(){
 
 
             /* ------------------------------------------------
-               مشخص کردن Input به عنوان Date Input
+               جلوگیری از Initialize دوباره
             ------------------------------------------------ */
+
+            if(
+                input.dataset.persianDateReady ===
+                "1"
+            ){
+
+                return;
+
+            }
+
 
             input.classList.add(
                 "jalali-date"
@@ -4081,30 +4069,55 @@ function initPersianDatePickers(){
             );
 
 
-            input.dataset.dateReady =
-                "1";
-
-
             /* ------------------------------------------------
-               فعال کردن DatePicker
+               Persian DatePicker
             ------------------------------------------------ */
 
-            jQuery(input).datepicker({
+            jQuery(input).pDatepicker({
 
-                changeMonth:true,
+                format:
+                    "YYYY/MM/DD",
 
-                changeYear:true,
+                autoClose:
+                    true,
 
-                dateFormat:"yy/mm/dd",
+                initialValue:
+                    false,
 
-                showButtonPanel:true
+                persianDigit:
+                    false,
+
+                calendarType:
+                    "persian",
+
+                observer:
+                    true,
+
+                responsive:
+                    true,
+
+                initialValueType:
+                    "persian",
+
+                toolbox:{
+
+                    calendarSwitch:{
+                        enabled:false
+                    }
+
+                }
 
             });
+
+
+            input.dataset.persianDateReady =
+                "1";
 
         }
     );
 
 }
+    
     /* ============================================================
    VALIDATION
 ============================================================ */
