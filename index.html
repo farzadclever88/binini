@@ -3953,66 +3953,159 @@ function apiDateToJalali(
 
 /* ============================================================
    DATEPICKER
+   Persian / Jalali Date Inputs
 ============================================================ */
 
 function initPersianDatePickers(){
+
+    /* --------------------------------------------------------
+       jQuery
+    -------------------------------------------------------- */
 
     if(
         typeof window.jQuery ===
         "undefined"
     ){
 
+        console.warn(
+            "Persian DatePicker: jQuery is not loaded."
+        );
+
         return;
 
     }
 
+
+    /* --------------------------------------------------------
+       jQuery UI Datepicker
+    -------------------------------------------------------- */
 
     if(
         typeof jQuery.fn.datepicker !==
         "function"
     ){
 
+        console.warn(
+            "Persian DatePicker: jQuery UI Datepicker is not loaded."
+        );
+
         return;
 
     }
 
 
-    $$(".jalali-date")
-        .forEach(
-            input => {
+    /* --------------------------------------------------------
+       پیدا کردن تمام Input های تاریخ
+    -------------------------------------------------------- */
 
-                if(
-                    input.dataset.dateReady
-                ){
+    const inputs = [
 
-                    return;
+        ...$$(".jalali-date"),
 
-                }
+        ...$$(
+            'input[data-date-type="jalali"]'
+        ),
+
+        ...$$(
+            'input[name*="date" i]'
+        ),
+
+        ...$$(
+            'input[id*="date" i]'
+        )
+
+    ];
 
 
-                input.dataset.dateReady =
-                    "1";
+    /* --------------------------------------------------------
+       حذف موارد تکراری
+    -------------------------------------------------------- */
+
+    const uniqueInputs =
+        [...new Set(inputs)];
 
 
-                jQuery(input).datepicker({
+    /* --------------------------------------------------------
+       Initialize
+    -------------------------------------------------------- */
 
-                    changeMonth:true,
+    uniqueInputs.forEach(
+        input => {
 
-                    changeYear:true,
+            if(
+                !input ||
+                input.dataset.dateReady
+            ){
 
-                    dateFormat:"yy/mm/dd",
-
-                    showButtonPanel:true
-
-                });
+                return;
 
             }
-        );
+
+
+            /* ------------------------------------------------
+               فقط TextBox
+            ------------------------------------------------ */
+
+            if(
+                input.tagName !==
+                "INPUT"
+            ){
+
+                return;
+
+            }
+
+
+            if(
+                input.type !==
+                "text"
+            ){
+
+                return;
+
+            }
+
+
+            /* ------------------------------------------------
+               مشخص کردن Input به عنوان Date Input
+            ------------------------------------------------ */
+
+            input.classList.add(
+                "jalali-date"
+            );
+
+
+            input.setAttribute(
+                "autocomplete",
+                "off"
+            );
+
+
+            input.dataset.dateReady =
+                "1";
+
+
+            /* ------------------------------------------------
+               فعال کردن DatePicker
+            ------------------------------------------------ */
+
+            jQuery(input).datepicker({
+
+                changeMonth:true,
+
+                changeYear:true,
+
+                dateFormat:"yy/mm/dd",
+
+                showButtonPanel:true
+
+            });
+
+        }
+    );
 
 }
-
-
-/* ============================================================
+    /* ============================================================
    VALIDATION
 ============================================================ */
 
