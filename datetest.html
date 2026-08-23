@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>
+    تست تاریخ شمسی - نی‌نی‌تو
+</title>
+
+
+<!-- =========================================================
+     PERSIAN DATEPICKER CSS
+========================================================= -->
+
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css"
+>
+
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+
+    margin:0;
+
+    min-height:100vh;
+
+    background:#f4f7fb;
+
+    color:#172033;
+
+    font-family:
+        Tahoma,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    padding:30px;
+
+}
+
+
+.container{
+
+    max-width:700px;
+
+    margin:0 auto;
+
+}
+
+
+.card{
+
+    background:#ffffff;
+
+    border-radius:16px;
+
+    padding:25px;
+
+    box-shadow:
+        0 8px 30px rgba(
+            15,
+            23,
+            42,
+            .10
+        );
+
+}
+
+
+h1{
+
+    margin-top:0;
+
+    font-size:24px;
+
+}
+
+
+.description{
+
+    color:#64748b;
+
+    line-height:1.9;
+
+}
+
+
+.form-group{
+
+    margin-top:25px;
+
+}
+
+
+label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:bold;
+
+}
+
+
+input{
+
+    width:100%;
+
+    padding:13px 15px;
+
+    border:1px solid #cbd5e1;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+    direction:ltr;
+
+    text-align:left;
+
+}
+
+
+input:focus{
+
+    outline:none;
+
+    border-color:#2563eb;
+
+}
+
+
+button{
+
+    margin-top:20px;
+
+    width:100%;
+
+    padding:14px;
+
+    border:0;
+
+    border-radius:10px;
+
+    background:#2563eb;
+
+    color:white;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+}
+
+
+button:hover{
+
+    background:#1d4ed8;
+
+}
+
+
+.result{
+
+    margin-top:25px;
+
+    padding:18px;
+
+    border-radius:10px;
+
+    background:#f8fafc;
+
+    border:1px solid #e2e8f0;
+
+    line-height:2;
+
+}
+
+
+.success{
+
+    color:#15803d;
+
+}
+
+
+.error{
+
+    color:#dc2626;
+
+}
+
+
+.status{
+
+    margin-top:10px;
+
+    padding:12px;
+
+    border-radius:8px;
+
+    background:#f1f5f9;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>
+            تست DatePicker شمسی
+        </h1>
+
+
+        <div class="description">
+
+            این صفحه فقط برای تست تقویم تاریخ سامانه نی‌نی‌تو است.
+            روی کادر تاریخ کلیک کنید و یک تاریخ شمسی انتخاب کنید.
+
+        </div>
+
+
+        <!-- =================================================
+             STATUS
+        ================================================= -->
+
+        <div
+            id="libraryStatus"
+            class="status"
+        >
+            در حال بررسی کتابخانه‌ها...
+        </div>
+
+
+        <!-- =================================================
+             DATE INPUT
+        ================================================= -->
+
+        <div class="form-group">
+
+            <label>
+                تاریخ آزمایشی
+            </label>
+
+            <input
+                type="text"
+                id="testDate"
+                class="jalali-date"
+                placeholder="1405/05/31"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <!-- =================================================
+             TEST BUTTON
+        ================================================= -->
+
+        <button
+            type="button"
+            id="testButton"
+        >
+            بررسی تاریخ انتخاب‌شده
+        </button>
+
+
+        <!-- =================================================
+             RESULT
+        ================================================= -->
+
+        <div
+            id="result"
+            class="result"
+        >
+            هنوز تاریخی انتخاب نشده است.
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     JQUERY
+========================================================= -->
+
+<script
+    src="https://code.jquery.com/jquery-3.7.1.min.js">
+</script>
+
+
+<!-- =========================================================
+     PERSIAN DATE
+========================================================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js">
+</script>
+
+
+<!-- =========================================================
+     PERSIAN DATEPICKER
+========================================================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js">
+</script>
+
+
+<script>
+
+/* ============================================================
+   TEST INITIALIZATION
+============================================================ */
+
+function initTest(){
+
+    const status =
+        document.getElementById(
+            "libraryStatus"
+        );
+
+
+    /* --------------------------------------------------------
+       jQuery
+    -------------------------------------------------------- */
+
+    if(
+        typeof window.jQuery ===
+        "undefined"
+    ){
+
+        status.innerHTML =
+            "❌ jQuery بارگذاری نشده است.";
+
+        status.className =
+            "status error";
+
+        return;
+
+    }
+
+
+    /* --------------------------------------------------------
+       Persian Date
+    -------------------------------------------------------- */
+
+    if(
+        typeof window.persianDate ===
+        "undefined"
+    ){
+
+        status.innerHTML =
+            "❌ کتابخانه persian-date بارگذاری نشده است.";
+
+        status.className =
+            "status error";
+
+        return;
+
+    }
+
+
+    /* --------------------------------------------------------
+       Persian DatePicker
+    -------------------------------------------------------- */
+
+    if(
+        typeof jQuery.fn.pDatepicker !==
+        "function"
+    ){
+
+        status.innerHTML =
+            "❌ Persian DatePicker بارگذاری نشده است.";
+
+        status.className =
+            "status error";
+
+        return;
+
+    }
+
+
+    /* --------------------------------------------------------
+       All Good
+    -------------------------------------------------------- */
+
+    status.innerHTML =
+        "✅ هر سه کتابخانه با موفقیت بارگذاری شدند.";
+
+
+    status.className =
+        "status success";
+
+
+    /* --------------------------------------------------------
+       Initialize DatePicker
+    -------------------------------------------------------- */
+
+    $("#testDate").pDatepicker({
+
+        format:
+            "YYYY/MM/DD",
+
+        autoClose:
+            true,
+
+        initialValue:
+            false,
+
+        persianDigit:
+            false,
+
+        calendarType:
+            "persian",
+
+        observer:
+            true,
+
+        responsive:
+            true,
+
+        initialValueType:
+            "persian",
+
+        toolbox:{
+
+            calendarSwitch:{
+                enabled:false
+            }
+
+        }
+
+    });
+
+}
+
+
+/* ============================================================
+   TEST BUTTON
+============================================================ */
+
+document
+    .getElementById(
+        "testButton"
+    )
+    .addEventListener(
+        "click",
+        function(){
+
+            const input =
+                document.getElementById(
+                    "testDate"
+                );
+
+
+            const result =
+                document.getElementById(
+                    "result"
+                );
+
+
+            const value =
+                input.value.trim();
+
+
+            if(!value){
+
+                result.innerHTML =
+                    "❌ هنوز تاریخی انتخاب نشده است.";
+
+                result.className =
+                    "result error";
+
+                return;
+
+            }
+
+
+            /* ------------------------------------------------
+               Validate Format
+            ------------------------------------------------ */
+
+            const valid =
+                /^\d{4}\/\d{2}\/\d{2}$/
+                    .test(value);
+
+
+            if(!valid){
+
+                result.innerHTML =
+
+                    "❌ تاریخ دریافت شد اما فرمت آن صحیح نیست."
+                    +
+                    "<br>"
+                    +
+                    "مقدار دریافت‌شده: "
+                    +
+                    "<strong>"
+                    +
+                    value
+                    +
+                    "</strong>"
+                    +
+                    "<br>"
+                    +
+                    "فرمت مورد انتظار: 1405/05/31";
+
+                result.className =
+                    "result error";
+
+                return;
+
+            }
+
+
+            result.innerHTML =
+
+                "✅ DatePicker درست کار می‌کند."
+                +
+                "<br><br>"
+                +
+                "تاریخ انتخاب‌شده:"
+                +
+                "<br>"
+                +
+                "<strong>"
+                +
+                value
+                +
+                "</strong>";
+
+
+            result.className =
+                "result success";
+
+        }
+    );
+
+
+/* ============================================================
+   START
+============================================================ */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    initTest
+);
+
+</script>
+
+
+</body>
+
+</html>
