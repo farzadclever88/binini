@@ -7518,76 +7518,8 @@ function openBomForm(
     }
 
 
-        /* ============================================================
-   TEMP DATEPICKER TEST - BEGIN
-============================================================ */
 
-alert(
-    "jQuery version = " +
-    (
-        window.jQuery &&
-        window.jQuery.fn
-            ? window.jQuery.fn.jquery
-            : "NOT FOUND"
-    )
-    +
-    "\n\n$.extend type = " +
-    typeof $.extend
-);
-
-/* ============================================================
-   TEST INIT
-============================================================ */
-
-try{
-
-    initPersianDatePickers();
-
-    alert(
-        "🟢 مرحله 2: initPersianDatePickers بدون خطا اجرا شد"
-    );
-
-}
-catch(error){
-
-    alert(
-        "🔴 مرحله 2: خطا در initPersianDatePickers\n\n" +
-        error.message
-    );
-
-}
-
-
-/* ============================================================
-   TEST INPUT
-============================================================ */
-
-setTimeout(
-
-    function(){
-
-        const inputs =
-            document.querySelectorAll(
-                "#bomForm .jalali-date"
-            );
-
-
-        alert(
-            "🔵 مرحله 3: تعداد فیلدهای تاریخ = " +
-            inputs.length
-        );
-
-    },
-
-    300
-
-);
-
-
-/* ============================================================
-   TEMP DATEPICKER TEST - END
-============================================================ */
-
+    
     $("#cancelBom")
         .addEventListener(
             "click",
