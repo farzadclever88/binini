@@ -7611,54 +7611,39 @@ async function submitBomForm(
    BOM DETAILS
 ============================================================ */
 
-async function loadBomDetails(
-    bomId
-){
+async function loadBomDetails(bomId) {
 
-    if(!bomId){
-
+    if (!bomId) {
         return;
-
     }
 
+    try {
 
-    try{
-
-        const data =
-            await apiRequest(
-                "/api/bom-details?bom_id=" +
-                encodeURIComponent(
-                    bomId
-                ),
-                {
-
-                    loadingText:
-                        "در حال دریافت اجزای BOM..."
-
-                }
-            );
-
+        const data = await apiRequest(
+            "/api/bom-details?bom_id=" +
+            encodeURIComponent(bomId),
+            {
+                loadingText:
+                    "در حال دریافت اجزای BOM..."
+            }
+        );
 
         STATE.bomDetails =
-            Array.isArray(
-                data.items
-            )
+            Array.isArray(data?.items)
                 ? data.items
                 : [];
-
 
         STATE.currentBomId =
             Number(bomId);
 
-
         renderBomDetails();
 
     }
-
-    catch(error){
+    catch (error) {
 
         showMessage(
-            error.message,
+            error.message ||
+            "دریافت اجزای BOM انجام نشد.",
             "error"
         );
 
@@ -7668,25 +7653,19 @@ async function loadBomDetails(
 
 
 /* ============================================================
-   BOM DETAILS RENDER
+   RENDER BOM DETAILS
 ============================================================ */
 
-function renderBomDetails(){
+function renderBomDetails() {
 
     const section =
         $("#bomDetailsSection");
 
-
-    if(!section){
-
+    if (!section) {
         return;
-
     }
 
-
-    section.style.display =
-        "block";
-
+    section.style.display = "block";
 
     section.innerHTML = `
 
@@ -7706,51 +7685,50 @@ function renderBomDetails(){
 
         </div>
 
-
         ${
             buildTable(
 
                 [
 
                     {
-                        label:"کد قطعه",
-                        value:"part_code"
+                        label: "کد قطعه",
+                        value: "part_code"
                     },
 
                     {
-                        label:"نام قطعه",
-                        value:"part_name"
+                        label: "نام قطعه",
+                        value: "part_name"
                     },
 
                     {
-                        label:"بارکد",
-                        value:"barcode"
+                        label: "بارکد",
+                        value: "barcode"
                     },
 
                     {
-                        label:"واحد",
-                        value:"unit_name"
+                        label: "واحد",
+                        value: "unit_name"
                     },
 
                     {
-                        label:"ضریب مصرف",
-                        value:"consumption_factor",
-                        type:"number"
+                        label: "ضریب مصرف",
+                        value: "consumption_factor",
+                        type: "number"
                     },
 
                     {
-                        label:"ضایعات",
-                        value:r =>
+                        label: "ضایعات",
+                        value: row =>
                             `${formatNumber(
-                                r.scrap_percent
+                                row.scrap_percent
                             )} %`
                     },
 
                     {
-                        label:"وضعیت",
-                        value:"status",
-                        type:"badge",
-                        raw:true
+                        label: "وضعیت",
+                        value: "status",
+                        type: "badge",
+                        raw: true
                     }
 
                 ],
@@ -7758,17 +7736,14 @@ function renderBomDetails(){
                 STATE.bomDetails,
 
                 {
-
                     empty:
                         "جزئی برای این BOM ثبت نشده است."
-
                 }
 
             )
         }
 
     `;
-
 
     $("#newBomDetail")
         .addEventListener(
@@ -7786,9 +7761,20 @@ function renderBomDetails(){
    BOM DETAIL FORM
 ============================================================ */
 
-function openBomDetailForm(
-    bomId
-){
+function openBomDetailForm(bomId) {
+
+    const id =
+        Number(bomId);
+
+    if (!id) {
+
+        showMessage(
+            "ابتدا یک BOM معتبر انتخاب کنید.",
+            "error"
+        );
+
+        return;
+    }
 
     openModal(
 
@@ -7804,11 +7790,8 @@ function openBomDetailForm(
                 <input
                     type="hidden"
                     name="bom_id"
-                    value="${escapeHtml(
-                        bomId
-                    )}"
+                    value="${escapeHtml(id)}"
                 >
-
 
                 <div class="form-grid">
 
@@ -7861,8 +7844,8 @@ function openBomDetailForm(
                             min="0"
                             step="any"
                             required
-                            data-number-words="factorWords"
                             placeholder="مثلاً 2"
+                            data-number-words="factorWords"
                         >
 
                         <div
@@ -7925,35 +7908,58 @@ function openBomDetailForm(
     );
 
 
+    /* ---------------------------------------------------------
+       BOM DISPLAY
+    --------------------------------------------------------- */
+
     populateSelect(
         ".bom-select",
         STATE.boms,
         "id",
         item =>
-            `${item.code || ""} - ${item.product_name || ""}`,
-        "BOM"
+            `${item.code || ""} - ${
+                item.product_name || ""
+            } - نسخه ${
+                item.version || 1
+            }`,
+        "انتخاب BOM"
     );
 
+
+    const form =
+        $("#bomDetailForm");
+
+
+    form.elements.bom_id_display.value =
+        String(id);
+
+
+    /* ---------------------------------------------------------
+       PARTS
+    --------------------------------------------------------- */
 
     populateSelect(
         ".part-select",
         STATE.parts,
         "id",
         item =>
-            `${item.code || ""} - ${item.name || ""}`,
+            `${item.code || ""} - ${
+                item.name || ""
+            }`,
         "انتخاب قطعه"
     );
 
 
-    $("#bomDetailForm")
-        .elements
-        .bom_id_display
-        .value =
-            bomId;
-
+    /* ---------------------------------------------------------
+       NUMBER WORDS
+    --------------------------------------------------------- */
 
     bindNumberWords();
 
+
+    /* ---------------------------------------------------------
+       BUTTONS
+    --------------------------------------------------------- */
 
     $("#cancelBomDetail")
         .addEventListener(
@@ -7962,38 +7968,41 @@ function openBomDetailForm(
         );
 
 
-    $("#bomDetailForm")
-        .addEventListener(
-            "submit",
-            submitBomDetailForm
-        );
+    form.addEventListener(
+        "submit",
+        submitBomDetailForm
+    );
 
 }
 
 
 /* ============================================================
-   BOM DETAIL SUBMIT
+   SUBMIT BOM DETAIL
 ============================================================ */
 
-async function submitBomDetailForm(
-    event
-){
+async function submitBomDetailForm(event) {
 
     event.preventDefault();
-
 
     const form =
         event.currentTarget;
 
-
     clearFormErrors(form);
 
 
+    /* ---------------------------------------------------------
+       BOM
+    --------------------------------------------------------- */
+
     const bomId =
         Number(
-            form.bom_id.value
+            form.elements.bom_id.value
         );
 
+
+    /* ---------------------------------------------------------
+       PART
+    --------------------------------------------------------- */
 
     const partId =
         selectNumericValue(
@@ -8002,14 +8011,18 @@ async function submitBomDetailForm(
         );
 
 
-    const factor =
-        numericValue(
-            form,
-            "consumption_factor"
+    if (!bomId) {
+
+        showMessage(
+            "BOM معتبر انتخاب نشده است.",
+            "error"
         );
 
+        return;
+    }
 
-    if(!partId){
+
+    if (!partId) {
 
         setFieldError(
             form,
@@ -8020,9 +8033,18 @@ async function submitBomDetailForm(
     }
 
 
-    if(
-        factor <= 0
-    ){
+    /* ---------------------------------------------------------
+       CONSUMPTION FACTOR
+    --------------------------------------------------------- */
+
+    const factor =
+        numericValue(
+            form,
+            "consumption_factor"
+        );
+
+
+    if (factor <= 0) {
 
         setFieldError(
             form,
@@ -8033,16 +8055,18 @@ async function submitBomDetailForm(
     }
 
 
-    if(
-        !bomId ||
+    if (
         !partId ||
         factor <= 0
-    ){
+    ) {
 
         return;
-
     }
 
+
+    /* ---------------------------------------------------------
+       SCRAP
+    --------------------------------------------------------- */
 
     const scrap =
         Math.max(
@@ -8057,16 +8081,20 @@ async function submitBomDetailForm(
         );
 
 
-    try{
+    /* ---------------------------------------------------------
+       API
+    --------------------------------------------------------- */
+
+    try {
 
         const result =
             await apiRequest(
                 "/api/bom-details",
                 {
 
-                    method:"POST",
+                    method: "POST",
 
-                    body:{
+                    body: {
 
                         bom_id:
                             bomId,
@@ -8090,8 +8118,8 @@ async function submitBomDetailForm(
 
 
         showMessage(
-            result.message ||
-            "جزء BOM ثبت شد."
+            result?.message ||
+            "جزء BOM با موفقیت ثبت شد."
         );
 
 
@@ -8103,11 +8131,11 @@ async function submitBomDetailForm(
         );
 
     }
-
-    catch(error){
+    catch (error) {
 
         showMessage(
-            error.message,
+            error.message ||
+            "ثبت جزء BOM انجام نشد.",
             "error"
         );
 
@@ -8116,10 +8144,8 @@ async function submitBomDetailForm(
 }
 
 
-/* ============================================================
-   PLANNING VIEW
-============================================================ */
 
+    
 function renderPlanningView(){
 
     const rows =
