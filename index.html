@@ -1859,6 +1859,133 @@ textarea.form-control{
 
 </div>
 
+
+
+ <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<script src="js/persian-datepicker.js"></script>
+<script>
+    document.addEventListener(
+    "DOMContentLoaded",
+    initializeApplication,
+    {
+        once:true
+    }
+);
+
+
+/* ============================================================
+   NINITO JALALI DATEPICKER
+   تشخیص خودکار فیلدهای تاریخ بر اساس Label
+============================================================ */
+
+$(document).on(
+    "focus",
+    "input[type='text']",
+    function(){
+
+        const input =
+            $(this);
+
+
+        if(
+            input.hasClass(
+                "hasDatepicker"
+            )
+        ){
+
+            return;
+
+        }
+
+
+        const label =
+            input
+                .closest(".form-group")
+                .find("label")
+                .first();
+
+
+        if(
+            !label.length
+        ){
+
+            return;
+
+        }
+
+
+        const labelText =
+            label
+                .text()
+                .trim();
+
+
+        if(
+            !labelText.includes("تاریخ")
+        ){
+
+            return;
+
+        }
+
+
+        if(
+            typeof $.fn.datepicker !==
+            "function"
+        ){
+
+            console.warn(
+                "Ninito DatePicker: jQuery UI Datepicker loaded نیست."
+            );
+
+            return;
+
+        }
+
+
+        input.datepicker({
+
+            dateFormat:
+                "yy/mm/dd",
+
+            changeMonth:
+                true,
+
+            changeYear:
+                true,
+
+            showButtonPanel:
+                true,
+
+            showAnim:
+                "fadeIn"
+
+        });
+
+
+        input.datepicker(
+            "show"
+        );
+
+    }
+);
+
+
+/* ============================================================
+   END NINITO JALALI DATEPICKER
+============================================================ */
+</script>
+
+<!-- =========================================================
+     JAVASCRIPT
+     فقط یک script در کل فایل
+========================================================= -->
+
+
+    
 <script>
 
 
@@ -10608,130 +10735,7 @@ else{
 
 </script>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-
-<script src="js/persian-datepicker.js"></script>
-<script>
-    document.addEventListener(
-    "DOMContentLoaded",
-    initializeApplication,
-    {
-        once:true
-    }
-);
-
-
-/* ============================================================
-   NINITO JALALI DATEPICKER
-   تشخیص خودکار فیلدهای تاریخ بر اساس Label
-============================================================ */
-
-$(document).on(
-    "focus",
-    "input[type='text']",
-    function(){
-
-        const input =
-            $(this);
-
-
-        if(
-            input.hasClass(
-                "hasDatepicker"
-            )
-        ){
-
-            return;
-
-        }
-
-
-        const label =
-            input
-                .closest(".form-group")
-                .find("label")
-                .first();
-
-
-        if(
-            !label.length
-        ){
-
-            return;
-
-        }
-
-
-        const labelText =
-            label
-                .text()
-                .trim();
-
-
-        if(
-            !labelText.includes("تاریخ")
-        ){
-
-            return;
-
-        }
-
-
-        if(
-            typeof $.fn.datepicker !==
-            "function"
-        ){
-
-            console.warn(
-                "Ninito DatePicker: jQuery UI Datepicker loaded نیست."
-            );
-
-            return;
-
-        }
-
-
-        input.datepicker({
-
-            dateFormat:
-                "yy/mm/dd",
-
-            changeMonth:
-                true,
-
-            changeYear:
-                true,
-
-            showButtonPanel:
-                true,
-
-            showAnim:
-                "fadeIn"
-
-        });
-
-
-        input.datepicker(
-            "show"
-        );
-
-    }
-);
-
-
-/* ============================================================
-   END NINITO JALALI DATEPICKER
-============================================================ */
-</script>
-
-<!-- =========================================================
-     JAVASCRIPT
-     فقط یک script در کل فایل
-========================================================= -->
-
-</body>
+   </body>
 
 </html>
 
