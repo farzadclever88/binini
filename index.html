@@ -2935,6 +2935,7 @@ function threeDigitWords(
 
 }
 
+    
 
 function numberToPersianWords(
     value
@@ -3040,7 +3041,84 @@ function numberToPersianWords(
 
 }
 
+/* ============================================================
+   PERSIAN DATE INPUTS
+   اتصال تمام TextBox های تاریخ به Datepicker شمسی
+============================================================ */
 
+function initializeDateInputs() {
+
+    /*
+     * تمام Input هایی که با کلاس
+     *
+     * .persian-date
+     *
+     * مشخص شده اند پیدا می شوند.
+     */
+
+    const dateInputs = document.querySelectorAll(
+        ".persian-date"
+    );
+
+
+    /*
+     * اگر هیچ TextBox تاریخی در صفحه وجود نداشت،
+     * تابع بدون ایجاد خطا تمام می شود.
+     */
+
+    if (!dateInputs.length) {
+
+        return;
+
+    }
+
+
+    /*
+     * هر TextBox را فقط یک بار Initialize می کنیم.
+     */
+
+    dateInputs.forEach(function (input) {
+
+
+        /*
+         * جلوگیری از Initialize شدن دوباره
+         */
+
+        if (
+            input.dataset.dateInitialized === "true"
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+         * غیرفعال کردن انتخاب تاریخ پیش فرض
+         * مرورگر
+         */
+
+        input.setAttribute(
+            "autocomplete",
+            "off"
+        );
+
+
+        /*
+         * فعلاً فقط مشخص می کنیم که این Input
+         * توسط سیستم تاریخ پروژه شناسایی شده است.
+         *
+         * مرحله بعدی:
+         * اتصال واقعی Datepicker شمسی
+         * به همین Input ها.
+         */
+
+        input.dataset.dateInitialized = "true";
+
+
+    });
+
+    }
 /* ============================================================
    NUMBER WORDS LIVE
 ============================================================ */
