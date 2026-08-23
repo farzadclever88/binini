@@ -7405,9 +7405,17 @@ function openBomForm(
 ============================================================ */
 
 alert(
-    "🟡 مرحله 1: قبل از اجرای initPersianDatePickers"
+    "jQuery version = " +
+    (
+        window.jQuery &&
+        window.jQuery.fn
+            ? window.jQuery.fn.jquery
+            : "NOT FOUND"
+    )
+    +
+    "\n\n$.extend type = " +
+    typeof $.extend
 );
-
 
 /* ============================================================
    TEST INIT
