@@ -10542,14 +10542,17 @@ else{
 <script src="js/bootstrap-datepicker.min.js"></script>
 <script src="js/bootstrap-datepicker.fa.min.js"></script>
 <script>
-document.addEventListener(
-    "DOMContentLoaded",
-    function(){
+jQuery("#bomForm .jalali-date").datepicker({
 
-        jQuery(".jalali-date").datepicker();
+    dateFormat: "yy/mm/dd",
 
-    }
-);
+    changeMonth: true,
+
+    changeYear: true,
+
+    showButtonPanel: true
+
+});
 </script>    
 </body>
 
