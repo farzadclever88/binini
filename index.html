@@ -7400,76 +7400,67 @@ function openBomForm(
     }
 
 
-    initPersianDatePickers();
+        /* ============================================================
+   TEMP DATEPICKER TEST - BEGIN
+============================================================ */
+
+alert(
+    "🟡 مرحله 1: قبل از اجرای initPersianDatePickers"
+);
 
 
 /* ============================================================
-   TEMP DATEPICKER TEST - BEGIN
-   این بخش فقط برای تست است و بعداً کامل حذف می‌شود.
+   TEST INIT
+============================================================ */
+
+try{
+
+    initPersianDatePickers();
+
+    alert(
+        "🟢 مرحله 2: initPersianDatePickers بدون خطا اجرا شد"
+    );
+
+}
+catch(error){
+
+    alert(
+        "🔴 مرحله 2: خطا در initPersianDatePickers\n\n" +
+        error.message
+    );
+
+}
+
+
+/* ============================================================
+   TEST INPUT
 ============================================================ */
 
 setTimeout(
+
     function(){
 
-        const testInput =
-            document.querySelector(
+        const inputs =
+            document.querySelectorAll(
                 "#bomForm .jalali-date"
             );
 
-        if(!testInput){
-
-            alert(
-                "❌ Input تاریخ در فرم BOM پیدا نشد."
-            );
-
-            return;
-
-        }
-
-
-        if(
-            typeof window.jQuery ===
-            "undefined"
-        ){
-
-            alert(
-                "❌ jQuery در index.html وجود ندارد."
-            );
-
-            return;
-
-        }
-
-
-        if(
-            typeof jQuery.fn.pDatepicker !==
-            "function"
-        ){
-
-            alert(
-                "❌ pDatepicker در index.html وجود ندارد."
-            );
-
-            return;
-
-        }
-
 
         alert(
-            "✅ jQuery و pDatepicker موجود هستند."
+            "🔵 مرحله 3: تعداد فیلدهای تاریخ = " +
+            inputs.length
         );
 
     },
+
     300
+
 );
 
 
 /* ============================================================
    TEMP DATEPICKER TEST - END
-   این بخش فقط برای تست است و بعداً کامل حذف می‌شود.
 ============================================================ */
-
-    
 
     $("#cancelBom")
         .addEventListener(
