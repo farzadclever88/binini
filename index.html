@@ -12340,12 +12340,30 @@ function getFriendlyApiError(
 
 /* ============================================================
    AUTH STORAGE
-   ============================================================ */
+============================================================ */
 
 function saveAuthentication(
     token,
     user
 ) {
+
+    /* --------------------------------------------------------
+       NEW AUTH SYSTEM
+    -------------------------------------------------------- */
+
+    setToken(
+        token
+    );
+
+    setCurrentUser(
+        user
+    );
+
+
+    /* --------------------------------------------------------
+       LEGACY STATE
+       موقتاً برای سازگاری با توابع قدیمی
+    -------------------------------------------------------- */
 
     AppState.token =
         token;
@@ -12353,63 +12371,7 @@ function saveAuthentication(
     AppState.user =
         user;
 
-
-    localStorage.setItem(
-        TOKEN_KEY,
-        token
-    );
-
-    localStorage.setItem(
-        USER_KEY,
-        JSON.stringify(
-            user
-        )
-    );
-
 }
-
-
-function clearAuthentication() {
-
-    AppState.token =
-        null;
-
-    AppState.user =
-        null;
-
-    localStorage.removeItem(
-        TOKEN_KEY
-    );
-
-    localStorage.removeItem(
-        USER_KEY
-    );
-
-}
-
-
-/* ============================================================
-   AUTH CHECK
-   ============================================================ */
-
-function requireAuthentication() {
-
-    if (
-        !AppState.token
-    ) {
-
-        window.location.href =
-            "login.html";
-
-        return false;
-
-    }
-
-    return true;
-
-}
-
-
 /* ============================================================
    DISPLAY CURRENT USER
    ============================================================ */
