@@ -6,347 +6,2026 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
 <title>داشبورد | سامانه نی‌نی‌تو</title>
+
 <style>
-:root{--bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#64748b;--border:#e2e8f0;--primary:#2563eb;--danger:#dc2626;--ok:#16a34a;--shadow:0 8px 28px #0f172a12}
-:root[data-theme=dark]{--bg:#0f172a;--card:#1e293b;--text:#f8fafc;--muted:#94a3b8;--border:#334155;--shadow:0 8px 28px #0005}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Tahoma,"Segoe UI",sans-serif}
-button,input{font:inherit}.header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--border)}
-.header-in{max-width:1450px;margin:auto;padding:13px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.brand{display:flex;align-items:center;gap:10px}.logo{width:42px;height:42px;border-radius:12px;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:900}.sub{font-size:12px;color:var(--muted)}
-.actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.user{padding:7px 10px;background:var(--bg);border:1px solid var(--border);border-radius:9px;font-size:12px}
-.btn{border:0;border-radius:9px;padding:9px 13px;background:var(--primary);color:#fff;cursor:pointer;font-weight:700}.btn.secondary{background:var(--card);color:var(--text);border:1px solid var(--border)}.btn.danger{background:var(--danger)}
-.layout{max-width:1450px;margin:auto;padding:18px;display:grid;grid-template-columns:220px 1fr;gap:18px}.side{position:sticky;top:82px;align-self:start;background:var(--card);border:1px solid var(--border);border-radius:15px;padding:9px;box-shadow:var(--shadow)}.side-title{font-size:12px;color:var(--muted);padding:8px}
-.nav{width:100%;border:0;background:transparent;color:var(--text);text-align:right;padding:10px;border-radius:9px;cursor:pointer}.nav:hover,.nav.active{background:#2563eb18;color:var(--primary)}
-.head{display:flex;justify-content:space-between;gap:12px;margin-bottom:15px}.head h1{margin:0;font-size:23px}.head p{margin:3px 0 0;color:var(--muted);font-size:13px}
-.status{padding:6px 10px;border-radius:99px;background:#16a34a18;color:var(--ok);font-size:12px;font-weight:700;height:max-content}.status.bad{background:#dc262618;color:var(--danger)}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:15px}.stat,.card{background:var(--card);border:1px solid var(--border);border-radius:15px;box-shadow:var(--shadow)}.stat{padding:15px}.stat small{color:var(--muted)}.stat b{display:block;font-size:26px;margin-top:3px}
-.card{overflow:hidden;margin-bottom:15px}.card-head{padding:13px 15px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}.card-head h2{margin:0;font-size:16px}.body{padding:15px}
-.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap;font-size:13px}th{background:var(--bg);color:var(--muted);font-size:12px}.empty{text-align:center;padding:32px;color:var(--muted)}
-.error{padding:13px;border-radius:10px;background:#dc262615;color:var(--danger);border:1px solid #dc262630;margin-bottom:12px}.search{display:flex;gap:8px}.search input{flex:1;min-width:180px;padding:10px;border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text)}
-.message{position:fixed;bottom:18px;left:18px;z-index:50;display:none;max-width:430px;padding:12px 15px;border-radius:11px;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow)}.message.show{display:block}
-.loader{position:fixed;inset:0;z-index:100;background:#0004;display:none;place-items:center}.loader.show{display:grid}.loader-box{background:var(--card);padding:22px 30px;border-radius:15px;text-align:center}.spin{width:32px;height:32px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:s .8s linear infinite;margin:auto auto 10px}@keyframes s{to{transform:rotate(360deg)}}
-.footer{max-width:1450px;margin:auto;padding:0 18px 25px;color:var(--muted);font-size:11px}
-@media(max-width:900px){.layout{grid-template-columns:1fr}.side{position:static;display:flex;overflow:auto;gap:3px}.side-title{display:none}.nav{white-space:nowrap;width:auto}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.header-in{align-items:flex-start}.sub{display:none}.head{flex-direction:column}}
+:root{
+  --bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#64748b;
+  --border:#e2e8f0;--primary:#2563eb;--primary2:#1d4ed8;
+  --danger:#dc2626;--warning:#d97706;--ok:#16a34a;
+  --shadow:0 8px 28px rgba(15,23,42,.07);--radius:15px;
+}
+:root[data-theme="dark"]{
+  --bg:#0f172a;--card:#1e293b;--text:#f8fafc;--muted:#94a3b8;
+  --border:#334155;--shadow:0 8px 28px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Tahoma,"Segoe UI",sans-serif;font-size:14px
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.header{
+  position:sticky;top:0;z-index:40;background:var(--card);
+  border-bottom:1px solid var(--border)
+}
+.header-in{
+  max-width:1500px;margin:auto;padding:12px 18px;
+  display:flex;justify-content:space-between;align-items:center;gap:12px
+}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{
+  width:43px;height:43px;border-radius:12px;background:var(--primary);
+  color:#fff;display:grid;place-items:center;font-weight:900;font-size:20px
+}
+.brand-title{font-weight:900}.sub{font-size:11px;color:var(--muted);margin-top:3px}
+.actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.user{
+  padding:8px 11px;background:var(--bg);border:1px solid var(--border);
+  border-radius:9px;font-size:12px
+}
+.btn{
+  border:0;border-radius:9px;padding:9px 13px;background:var(--primary);
+  color:#fff;font-weight:700
+}
+.btn:hover{background:var(--primary2)}
+.btn.secondary{
+  background:var(--card);color:var(--text);border:1px solid var(--border)
+}
+.btn.danger{background:var(--danger)}
+.btn.small{padding:7px 10px;font-size:12px}
+.layout{
+  max-width:1500px;margin:auto;padding:18px;
+  display:grid;grid-template-columns:225px minmax(0,1fr);gap:18px
+}
+.side{
+  position:sticky;top:78px;align-self:start;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--radius);
+  padding:9px;box-shadow:var(--shadow)
+}
+.side-title{font-size:11px;color:var(--muted);padding:8px}
+.nav{
+  width:100%;border:0;background:transparent;color:var(--text);
+  text-align:right;padding:10px;border-radius:9px;margin:1px 0
+}
+.nav:hover,.nav.active{background:#2563eb18;color:var(--primary);font-weight:700}
+.head{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  gap:12px;margin-bottom:15px
+}
+.head h1{margin:0;font-size:23px}.head p{margin:4px 0 0;color:var(--muted);font-size:12px}
+.status{
+  padding:7px 11px;border-radius:99px;background:#16a34a18;color:var(--ok);
+  font-size:11px;font-weight:700;white-space:nowrap
+}
+.status.bad{background:#dc262618;color:var(--danger)}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:15px}
+.stat,.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);box-shadow:var(--shadow)
+}
+.stat{padding:15px}.stat small{color:var(--muted)}.stat b{display:block;font-size:25px;margin-top:5px}
+.card{overflow:hidden;margin-bottom:15px}
+.card-head{
+  padding:13px 15px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;gap:10px
+}
+.card-head h2{margin:0;font-size:15px}
+.body{padding:15px}
+.toolbar{
+  padding:12px 15px;border-bottom:1px solid var(--border);
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap
+}
+.search{display:flex;gap:7px;flex:1;min-width:220px}
+.search input,.field input,.field select{
+  width:100%;padding:9px 10px;border:1px solid var(--border);
+  border-radius:9px;background:var(--bg);color:var(--text);outline:none
+}
+.search input:focus,.field input:focus,.field select:focus{border-color:var(--primary)}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th,td{
+  padding:9px 10px;border-bottom:1px solid var(--border);
+  text-align:right;white-space:nowrap;font-size:12px
+}
+th{background:var(--bg);color:var(--muted);font-size:11px}
+tr:hover td{background:#2563eb08}
+.empty{text-align:center;padding:35px;color:var(--muted)}
+.grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:12px;padding:15px
+}
+.entity-card{
+  border:1px solid var(--border);border-radius:12px;padding:13px;background:var(--bg)
+}
+.entity-title{font-weight:800;margin-bottom:7px}.entity-meta{font-size:12px;color:var(--muted);line-height:1.9}
+.badge{
+  display:inline-block;padding:3px 7px;border-radius:99px;font-size:10px;
+  background:#2563eb16;color:var(--primary)
+}
+.form-grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px
+}
+.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px}
+.field.full{grid-column:1/-1}
+.form-actions{display:flex;gap:7px;margin-top:12px}
+.error{
+  padding:13px;border-radius:10px;background:#dc262615;color:var(--danger);
+  border:1px solid #dc262630;margin:12px 15px
+}
+.message{
+  position:fixed;bottom:18px;left:18px;z-index:90;display:none;
+  max-width:430px;padding:12px 15px;border-radius:11px;background:var(--card);
+  border:1px solid var(--border);box-shadow:var(--shadow)
+}
+.message.show{display:block}.message.success{border-right:4px solid var(--ok)}
+.message.warning{border-right:4px solid var(--warning)}
+.message.error{border-right:4px solid var(--danger)}
+.loader{
+  position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.28);
+  display:none;place-items:center
+}
+.loader.show{display:grid}
+.loader-box{background:var(--card);padding:22px 30px;border-radius:15px;text-align:center;min-width:210px}
+.spin{
+  width:32px;height:32px;border:4px solid var(--border);border-top-color:var(--primary);
+  border-radius:50%;animation:spin .8s linear infinite;margin:auto auto 10px
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal{
+  position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.35);
+  display:none;place-items:center;padding:18px
+}
+.modal.show{display:grid}
+.modal-box{
+  width:min(760px,100%);max-height:90vh;overflow:auto;background:var(--card);
+  border-radius:16px;border:1px solid var(--border);box-shadow:var(--shadow)
+}
+.modal-head{
+  padding:13px 15px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between
+}
+.modal-body{padding:15px}
+.close{border:0;background:transparent;color:var(--muted);font-size:22px}
+.footer{max-width:1500px;margin:auto;padding:0 18px 25px;color:var(--muted);font-size:11px}
+.hidden{display:none!important}
+@media(max-width:1100px){
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .form-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:850px){
+  .layout{grid-template-columns:1fr}
+  .side{position:static;display:flex;overflow:auto;gap:3px}
+  .side-title{display:none}.nav{white-space:nowrap;width:auto}
+}
+@media(max-width:600px){
+  .header-in{align-items:flex-start}.sub{display:none}
+  .head{flex-direction:column}.stats{grid-template-columns:repeat(2,1fr)}
+  .form-grid{grid-template-columns:1fr}
+  .form-actions{flex-wrap:wrap}
+}
 </style>
+
+<!--
+  مهم:
+  1) هیچ JavaScript در head اجرا نمی‌شود.
+  2) CSS قبل از هر اسکریپتی بارگذاری می‌شود.
+  3) اسکریپت فقط در انتهای body اجرا می‌شود.
+-->
 </head>
+
 <body>
 
 <header class="header">
-<div class="header-in">
-<div class="brand"><div class="logo">ن</div><div><strong>سامانه نی‌نی‌تو</strong><div class="sub">مدیریت تولید، BOM و انبار</div></div></div>
-<div class="actions"><div class="user">کاربر: <b id="currentUser">در حال بررسی...</b></div><button id="theme" class="btn secondary">تم شب</button><button id="logout" class="btn danger">خروج</button></div>
-</div>
+  <div class="header-in">
+    <div class="brand">
+      <div class="logo">ن</div>
+      <div>
+        <div class="brand-title">سامانه نی‌نی‌تو</div>
+        <div class="sub">مدیریت تولید، BOM و انبار</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="user">
+        کاربر:
+        <b id="currentUser">در حال بررسی...</b>
+      </div>
+      <button id="themeBtn" class="btn secondary" type="button">تم شب</button>
+      <button id="logoutBtn" class="btn danger" type="button">خروج</button>
+    </div>
+  </div>
 </header>
 
 <div class="layout">
+
 <aside class="side">
-<div class="side-title">منوی سامانه</div>
-<button class="nav active" data-view="dashboard">داشبورد</button>
-<button class="nav" data-view="units">واحدها</button>
-<button class="nav" data-view="products">محصولات</button>
-<button class="nav" data-view="parts">قطعات</button>
-<button class="nav" data-view="warehouses">انبارها</button>
-<button class="nav" data-view="boms">BOM ها</button>
-<button class="nav" data-view="planning">برنامه تولید</button>
-<button class="nav" data-view="production">تولید</button>
-<button class="nav" data-view="inventory">موجودی انبار</button>
-<button class="nav" data-view="barcode">جستجوی بارکد</button>
+  <div class="side-title">منوی سامانه</div>
+
+  <button class="nav active" data-view="dashboard" type="button">داشبورد</button>
+  <button class="nav" data-view="units" type="button">واحدها</button>
+  <button class="nav" data-view="products" type="button">محصولات</button>
+  <button class="nav" data-view="parts" type="button">قطعات</button>
+  <button class="nav" data-view="warehouses" type="button">انبارها</button>
+  <button class="nav" data-view="boms" type="button">BOM ها</button>
+  <button class="nav" data-view="planning" type="button">برنامه تولید</button>
+  <button class="nav" data-view="production" type="button">ثبت تولید</button>
+  <button class="nav" data-view="inventory" type="button">موجودی انبار</button>
+  <button class="nav" data-view="barcode" type="button">جستجوی بارکد</button>
 </aside>
 
 <main id="main">
-<section class="head"><div><h1>داشبورد</h1><p>نمای کلی سامانه نی‌نی‌تو</p></div><span id="status" class="status">در حال اتصال...</span></section>
-<div class="card"><div class="body"><b>در حال آماده‌سازی...</b><div style="color:var(--muted);font-size:13px">در حال دریافت اطلاعات از Worker و پایگاه داده.</div></div></div>
+  <section class="head">
+    <div>
+      <h1>داشبورد</h1>
+      <p>در حال اتصال به Worker و دریافت اطلاعات...</p>
+    </div>
+    <span id="status" class="status">در حال اتصال...</span>
+  </section>
+
+  <div class="card">
+    <div class="body">
+      <b>در حال آماده‌سازی سامانه...</b>
+      <div style="color:var(--muted);font-size:12px;margin-top:5px">
+        اطلاعات پس از اتصال موفق به Worker نمایش داده می‌شود.
+      </div>
+    </div>
+  </div>
 </main>
+
 </div>
 
-<div class="footer">نی‌نی‌تو — اتصال به Cloudflare Worker و D1</div>
-<div id="message" class="message"></div>
-<div id="loader" class="loader"><div class="loader-box"><div class="spin"></div><div id="loaderText">در حال ارتباط با سامانه...</div></div></div>
+<div class="footer">نی‌نی‌تو — Cloudflare Worker + D1</div>
 
+<div id="message" class="message"></div>
+
+<div id="loader" class="loader">
+  <div class="loader-box">
+    <div class="spin"></div>
+    <div id="loaderText">در حال ارتباط با سامانه...</div>
+  </div>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <b id="modalTitle">جزئیات</b>
+      <button id="modalClose" class="close" type="button">×</button>
+    </div>
+    <div id="modalBody" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT — فقط این بخش، در انتهای body
+============================================================ -->
 <script>
 "use strict";
 
 /* ============================================================
-   CONFIG — دقیقاً مطابق Login.html و Worker فعلی
+   CONFIGURATION
+   مطابق Worker فعلی نی‌نی‌تو
 ============================================================ */
-const CONFIG={
- API:"https://ninitoapp.farzadclever88.workers.dev",
- TOKEN_KEY:"ninito_token",
- THEME_KEY:"ninito_theme",
- TIMEOUT:20000
+const CONFIG = Object.freeze({
+  API_BASE_URL: "https://ninitoapp.farzadclever88.workers.dev",
+  TOKEN_KEY: "ninito_token",
+  THEME_KEY: "ninito_theme",
+  REQUEST_TIMEOUT: 20000
+});
+
+/* ============================================================
+   STATE
+============================================================ */
+const STATE = {
+  user: null,
+  units: [],
+  products: [],
+  parts: [],
+  warehouses: [],
+  boms: [],
+  bomDetails: [],
+  planning: [],
+  production: [],
+  inventory: [],
+  view: "dashboard"
 };
 
-const STATE={
- user:null,units:[],products:[],parts:[],warehouses:[],
- boms:[],planning:[],production:[],inventory:[],view:"dashboard"
-};
+/* ============================================================
+   DOM
+============================================================ */
+const $ = (selector, parent = document) => parent.querySelector(selector);
+const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
 
-const $=s=>document.querySelector(s);
-const $$=s=>[...document.querySelectorAll(s)];
+/* ============================================================
+   HELPERS
+============================================================ */
+function esc(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
 
-function esc(v){
- return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+function numberFa(value){
+  const n = Number(value);
+  return Number.isFinite(n)
+    ? n.toLocaleString("fa-IR")
+    : esc(value ?? "-");
 }
-function num(v){
- const n=Number(v); return Number.isFinite(n)?n.toLocaleString("fa-IR"):esc(v??"-");
+
+function dateFa(value){
+  if(!value) return "-";
+
+  const s = String(value);
+
+  /* اگر Worker تاریخ ISO برگرداند */
+  const d = new Date(s);
+
+  if(!Number.isNaN(d.getTime()) && /T|\d{2}:\d{2}/.test(s)){
+    return new Intl.DateTimeFormat("fa-IR",{
+      year:"numeric",
+      month:"2-digit",
+      day:"2-digit",
+      hour:"2-digit",
+      minute:"2-digit"
+    }).format(d);
+  }
+
+  /* تاریخ YYYY-MM-DD */
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m){
+    try{
+      return new Intl.DateTimeFormat("fa-IR",{
+        year:"numeric",month:"2-digit",day:"2-digit"
+      }).format(new Date(
+        Number(m[1]),Number(m[2])-1,Number(m[3])
+      ));
+    }catch{}
+  }
+
+  return esc(s);
 }
-function token(){return localStorage.getItem(CONFIG.TOKEN_KEY)}
-function message(text,type="success"){
- const x=$("#message"); if(!x)return;
- x.textContent=text;x.className="message show";
- x.style.borderRight="4px solid "+(type==="error"?"#dc2626":type==="warning"?"#d97706":"#16a34a");
- clearTimeout(x._t);x._t=setTimeout(()=>x.classList.remove("show"),4500);
+
+function todayISO(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
 }
-function loading(on,text="در حال ارتباط با سامانه..."){
- $("#loaderText").textContent=text;$("#loader").classList.toggle("show",!!on);
+
+function getToken(){
+  return localStorage.getItem(CONFIG.TOKEN_KEY);
 }
-function clearAuth(){
- localStorage.removeItem(CONFIG.TOKEN_KEY);
- STATE.user=null;
+
+function clearAuthentication(){
+  localStorage.removeItem(CONFIG.TOKEN_KEY);
+  STATE.user = null;
 }
-function theme(){
- const t=localStorage.getItem(CONFIG.THEME_KEY);
- if(t==="dark")document.documentElement.dataset.theme="dark";
- else delete document.documentElement.dataset.theme;
- $("#theme").textContent=t==="dark"?"تم روز":"تم شب";
+
+function showMessage(text,type="success"){
+  const box = $("#message");
+  if(!box) return;
+
+  box.textContent = text || "پیام";
+  box.className = "message show " + type;
+
+  clearTimeout(box._timer);
+  box._timer = setTimeout(()=>{
+    box.classList.remove("show");
+  },5000);
 }
-function toggleTheme(){
- const dark=document.documentElement.dataset.theme==="dark";
- if(dark){delete document.documentElement.dataset.theme;localStorage.setItem(CONFIG.THEME_KEY,"light")}
- else{document.documentElement.dataset.theme="dark";localStorage.setItem(CONFIG.THEME_KEY,"dark")}
- theme();
+
+function setLoading(active,text="در حال ارتباط با سامانه..."){
+  const loader = $("#loader");
+  if(!loader) return;
+
+  $("#loaderText").textContent = text;
+  loader.classList.toggle("show",Boolean(active));
+}
+
+function setStatus(text,bad=false){
+  const el = $("#status");
+  if(!el) return;
+  el.textContent = text;
+  el.classList.toggle("bad",bad);
 }
 
 /* ============================================================
-   API REQUEST — تنها apiRequest فایل
+   THEME
+============================================================ */
+function applyTheme(){
+  const theme = localStorage.getItem(CONFIG.THEME_KEY) || "light";
+
+  if(theme === "dark"){
+    document.documentElement.dataset.theme = "dark";
+    $("#themeBtn").textContent = "تم روز";
+  }else{
+    delete document.documentElement.dataset.theme;
+    $("#themeBtn").textContent = "تم شب";
+  }
+}
+
+function toggleTheme(){
+  const dark = document.documentElement.dataset.theme === "dark";
+
+  if(dark){
+    localStorage.setItem(CONFIG.THEME_KEY,"light");
+  }else{
+    localStorage.setItem(CONFIG.THEME_KEY,"dark");
+  }
+
+  applyTheme();
+}
+
+/* ============================================================
+   API
+   تنها تابع ارتباط با Worker
 ============================================================ */
 async function apiRequest(path,options={}){
- const method=options.method||"GET";
- const body=options.body??null;
- const auth=options.auth!==false;
- const headers={"Content-Type":"application/json",...(options.headers||{})};
- const t=token();
- if(auth&&t)headers.Authorization="Bearer "+t;
+  const {
+    method = "GET",
+    body = null,
+    auth = true,
+    loadingText = "در حال ارتباط با سامانه..."
+  } = options;
 
- const controller=new AbortController();
- const timer=setTimeout(()=>controller.abort(),CONFIG.TIMEOUT);
- loading(true,options.loadingText||"در حال ارتباط با سامانه...");
+  const headers = {
+    "Content-Type":"application/json",
+    ...(options.headers || {})
+  };
 
- let response;
- try{
-  response=await fetch(CONFIG.API+path,{
-   method,headers,
-   body:body===null?undefined:JSON.stringify(body),
-   signal:controller.signal,cache:"no-store"
+  const t = getToken();
+
+  if(auth && t){
+    headers.Authorization = "Bearer " + t;
+  }
+
+  const controller = new AbortController();
+
+  const timeout = setTimeout(()=>{
+    controller.abort();
+  },CONFIG.REQUEST_TIMEOUT);
+
+  setLoading(true,loadingText);
+
+  try{
+    let response;
+
+    try{
+      response = await fetch(
+        CONFIG.API_BASE_URL + path,
+        {
+          method,
+          headers,
+          body: body === null
+            ? undefined
+            : JSON.stringify(body),
+          signal: controller.signal,
+          cache:"no-store"
+        }
+      );
+    }catch(error){
+      if(error?.name === "AbortError"){
+        throw {
+          code:"NET-002",
+          message:"زمان پاسخ‌گویی Worker به پایان رسید."
+        };
+      }
+
+      throw {
+        code:"NET-001",
+        message:"ارتباط با Worker برقرار نشد. آدرس Worker یا اتصال اینترنت را بررسی کنید."
+      };
+    }
+
+    let data = null;
+
+    try{
+      data = await response.json();
+    }catch{
+      throw {
+        code:"API-JSON",
+        message:"پاسخ Worker قابل خواندن نیست."
+      };
+    }
+
+    if(response.status === 401){
+      clearAuthentication();
+
+      throw {
+        code:data?.error?.code || "AUTH-401",
+        message:data?.error?.message || "نشست شما معتبر نیست.",
+        status:401
+      };
+    }
+
+    if(!response.ok){
+      throw {
+        code:data?.error?.code || `HTTP-${response.status}`,
+        message:data?.error?.message || "عملیات در Worker انجام نشد.",
+        details:data?.error?.details || null,
+        status:response.status
+      };
+    }
+
+    if(data?.success === false){
+      throw {
+        code:data?.error?.code || "API-ERROR",
+        message:data?.error?.message || "عملیات انجام نشد.",
+        details:data?.error?.details || null
+      };
+    }
+
+    return data;
+
+  }finally{
+    clearTimeout(timeout);
+    setLoading(false);
+  }
+}
+
+/* ============================================================
+   API WRAPPERS
+============================================================ */
+const apiGet = (path,options={}) =>
+  apiRequest(path,{...options,method:"GET"});
+
+const apiPost = (path,data,options={}) =>
+  apiRequest(path,{...options,method:"POST",body:data});
+
+const apiDelete = (path,options={}) =>
+  apiRequest(path,{...options,method:"DELETE"});
+
+/* ============================================================
+   AUTH
+============================================================ */
+async function loadCurrentUser(){
+  const t = getToken();
+
+  if(!t){
+    location.href = "Login.html";
+    return null;
+  }
+
+  const data = await apiGet("/api/me",{
+    loadingText:"در حال بررسی حساب کاربری..."
   });
- }catch(e){
-  clearTimeout(timer);loading(false);
-  if(e.name==="AbortError")throw{code:"NET-002",message:"زمان پاسخ‌گویی Worker به پایان رسید.",status:0};
-  throw{code:"NET-001",message:"ارتباط با Worker برقرار نشد. آدرس Worker یا اتصال اینترنت را بررسی کنید.",status:0};
- }
- clearTimeout(timer);loading(false);
 
- let data;
- try{data=await response.json()}catch{throw{code:"API-JSON",message:"پاسخ Worker قابل خواندن نیست.",status:response.status}}
+  STATE.user = data?.data?.user || data?.user || null;
 
- if(response.status===401){
-  clearAuth();
-  message("نشست شما معتبر نیست. دوباره وارد شوید.","error");
-  setTimeout(()=>location.href="Login.html",700);
-  throw{code:data?.error?.code||"AUTH-401",message:data?.error?.message||"نشست معتبر نیست.",status:401};
- }
- if(!response.ok)throw{code:data?.error?.code||"HTTP-"+response.status,message:data?.error?.message||"عملیات در Worker انجام نشد.",status:response.status};
- if(data?.success===false)throw{code:data?.error?.code||"API-ERROR",message:data?.error?.message||"عملیات انجام نشد.",status:response.status};
- return data;
+  if(!STATE.user){
+    throw {
+      code:"AUTH-USER",
+      message:"اطلاعات کاربر از Worker دریافت نشد."
+    };
+  }
+
+  $("#currentUser").textContent =
+    STATE.user.full_name ||
+    STATE.user.username ||
+    "کاربر";
+
+  return STATE.user;
+}
+
+async function logout(){
+  try{
+    await apiPost("/api/logout",null,{
+      loadingText:"در حال خروج از سامانه..."
+    });
+  }catch(error){
+    console.warn("LOGOUT",error);
+  }finally{
+    clearAuthentication();
+    location.href = "Login.html";
+  }
 }
 
 /* ============================================================
-   LOADERS — همه به همان apiRequest متصل‌اند
+   DATA LOADERS
+   هر Loader مستقل است تا خطای یک جدول مانع جدول‌های دیگر نشود.
 ============================================================ */
-async function load(name,path,label){
- try{
-  const d=await apiRequest(path,{loadingText:"در حال دریافت "+label+"..."});
-  const items=Array.isArray(d?.items)?d.items:[];
-  STATE[name]=items;
-  return {ok:true,items};
- }catch(error){
-  console.error(path,error);
-  return {ok:false,items:[],error};
- }
+const DATASETS = {
+  units:{
+    path:"/api/units",
+    label:"واحدها"
+  },
+  products:{
+    path:"/api/products",
+    label:"محصولات"
+  },
+  parts:{
+    path:"/api/parts",
+    label:"قطعات"
+  },
+  warehouses:{
+    path:"/api/warehouses",
+    label:"انبارها"
+  },
+  boms:{
+    path:"/api/boms",
+    label:"BOMها"
+  },
+  planning:{
+    path:"/api/planning",
+    label:"برنامه تولید"
+  },
+  production:{
+    path:"/api/production",
+    label:"سوابق تولید"
+  },
+  inventory:{
+    path:"/api/inventory",
+    label:"موجودی انبار"
+  }
+};
+
+async function loadDataset(name){
+  const cfg = DATASETS[name];
+
+  if(!cfg) return {ok:false};
+
+  try{
+    const data = await apiGet(cfg.path,{
+      loadingText:"در حال دریافت " + cfg.label + "..."
+    });
+
+    const items =
+      data?.data?.items ||
+      data?.items ||
+      [];
+
+    STATE[name] = Array.isArray(items) ? items : [];
+
+    return {ok:true,items:STATE[name]};
+
+  }catch(error){
+    console.error("LOAD",name,error);
+    return {ok:false,error};
+  }
 }
-async function loadAll(){
- return Promise.all([
-  load("units","/api/units","واحدها"),
-  load("products","/api/products","محصولات"),
-  load("parts","/api/parts","قطعات"),
-  load("warehouses","/api/warehouses","انبارها"),
-  load("boms","/api/boms","BOMها"),
-  load("planning","/api/planning","برنامه تولید"),
-  load("production","/api/production","سوابق تولید"),
-  load("inventory","/api/inventory","موجودی انبار")
- ]);
-}
-async function loadUser(){
- const d=await apiRequest("/api/me",{loadingText:"در حال بررسی کاربر..."});
- STATE.user=d?.user||null;
- $("#currentUser").textContent=STATE.user?.full_name||STATE.user?.username||"کاربر";
+
+async function loadAllDatasets(){
+  const names = Object.keys(DATASETS);
+  const results = await Promise.all(
+    names.map(name=>loadDataset(name))
+  );
+
+  return results;
 }
 
 /* ============================================================
-   TABLE
+   TABLE / GRID
 ============================================================ */
-function table(columns,rows,empty="اطلاعاتی وجود ندارد."){
- if(!rows.length)return `<div class="empty">${esc(empty)}</div>`;
- return `<div class="table-wrap"><table><thead><tr>${columns.map(c=>`<th>${esc(c.label)}</th>`).join("")}</tr></thead><tbody>${
- rows.map(r=>`<tr>${columns.map(c=>`<td>${esc(typeof c.value==="function"?c.value(r):r[c.value]??"-")}</td>`).join("")}</tr>`).join("")
- }</tbody></table></div>`;
+function renderTable(columns,rows,empty="اطلاعاتی وجود ندارد."){
+  if(!rows.length){
+    return `<div class="empty">${esc(empty)}</div>`;
+  }
+
+  return `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            ${columns.map(c=>`<th>${esc(c.label)}</th>`).join("")}
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(row=>`
+            <tr>
+              ${columns.map(c=>{
+                let value =
+                  typeof c.value === "function"
+                    ? c.value(row)
+                    : row[c.value];
+
+                return `<td>${value ?? "-"}</td>`;
+              }).join("")}
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderGrid(rows,config){
+  if(!rows.length){
+    return `<div class="empty">${esc(config.empty || "اطلاعاتی وجود ندارد.")}</div>`;
+  }
+
+  return `
+    <div class="grid">
+      ${rows.map(row=>`
+        <article class="entity-card">
+          <div class="entity-title">
+            ${esc(config.title(row))}
+          </div>
+          <div class="entity-meta">
+            ${config.meta(row)}
+          </div>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+/* ============================================================
+   VIEW CONFIGURATION
+============================================================ */
+const VIEWS = {
+  units:{
+    title:"واحدها",
+    state:"units",
+    path:"/api/units",
+    cols:[
+      {label:"کد",value:"code"},
+      {label:"نام",value:"name"},
+      {label:"وضعیت",value:"status"}
+    ],
+    grid:{
+      title:r=>r.name || r.code || "واحد",
+      meta:r=>`
+        کد: ${esc(r.code || "-")}<br>
+        وضعیت: ${esc(r.status || "-")}
+      `
+    }
+  },
+
+  products:{
+    title:"محصولات",
+    state:"products",
+    path:"/api/products",
+    cols:[
+      {label:"کد",value:"code"},
+      {label:"نام",value:"name"},
+      {label:"واحد",value:"unit_name"},
+      {label:"وضعیت",value:"status"}
+    ],
+    grid:{
+      title:r=>r.name || r.code || "محصول",
+      meta:r=>`
+        کد: ${esc(r.code || "-")}<br>
+        واحد: ${esc(r.unit_name || "-")}<br>
+        وضعیت: ${esc(r.status || "-")}
+      `
+    }
+  },
+
+  parts:{
+    title:"قطعات",
+    state:"parts",
+    path:"/api/parts",
+    cols:[
+      {label:"کد",value:"code"},
+      {label:"شرح",value:"name"},
+      {label:"واحد",value:"unit_name"},
+      {label:"بارکد",value:"barcode"},
+      {label:"حداقل",value:r=>numberFa(r.min_stock)},
+      {label:"نقطه سفارش",value:r=>numberFa(r.reorder_point)},
+      {label:"وضعیت",value:"status"}
+    ],
+    grid:{
+      title:r=>r.name || r.code || "قطعه",
+      meta:r=>`
+        کد: ${esc(r.code || "-")}<br>
+        بارکد: ${esc(r.barcode || "-")}<br>
+        واحد: ${esc(r.unit_name || "-")}<br>
+        حداقل موجودی: ${numberFa(r.min_stock)}<br>
+        نقطه سفارش: ${numberFa(r.reorder_point)}
+      `
+    }
+  },
+
+  warehouses:{
+    title:"انبارها",
+    state:"warehouses",
+    path:"/api/warehouses",
+    cols:[
+      {label:"کد",value:"code"},
+      {label:"نام",value:"name"},
+      {label:"نوع",value:"warehouse_type"},
+      {label:"وضعیت",value:"status"}
+    ],
+    grid:{
+      title:r=>r.name || r.code || "انبار",
+      meta:r=>`
+        کد: ${esc(r.code || "-")}<br>
+        نوع: ${esc(r.warehouse_type || "-")}<br>
+        وضعیت: ${esc(r.status || "-")}
+      `
+    }
+  },
+
+  boms:{
+    title:"BOM ها",
+    state:"boms",
+    path:"/api/boms",
+    cols:[
+      {label:"کد BOM",value:"code"},
+      {label:"کد محصول",value:"product_code"},
+      {label:"محصول",value:"product_name"},
+      {label:"نسخه",value:"version"},
+      {label:"از تاریخ",value:r=>dateFa(r.effective_from)},
+      {label:"تا تاریخ",value:r=>dateFa(r.effective_to)},
+      {label:"وضعیت",value:"status"}
+    ],
+    grid:{
+      title:r=>r.code || "BOM",
+      meta:r=>`
+        محصول: ${esc(r.product_name || "-")}<br>
+        کد محصول: ${esc(r.product_code || "-")}<br>
+        نسخه: ${numberFa(r.version)}<br>
+        شروع: ${dateFa(r.effective_from)}<br>
+        پایان: ${dateFa(r.effective_to)}
+      `
+    }
+  },
+
+  planning:{
+    title:"برنامه تولید",
+    state:"planning",
+    path:"/api/planning",
+    cols:[
+      {label:"تاریخ",value:r=>dateFa(r.plan_date)},
+      {label:"BOM",value:"bom_code"},
+      {label:"محصول",value:"product_name"},
+      {label:"برنامه",value:r=>numberFa(r.planned_quantity)},
+      {label:"تولید",value:r=>numberFa(r.produced_quantity)},
+      {label:"باقی‌مانده",value:r=>numberFa(
+        Math.max(0,(Number(r.planned_quantity)||0)-(Number(r.produced_quantity)||0))
+      )},
+      {label:"وضعیت",value:"status"}
+    ],
+    grid:{
+      title:r=>r.product_name || r.bom_code || "برنامه",
+      meta:r=>`
+        تاریخ: ${dateFa(r.plan_date)}<br>
+        BOM: ${esc(r.bom_code || "-")}<br>
+        برنامه: ${numberFa(r.planned_quantity)}<br>
+        تولید: ${numberFa(r.produced_quantity)}<br>
+        باقی‌مانده: ${numberFa(
+          Math.max(0,(Number(r.planned_quantity)||0)-(Number(r.produced_quantity)||0))
+        )}
+      `
+    }
+  },
+
+  production:{
+    title:"سوابق تولید",
+    state:"production",
+    path:"/api/production",
+    cols:[
+      {label:"تاریخ",value:r=>dateFa(r.production_date)},
+      {label:"کد محصول",value:"product_code"},
+      {label:"محصول",value:"product_name"},
+      {label:"مقدار",value:r=>numberFa(r.produced_quantity)},
+      {label:"وضعیت",value:"status"}
+    ],
+    grid:{
+      title:r=>r.product_name || r.product_code || "تولید",
+      meta:r=>`
+        تاریخ: ${dateFa(r.production_date)}<br>
+        کد محصول: ${esc(r.product_code || "-")}<br>
+        مقدار: ${numberFa(r.produced_quantity)}<br>
+        وضعیت: ${esc(r.status || "-")}
+      `
+    }
+  },
+
+  inventory:{
+    title:"موجودی انبار",
+    state:"inventory",
+    path:"/api/inventory",
+    cols:[
+      {label:"انبار",value:"warehouse_name"},
+      {label:"کد انبار",value:"warehouse_code"},
+      {label:"نوع",value:"item_type"},
+      {label:"شرح",value:"item_name"},
+      {label:"مقدار",value:r=>numberFa(r.quantity)},
+      {label:"بروزرسانی",value:r=>dateFa(r.updated_at)}
+    ],
+    grid:{
+      title:r=>r.item_name || "موجودی",
+      meta:r=>`
+        انبار: ${esc(r.warehouse_name || "-")}<br>
+        نوع: ${esc(r.item_type || "-")}<br>
+        مقدار: ${numberFa(r.quantity)}<br>
+        بروزرسانی: ${dateFa(r.updated_at)}
+      `
+    }
+  }
+};
+
+/* ============================================================
+   SEARCH + VIEW MODE
+============================================================ */
+const VIEW_MODE = {
+  list:"list",
+  grid:"grid"
+};
+
+function filterRows(rows,query){
+  const q = String(query || "").trim().toLowerCase();
+
+  if(!q) return rows;
+
+  return rows.filter(row=>
+    Object.values(row).some(value=>
+      String(value ?? "").toLowerCase().includes(q)
+    )
+  );
+}
+
+function viewHeader(title,count){
+  return `
+    <section class="head">
+      <div>
+        <h1>${esc(title)}</h1>
+        <p>اطلاعات دریافت‌شده مستقیم از Cloudflare Worker و D1</p>
+      </div>
+      <span class="status">${numberFa(count)} رکورد</span>
+    </section>
+  `;
+}
+
+function renderDataView(viewName,query=""){
+  const cfg = VIEWS[viewName];
+  if(!cfg) return;
+
+  const rows = filterRows(STATE[cfg.state] || [],query);
+
+  $("#main").innerHTML = `
+    ${viewHeader(cfg.title,rows.length)}
+
+    <section class="card">
+      <div class="toolbar">
+        <div class="search">
+          <input
+            id="viewSearch"
+            type="search"
+            placeholder="جستجو در ${esc(cfg.title)}..."
+            value="${esc(query)}"
+          >
+          <button id="searchBtn" class="btn small" type="button">جستجو</button>
+        </div>
+
+        <button id="listModeBtn" class="btn secondary small" type="button">لیست</button>
+        <button id="gridModeBtn" class="btn secondary small" type="button">کارت</button>
+        <button id="refreshBtn" class="btn secondary small" type="button">بروزرسانی</button>
+      </div>
+
+      <div id="viewContent">
+        ${STATE._mode === VIEW_MODE.grid
+          ? renderGrid(rows,cfg.grid)
+          : renderTable(cfg.cols,rows,`در ${cfg.title} اطلاعاتی وجود ندارد.`)
+        }
+      </div>
+    </section>
+  `;
+
+  $("#searchBtn").onclick=()=>{
+    renderDataView(viewName,$("#viewSearch").value);
+  };
+
+  $("#viewSearch").onkeydown=e=>{
+    if(e.key==="Enter"){
+      e.preventDefault();
+      $("#searchBtn").click();
+    }
+  };
+
+  $("#listModeBtn").onclick=()=>{
+    STATE._mode=VIEW_MODE.list;
+    renderDataView(viewName,$("#viewSearch").value);
+  };
+
+  $("#gridModeBtn").onclick=()=>{
+    STATE._mode=VIEW_MODE.grid;
+    renderDataView(viewName,$("#viewSearch").value);
+  };
+
+  $("#refreshBtn").onclick=async()=>{
+    const result = await loadDataset(cfg.state);
+
+    if(!result.ok){
+      showMessage(
+        result.error?.message || "بروزرسانی انجام نشد.",
+        "error"
+      );
+      return;
+    }
+
+    renderDataView(viewName,$("#viewSearch").value);
+    showMessage("اطلاعات با موفقیت بروزرسانی شد.","success");
+  };
 }
 
 /* ============================================================
    DASHBOARD
 ============================================================ */
-function dashboard(){
- const inv=STATE.inventory.reduce((s,x)=>s+(Number(x.quantity)||0),0);
- $("#main").innerHTML=`
- <section class="head"><div><h1>داشبورد</h1><p>نمای کلی سامانه نی‌نی‌تو</p></div><span class="status">اتصال به Worker موفق</span></section>
- <section class="stats">
-  <div class="stat"><small>واحدها</small><b>${num(STATE.units.length)}</b></div>
-  <div class="stat"><small>محصولات</small><b>${num(STATE.products.length)}</b></div>
-  <div class="stat"><small>قطعات</small><b>${num(STATE.parts.length)}</b></div>
-  <div class="stat"><small>مجموع موجودی</small><b>${num(inv)}</b></div>
- </section>
- <section class="card"><div class="card-head"><h2>برنامه تولید</h2><span>${num(STATE.planning.length)} رکورد</span></div>${
- table([
-  {label:"تاریخ",value:"plan_date"},
-  {label:"BOM",value:"bom_code"},
-  {label:"محصول",value:"product_name"},
-  {label:"برنامه",value:r=>num(r.planned_quantity)},
-  {label:"تولید",value:r=>num(r.produced_quantity)},
-  {label:"وضعیت",value:"status"}
- ],STATE.planning,"برنامه تولیدی ثبت نشده است.")}</section>
- <section class="card"><div class="card-head"><h2>موجودی انبار</h2><span>${num(STATE.inventory.length)} رکورد</span></div>${
- table([
-  {label:"انبار",value:"warehouse_name"},
-  {label:"نوع",value:"item_type"},
-  {label:"شرح",value:"item_name"},
-  {label:"مقدار",value:r=>num(r.quantity)},
-  {label:"بروزرسانی",value:"updated_at"}
- ],STATE.inventory,"موجودی ثبت نشده است.")}</section>
- <section class="card"><div class="card-head"><h2>BOM ها</h2><span>${num(STATE.boms.length)} رکورد</span></div>${
- table([
-  {label:"کد BOM",value:"code"},
-  {label:"کد محصول",value:"product_code"},
-  {label:"محصول",value:"product_name"},
-  {label:"نسخه",value:"version"},
-  {label:"از تاریخ",value:"effective_from"},
-  {label:"وضعیت",value:"status"}
- ],STATE.boms,"BOM ثبت نشده است.")}</section>`;
+function dashboardView(){
+  const inventoryTotal =
+    STATE.inventory.reduce(
+      (sum,row)=>sum+(Number(row.quantity)||0),0
+    );
+
+  $("#main").innerHTML = `
+    ${viewHeader("داشبورد",STATE.units.length + STATE.products.length)}
+
+    <section class="stats">
+      <div class="stat"><small>واحدها</small><b>${numberFa(STATE.units.length)}</b></div>
+      <div class="stat"><small>محصولات</small><b>${numberFa(STATE.products.length)}</b></div>
+      <div class="stat"><small>قطعات</small><b>${numberFa(STATE.parts.length)}</b></div>
+      <div class="stat"><small>انبارها</small><b>${numberFa(STATE.warehouses.length)}</b></div>
+      <div class="stat"><small>مجموع موجودی</small><b>${numberFa(inventoryTotal)}</b></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>برنامه تولید</h2>
+        <span>${numberFa(STATE.planning.length)} رکورد</span>
+      </div>
+      ${renderTable(VIEWS.planning.cols,STATE.planning,"برنامه تولیدی ثبت نشده است.")}
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>موجودی انبار</h2>
+        <span>${numberFa(STATE.inventory.length)} رکورد</span>
+      </div>
+      ${renderTable(VIEWS.inventory.cols,STATE.inventory,"موجودی ثبت نشده است.")}
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>BOM ها</h2>
+        <span>${numberFa(STATE.boms.length)} رکورد</span>
+      </div>
+      ${renderTable(VIEWS.boms.cols,STATE.boms,"BOM ثبت نشده است.")}
+    </section>
+  `;
 }
 
 /* ============================================================
-   VIEWS
+   BOM DETAILS
 ============================================================ */
-const V={
- units:{title:"واحدها",state:"units",path:"/api/units",cols:[
-  {label:"کد",value:"code"},{label:"شرح",value:"name"},{label:"وضعیت",value:"status"}]},
- products:{title:"محصولات",state:"products",path:"/api/products",cols:[
-  {label:"کد",value:"code"},{label:"نام",value:"name"},{label:"واحد",value:"unit_name"},{label:"وضعیت",value:"status"}]},
- parts:{title:"قطعات",state:"parts",path:"/api/parts",cols:[
-  {label:"کد",value:"code"},{label:"شرح",value:"name"},{label:"واحد",value:"unit_name"},{label:"بارکد",value:"barcode"},{label:"حداقل",value:r=>num(r.min_stock)},{label:"نقطه سفارش",value:r=>num(r.reorder_point)},{label:"وضعیت",value:"status"}]},
- warehouses:{title:"انبارها",state:"warehouses",path:"/api/warehouses",cols:[
-  {label:"کد",value:"code"},{label:"نام",value:"name"},{label:"نوع",value:"warehouse_type"},{label:"وضعیت",value:"status"}]},
- boms:{title:"BOM ها",state:"boms",path:"/api/boms",cols:[
-  {label:"کد BOM",value:"code"},{label:"کد محصول",value:"product_code"},{label:"محصول",value:"product_name"},{label:"نسخه",value:"version"},{label:"از",value:"effective_from"},{label:"تا",value:"effective_to"},{label:"وضعیت",value:"status"}]},
- planning:{title:"برنامه تولید",state:"planning",path:"/api/planning",cols:[
-  {label:"تاریخ",value:"plan_date"},{label:"BOM",value:"bom_code"},{label:"محصول",value:"product_name"},{label:"برنامه",value:r=>num(r.planned_quantity)},{label:"تولید",value:r=>num(r.produced_quantity)},{label:"وضعیت",value:"status"}]},
- production:{title:"تولید",state:"production",path:"/api/production",cols:[
-  {label:"تاریخ",value:"production_date"},{label:"کد محصول",value:"product_code"},{label:"محصول",value:"product_name"},{label:"مقدار",value:r=>num(r.produced_quantity)},{label:"وضعیت",value:"status"}]},
- inventory:{title:"موجودی انبار",state:"inventory",path:"/api/inventory",cols:[
-  {label:"انبار",value:"warehouse_name"},{label:"کد انبار",value:"warehouse_code"},{label:"نوع",value:"item_type"},{label:"شرح",value:"item_name"},{label:"مقدار",value:r=>num(r.quantity)},{label:"بروزرسانی",value:"updated_at"}]}
-};
-
-function renderView(v){
- const d=V[v],rows=STATE[d.state]||[];
- $("#main").innerHTML=`
- <section class="head"><div><h1>${esc(d.title)}</h1><p>اطلاعات دریافت‌شده مستقیم از Worker</p></div><span class="status">${num(rows.length)} رکورد</span></section>
- <section class="card"><div class="card-head"><h2>${esc(d.title)}</h2><button class="btn secondary" id="refresh">بروزرسانی</button></div>${table(d.cols,rows)}</section>`;
- $("#refresh").onclick=async()=>{
-  const r=await load(d.state,d.path,d.title);
-  if(!r.ok)message(r.error?.message||"خطا در بروزرسانی","error");
-  renderView(v);
- };
-}
-
-function barcodeView(){
- $("#main").innerHTML=`
- <section class="head"><div><h1>جستجوی بارکد</h1><p>جستجوی قطعه از API Worker</p></div></section>
- <section class="card"><div class="body"><div class="search"><input id="barcode" placeholder="بارکد قطعه"><button id="searchBarcode" class="btn">جستجو</button></div><div id="barcodeResult" class="empty">هنوز جستجویی انجام نشده است.</div></div></section>`;
- const run=async()=>{
-  const b=$("#barcode").value.trim();
-  if(!b)return message("بارکد را وارد کنید.","warning");
+async function openBomDetails(bomId){
   try{
-   const d=await apiRequest("/api/parts/barcode?barcode="+encodeURIComponent(b),{loadingText:"در حال جستجوی بارکد..."});
-   const x=d?.item;
-   $("#barcodeResult").innerHTML=x?`<div style="padding-top:18px"><b>${esc(x.name)}</b><p>کد: ${esc(x.code)}</p><p>واحد: ${esc(x.unit_name)}</p><p>بارکد: ${esc(x.barcode)}</p></div>`:"<div class='empty'>قطعه‌ای پیدا نشد.</div>";
-  }catch(e){$("#barcodeResult").innerHTML=`<div class="error">${esc(e.message)}</div>`}
- };
- $("#searchBarcode").onclick=run;
- $("#barcode").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();run()}};
-}
+    const data = await apiGet(
+      "/api/bom-details?bom_id="+encodeURIComponent(bomId),
+      {loadingText:"در حال دریافت اجزای BOM..."}
+    );
 
-async function openView(v){
- STATE.view=v;
- $$(".nav").forEach(x=>x.classList.toggle("active",x.dataset.view===v));
- if(v==="dashboard")return dashboard();
- if(v==="barcode")return barcodeView();
- return renderView(v);
+    STATE.bomDetails =
+      data?.data?.items ||
+      data?.items ||
+      [];
+
+    const bom = STATE.boms.find(x=>Number(x.id)===Number(bomId));
+
+    $("#modalTitle").textContent =
+      "اجزای BOM " + (bom?.code || bomId);
+
+    $("#modalBody").innerHTML =
+      renderTable([
+        {label:"کد قطعه",value:"part_code"},
+        {label:"قطعه",value:"part_name"},
+        {label:"بارکد",value:"barcode"},
+        {label:"واحد",value:"unit_name"},
+        {label:"ضریب مصرف",value:r=>numberFa(r.consumption_factor)},
+        {label:"ضایعات",value:r=>numberFa(r.scrap_percent)+" %"},
+        {label:"وضعیت",value:"status"}
+      ],STATE.bomDetails,"برای این BOM جزئی ثبت نشده است.");
+
+    $("#modal").classList.add("show");
+
+  }catch(error){
+    showMessage(error.message || "دریافت اجزای BOM انجام نشد.","error");
+  }
 }
 
 /* ============================================================
-   LOGOUT
+   BOM VIEW WITH DETAILS
 ============================================================ */
-async function logout(){
- try{await apiRequest("/api/logout",{method:"POST",loadingText:"در حال خروج..."})}catch(e){console.warn(e)}
- finally{clearAuth();location.href="Login.html"}
+function renderBoms(){
+  const rows = STATE.boms;
+
+  $("#main").innerHTML = `
+    ${viewHeader("BOM ها",rows.length)}
+
+    <section class="card">
+      <div class="toolbar">
+        <div class="search">
+          <input id="bomSearch" placeholder="جستجو در BOM..." type="search">
+        </div>
+        <button id="bomList" class="btn secondary small" type="button">لیست</button>
+        <button id="bomGrid" class="btn secondary small" type="button">کارت</button>
+        <button id="bomRefresh" class="btn secondary small" type="button">بروزرسانی</button>
+      </div>
+
+      <div id="bomContent">
+        ${renderBomContent(rows)}
+      </div>
+    </section>
+  `;
+
+  $("#bomSearch").oninput=()=>{
+    const q=$("#bomSearch").value.trim().toLowerCase();
+    renderBomContent(
+      rows.filter(r=>
+        Object.values(r).some(v=>String(v??"").toLowerCase().includes(q))
+      )
+    );
+  };
+
+  $("#bomList").onclick=()=>{
+    STATE._mode=VIEW_MODE.list;
+    renderBomContent(rows);
+  };
+
+  $("#bomGrid").onclick=()=>{
+    STATE._mode=VIEW_MODE.grid;
+    renderBomContent(rows);
+  };
+
+  $("#bomRefresh").onclick=async()=>{
+    const result=await loadDataset("boms");
+    if(!result.ok){
+      showMessage(result.error?.message || "بروزرسانی انجام نشد.","error");
+      return;
+    }
+    renderBoms();
+  };
+}
+
+function renderBomContent(rows){
+  if(STATE._mode===VIEW_MODE.grid){
+    $("#bomContent").innerHTML=renderGrid(rows,{
+      title:r=>r.code || "BOM",
+      meta:r=>`
+        محصول: ${esc(r.product_name || "-")}<br>
+        نسخه: ${numberFa(r.version)}<br>
+        شروع: ${dateFa(r.effective_from)}<br>
+        پایان: ${dateFa(r.effective_to)}<br>
+        <button
+          type="button"
+          class="btn small"
+          style="margin-top:8px"
+          data-bom-details="${esc(r.id)}"
+        >مشاهده اجزا</button>
+      `
+    });
+  }else{
+    $("#bomContent").innerHTML=`
+      ${renderTable([
+        {label:"کد BOM",value:"code"},
+        {label:"محصول",value:"product_name"},
+        {label:"نسخه",value:"version"},
+        {label:"از",value:r=>dateFa(r.effective_from)},
+        {label:"تا",value:r=>dateFa(r.effective_to)},
+        {label:"وضعیت",value:"status"},
+        {label:"عملیات",value:r=>`
+          <button
+            type="button"
+            class="btn small"
+            data-bom-details="${esc(r.id)}"
+          >اجزا</button>
+        `}
+      ],rows)}
+    `;
+  }
+
+  $$("[data-bom-details]").forEach(btn=>{
+    btn.onclick=()=>openBomDetails(btn.dataset.bomDetails);
+  });
+}
+
+/* ============================================================
+   BARCODE VIEW
+============================================================ */
+function barcodeView(){
+  $("#main").innerHTML = `
+    ${viewHeader("جستجوی بارکد",0)}
+
+    <section class="card">
+      <div class="body">
+        <div class="search">
+          <input
+            id="barcodeInput"
+            type="search"
+            inputmode="numeric"
+            placeholder="بارکد قطعه را وارد یا اسکن کنید"
+          >
+          <button id="barcodeSearchBtn" class="btn" type="button">جستجو</button>
+        </div>
+
+        <div id="barcodeResult" class="empty">
+          هنوز جستجویی انجام نشده است.
+        </div>
+      </div>
+    </section>
+  `;
+
+  const run=async()=>{
+    const barcode=$("#barcodeInput").value.trim();
+
+    if(!barcode){
+      showMessage("بارکد را وارد یا اسکن کنید.","warning");
+      return;
+    }
+
+    try{
+      const data=await apiGet(
+        "/api/parts/barcode?barcode="+encodeURIComponent(barcode),
+        {loadingText:"در حال جستجوی بارکد..."}
+      );
+
+      const part=data?.data?.item || data?.item;
+
+      if(!part){
+        $("#barcodeResult").innerHTML=
+          `<div class="empty">قطعه‌ای با این بارکد پیدا نشد.</div>`;
+        return;
+      }
+
+      $("#barcodeResult").innerHTML=`
+        <div class="entity-card" style="margin-top:15px">
+          <div class="entity-title">${esc(part.name || "قطعه")}</div>
+          <div class="entity-meta">
+            کد: ${esc(part.code || "-")}<br>
+            واحد: ${esc(part.unit_name || "-")}<br>
+            بارکد: ${esc(part.barcode || "-")}<br>
+            حداقل موجودی: ${numberFa(part.min_stock)}<br>
+            نقطه سفارش: ${numberFa(part.reorder_point)}
+          </div>
+        </div>
+      `;
+
+    }catch(error){
+      $("#barcodeResult").innerHTML=
+        `<div class="error">${esc(error.message || "خطا در جستجوی بارکد")}</div>`;
+    }
+  };
+
+  $("#barcodeSearchBtn").onclick=run;
+  $("#barcodeInput").onkeydown=e=>{
+    if(e.key==="Enter"){
+      e.preventDefault();
+      run();
+    }
+  };
+}
+
+/* ============================================================
+   FORM HELPERS
+============================================================ */
+function optionList(items,valueField,labelFunction){
+  return items.map(item=>`
+    <option value="${esc(item[valueField])}">
+      ${esc(labelFunction(item))}
+    </option>
+  `).join("");
+}
+
+function selectHtml(id,items,valueField,labelFunction,placeholder){
+  return `
+    <select id="${id}">
+      <option value="">${esc(placeholder || "انتخاب کنید")}</option>
+      ${optionList(items,valueField,labelFunction)}
+    </select>
+  `;
+}
+
+/* ============================================================
+   CREATE UNIT
+============================================================ */
+function unitCreateView(){
+  $("#main").innerHTML=`
+    ${viewHeader("واحدها",STATE.units.length)}
+
+    <section class="card">
+      <div class="card-head"><h2>ثبت واحد جدید</h2></div>
+      <div class="body">
+        <form id="unitForm">
+          <div class="form-grid">
+            <div class="field">
+              <label>کد واحد</label>
+              <input name="code" required>
+            </div>
+            <div class="field">
+              <label>نام واحد</label>
+              <input name="name" required>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit">ثبت واحد</button>
+            <button class="btn secondary" type="button" id="showUnits">مشاهده واحدها</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  `;
+
+  $("#unitForm").onsubmit=async e=>{
+    e.preventDefault();
+    const form=e.currentTarget;
+
+    try{
+      const result=await apiPost("/api/units",{
+        code:form.code.value.trim(),
+        name:form.name.value.trim()
+      },{loadingText:"در حال ثبت واحد..."});
+
+      showMessage(result?.message || "واحد با موفقیت ثبت شد.");
+      form.reset();
+      await loadDataset("units");
+
+    }catch(error){
+      showMessage(error.message || "ثبت واحد انجام نشد.","error");
+    }
+  };
+
+  $("#showUnits").onclick=()=>renderDataView("units");
+}
+
+/* ============================================================
+   CREATE PRODUCT
+============================================================ */
+function productCreateView(){
+  $("#main").innerHTML=`
+    ${viewHeader("محصولات",STATE.products.length)}
+
+    <section class="card">
+      <div class="card-head"><h2>ثبت محصول جدید</h2></div>
+      <div class="body">
+        <form id="productForm">
+          <div class="form-grid">
+            <div class="field">
+              <label>کد محصول</label>
+              <input name="code" required>
+            </div>
+            <div class="field">
+              <label>نام محصول</label>
+              <input name="name" required>
+            </div>
+            <div class="field">
+              <label>واحد</label>
+              ${selectHtml(
+                "productUnit",
+                STATE.units,
+                "id",
+                x=>`${x.code} - ${x.name}`,
+                "انتخاب واحد"
+              )}
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit">ثبت محصول</button>
+            <button class="btn secondary" type="button" id="showProducts">مشاهده محصولات</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  `;
+
+  $("#productForm").onsubmit=async e=>{
+    e.preventDefault();
+    const f=e.currentTarget;
+
+    try{
+      const result=await apiPost("/api/products",{
+        code:f.code.value.trim(),
+        name:f.name.value.trim(),
+        unit_id:Number($("#productUnit").value)
+      },{loadingText:"در حال ثبت محصول..."});
+
+      showMessage(result?.message || "محصول با موفقیت ثبت شد.");
+      f.reset();
+      await loadDataset("products");
+
+    }catch(error){
+      showMessage(error.message || "ثبت محصول انجام نشد.","error");
+    }
+  };
+
+  $("#showProducts").onclick=()=>renderDataView("products");
+}
+
+/* ============================================================
+   CREATE PART
+============================================================ */
+function partCreateView(){
+  $("#main").innerHTML=`
+    ${viewHeader("قطعات",STATE.parts.length)}
+
+    <section class="card">
+      <div class="card-head"><h2>ثبت قطعه جدید</h2></div>
+      <div class="body">
+        <form id="partForm">
+          <div class="form-grid">
+            <div class="field"><label>کد قطعه</label><input name="code" required></div>
+            <div class="field"><label>نام قطعه</label><input name="name" required></div>
+            <div class="field">
+              <label>واحد</label>
+              ${selectHtml("partUnit",STATE.units,"id",x=>`${x.code} - ${x.name}`,"انتخاب واحد")}
+            </div>
+            <div class="field"><label>بارکد</label><input name="barcode"></div>
+            <div class="field"><label>حداقل موجودی</label><input name="min_stock" type="number" min="0" value="0"></div>
+            <div class="field"><label>نقطه سفارش</label><input name="reorder_point" type="number" min="0" value="0"></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit">ثبت قطعه</button>
+            <button class="btn secondary" type="button" id="showParts">مشاهده قطعات</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  `;
+
+  $("#partForm").onsubmit=async e=>{
+    e.preventDefault();
+    const f=e.currentTarget;
+
+    try{
+      const result=await apiPost("/api/parts",{
+        code:f.code.value.trim(),
+        name:f.name.value.trim(),
+        unit_id:Number($("#partUnit").value),
+        barcode:f.barcode.value.trim(),
+        min_stock:Number(f.min_stock.value||0),
+        reorder_point:Number(f.reorder_point.value||0)
+      },{loadingText:"در حال ثبت قطعه..."});
+
+      showMessage(result?.message || "قطعه با موفقیت ثبت شد.");
+      f.reset();
+      await loadDataset("parts");
+
+    }catch(error){
+      showMessage(error.message || "ثبت قطعه انجام نشد.","error");
+    }
+  };
+
+  $("#showParts").onclick=()=>renderDataView("parts");
+}
+
+/* ============================================================
+   CREATE BOM
+============================================================ */
+function bomCreateView(){
+  $("#main").innerHTML=`
+    ${viewHeader("BOM ها",STATE.boms.length)}
+
+    <section class="card">
+      <div class="card-head"><h2>ایجاد BOM</h2></div>
+      <div class="body">
+        <form id="bomForm">
+          <div class="form-grid">
+            <div class="field"><label>کد BOM</label><input name="code" required></div>
+            <div class="field">
+              <label>محصول</label>
+              ${selectHtml("bomProduct",STATE.products,"id",x=>`${x.code} - ${x.name}`,"انتخاب محصول")}
+            </div>
+            <div class="field"><label>نسخه</label><input name="version" type="number" min="1" value="1"></div>
+            <div class="field"><label>از تاریخ</label><input name="effective_from" type="date"></div>
+            <div class="field"><label>تا تاریخ</label><input name="effective_to" type="date"></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit">ایجاد BOM</button>
+            <button class="btn secondary" type="button" id="showBoms">مشاهده BOMها</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  `;
+
+  $("#bomForm").onsubmit=async e=>{
+    e.preventDefault();
+    const f=e.currentTarget;
+
+    try{
+      const result=await apiPost("/api/boms",{
+        code:f.code.value.trim(),
+        product_id:Number($("#bomProduct").value),
+        version:Number(f.version.value||1),
+        effective_from:f.effective_from.value.trim(),
+        effective_to:f.effective_to.value.trim()
+      },{loadingText:"در حال ایجاد BOM..."});
+
+      showMessage(result?.message || "BOM با موفقیت ایجاد شد.");
+      f.reset();
+      f.version.value=1;
+      await loadDataset("boms");
+
+    }catch(error){
+      showMessage(error.message || "ایجاد BOM انجام نشد.","error");
+    }
+  };
+
+  $("#showBoms").onclick=renderBoms;
+}
+
+/* ============================================================
+   ADD BOM DETAIL
+============================================================ */
+function bomDetailCreateView(){
+  $("#main").innerHTML=`
+    ${viewHeader("اجزای BOM",STATE.bomDetails.length)}
+
+    <section class="card">
+      <div class="card-head"><h2>افزودن قطعه به BOM</h2></div>
+      <div class="body">
+        <form id="bomDetailForm">
+          <div class="form-grid">
+            <div class="field">
+              <label>BOM</label>
+              ${selectHtml("detailBom",STATE.boms,"id",x=>`${x.code} - ${x.product_name} - نسخه ${x.version}`,"انتخاب BOM")}
+            </div>
+            <div class="field">
+              <label>قطعه</label>
+              ${selectHtml("detailPart",STATE.parts,"id",x=>`${x.code} - ${x.name}`,"انتخاب قطعه")}
+            </div>
+            <div class="field"><label>ضریب مصرف</label><input name="consumption_factor" type="number" step="0.0001" min="0" required></div>
+            <div class="field"><label>درصد ضایعات</label><input name="scrap_percent" type="number" step="0.01" min="0" value="0"></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit">افزودن به BOM</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>انتخاب BOM برای مشاهده اجزا</h2></div>
+      <div class="body">
+        <div class="search">
+          ${selectHtml("detailViewBom",STATE.boms,"id",x=>`${x.code} - ${x.product_name} - نسخه ${x.version}`,"انتخاب BOM")}
+          <button id="loadDetails" class="btn" type="button">نمایش اجزا</button>
+        </div>
+        <div id="detailsBox" style="margin-top:15px"></div>
+      </div>
+    </section>
+  `;
+
+  $("#bomDetailForm").onsubmit=async e=>{
+    e.preventDefault();
+    const f=e.currentTarget;
+
+    try{
+      const bomId=Number($("#detailBom").value);
+
+      await apiPost("/api/bom-details",{
+        bom_id:bomId,
+        part_id:Number($("#detailPart").value),
+        consumption_factor:Number(f.consumption_factor.value),
+        scrap_percent:Number(f.scrap_percent.value||0)
+      },{loadingText:"در حال افزودن قطعه به BOM..."});
+
+      showMessage("جزء BOM با موفقیت ثبت شد.");
+      f.reset();
+
+      if(bomId){
+        $("#detailViewBom").value=String(bomId);
+        await loadDetailsInto("#detailsBox",bomId);
+      }
+
+    }catch(error){
+      showMessage(error.message || "ثبت جزء BOM انجام نشد.","error");
+    }
+  };
+
+  $("#loadDetails").onclick=async()=>{
+    const id=$("#detailViewBom").value;
+    if(!id){
+      showMessage("ابتدا BOM را انتخاب کنید.","warning");
+      return;
+    }
+    await loadDetailsInto("#detailsBox",id);
+  };
+}
+
+async function loadDetailsInto(selector,bomId){
+  try{
+    const data=await apiGet(
+      "/api/bom-details?bom_id="+encodeURIComponent(bomId),
+      {loadingText:"در حال دریافت اجزای BOM..."}
+    );
+
+    STATE.bomDetails=data?.data?.items || data?.items || [];
+
+    $(selector).innerHTML=renderTable([
+      {label:"کد قطعه",value:"part_code"},
+      {label:"قطعه",value:"part_name"},
+      {label:"بارکد",value:"barcode"},
+      {label:"واحد",value:"unit_name"},
+      {label:"ضریب مصرف",value:r=>numberFa(r.consumption_factor)},
+      {label:"ضایعات",value:r=>numberFa(r.scrap_percent)+" %"},
+      {label:"وضعیت",value:"status"}
+    ],STATE.bomDetails,"برای این BOM جزئی ثبت نشده است.");
+
+  }catch(error){
+    $(selector).innerHTML=`<div class="error">${esc(error.message)}</div>`;
+  }
+}
+
+/* ============================================================
+   PLANNING FORM
+============================================================ */
+function planningCreateView(){
+  $("#main").innerHTML=`
+    ${viewHeader("برنامه تولید",STATE.planning.length)}
+
+    <section class="card">
+      <div class="card-head"><h2>ثبت برنامه تولید</h2></div>
+      <div class="body">
+        <form id="planningForm">
+          <div class="form-grid">
+            <div class="field"><label>تاریخ برنامه</label><input name="plan_date" type="date" value="${todayISO()}" required></div>
+            <div class="field">
+              <label>BOM</label>
+              ${selectHtml("planningBom",STATE.boms,"id",x=>`${x.code} - ${x.product_name} - نسخه ${x.version}`,"انتخاب BOM")}
+            </div>
+            <div class="field"><label>مقدار برنامه‌ریزی</label><input name="planned_quantity" type="number" min="1" required></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit">ثبت برنامه</button>
+            <button class="btn secondary" type="button" id="showPlanning">مشاهده برنامه‌ها</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  `;
+
+  $("#planningForm").onsubmit=async e=>{
+    e.preventDefault();
+    const f=e.currentTarget;
+
+    try{
+      const result=await apiPost("/api/planning",{
+        plan_date:f.plan_date.value.trim(),
+        bom_id:Number($("#planningBom").value),
+        planned_quantity:Number(f.planned_quantity.value)
+      },{loadingText:"در حال ثبت برنامه تولید..."});
+
+      showMessage(result?.message || "برنامه تولید ثبت شد.");
+      f.reset();
+      f.plan_date.value=todayISO();
+      await loadDataset("planning");
+
+    }catch(error){
+      showMessage(error.message || "ثبت برنامه انجام نشد.","error");
+    }
+  };
+
+  $("#showPlanning").onclick=()=>renderDataView("planning");
+}
+
+/* ============================================================
+   PRODUCTION FORM
+============================================================ */
+function productionCreateView(){
+  $("#main").innerHTML=`
+    ${viewHeader("ثبت تولید",STATE.planning.length)}
+
+    <section class="card">
+      <div class="card-head"><h2>ثبت تولید</h2></div>
+      <div class="body">
+        <form id="productionForm">
+          <div class="form-grid">
+            <div class="field">
+              <label>برنامه تولید</label>
+              ${selectHtml(
+                "productionPlanning",
+                STATE.planning,
+                "id",
+                x=>`${x.plan_date} - ${x.product_name || x.bom_code} - برنامه ${x.planned_quantity}`,
+                "انتخاب برنامه تولید"
+              )}
+            </div>
+            <div class="field"><label>مقدار تولیدشده</label><input name="produced_quantity" type="number" min="1" required></div>
+            <div class="field"><label>تاریخ تولید</label><input name="production_date" type="date" value="${todayISO()}" required></div>
+            <div class="field">
+              <label>انبار مقصد</label>
+              ${selectHtml("productionWarehouse",STATE.warehouses,"id",x=>`${x.code} - ${x.name}`,"انتخاب انبار")}
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit">ثبت تولید</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  `;
+
+  $("#productionForm").onsubmit=async e=>{
+    e.preventDefault();
+    const f=e.currentTarget;
+
+    try{
+      const result=await apiPost("/api/production",{
+        planning_daily_id:Number($("#productionPlanning").value),
+        produced_quantity:Number(f.produced_quantity.value),
+        production_date:f.production_date.value.trim(),
+        warehouse_id:$("#productionWarehouse").value
+          ? Number($("#productionWarehouse").value)
+          : null
+      },{loadingText:"در حال ثبت تولید و بروزرسانی موجودی..."});
+
+      showMessage(result?.message || "تولید با موفقیت ثبت شد.");
+      f.reset();
+      f.production_date.value=todayISO();
+
+      await Promise.all([
+        loadDataset("planning"),
+        loadDataset("production"),
+        loadDataset("inventory")
+      ]);
+
+    }catch(error){
+      showMessage(error.message || "ثبت تولید انجام نشد.","error");
+    }
+  };
+}
+
+/* ============================================================
+   INVENTORY VIEW
+============================================================ */
+function inventoryView(){
+  $("#main").innerHTML=`
+    ${viewHeader("موجودی انبار",STATE.inventory.length)}
+
+    <section class="card">
+      <div class="card-head"><h2>موجودی فعلی</h2></div>
+      ${renderTable(VIEWS.inventory.cols,STATE.inventory,"موجودی ثبت نشده است.")}
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>ورود دستی موجودی</h2></div>
+      <div class="body">
+        <form id="receiptForm">
+          <div class="form-grid">
+            <div class="field">
+              <label>انبار</label>
+              ${selectHtml("receiptWarehouse",STATE.warehouses,"id",x=>`${x.code} - ${x.name}`,"انتخاب انبار")}
+            </div>
+            <div class="field">
+              <label>قطعه</label>
+              ${selectHtml("receiptPart",STATE.parts,"id",x=>`${x.code} - ${x.name}`,"انتخاب قطعه")}
+            </div>
+            <div class="field"><label>مقدار</label><input name="quantity" type="number" min="0.0001" step="0.0001" required></div>
+            <div class="field"><label>شرح</label><input name="description" value="ورود مواد اولیه"></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit">ثبت ورود</button>
+            <button class="btn secondary" type="button" id="issueBtn">ثبت خروج</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  `;
+
+  $("#receiptForm").onsubmit=async e=>{
+    e.preventDefault();
+    const f=e.currentTarget;
+
+    try{
+      await apiPost("/api/inventory/receipt",{
+        warehouse_id:Number($("#receiptWarehouse").value),
+        part_id:Number($("#receiptPart").value),
+        quantity:Number(f.quantity.value),
+        reference_type:"manual",
+        description:f.description.value.trim() || "ورود مواد اولیه"
+      },{loadingText:"در حال ثبت ورود موجودی..."});
+
+      showMessage("ورود موجودی با موفقیت ثبت شد.");
+      f.reset();
+      await loadDataset("inventory");
+      inventoryView();
+
+    }catch(error){
+      showMessage(error.message || "ثبت ورود انجام نشد.","error");
+    }
+  };
+
+  $("#issueBtn").onclick=async()=>{
+    const f=$("#receiptForm");
+
+    if(!$("#receiptWarehouse").value || !$("#receiptPart").value || !f.quantity.value){
+      showMessage("انبار، قطعه و مقدار را مشخص کنید.","warning");
+      return;
+    }
+
+    try{
+      await apiPost("/api/inventory/issue",{
+        warehouse_id:Number($("#receiptWarehouse").value),
+        part_id:Number($("#receiptPart").value),
+        quantity:Number(f.quantity.value),
+        reference_type:"manual",
+        description:f.description.value.trim() || "خروج مواد اولیه"
+      },{loadingText:"در حال ثبت خروج موجودی..."});
+
+      showMessage("خروج موجودی با موفقیت ثبت شد.");
+      f.reset();
+      await loadDataset("inventory");
+      inventoryView();
+
+    }catch(error){
+      showMessage(error.message || "ثبت خروج انجام نشد.","error");
+    }
+  };
+}
+
+/* ============================================================
+   ROUTING
+============================================================ */
+async function openView(name){
+  STATE.view=name;
+
+  $$(".nav").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.view===name);
+  });
+
+  if(name==="dashboard"){
+    dashboardView();
+    return;
+  }
+
+  if(name==="barcode"){
+    barcodeView();
+    return;
+  }
+
+  if(name==="boms"){
+    renderBoms();
+    return;
+  }
+
+  if(name==="units"){
+    unitCreateView();
+    return;
+  }
+
+  if(name==="products"){
+    productCreateView();
+    return;
+  }
+
+  if(name==="parts"){
+    partCreateView();
+    return;
+  }
+
+  if(name==="warehouses"){
+    renderDataView("warehouses");
+    return;
+  }
+
+  if(name==="planning"){
+    planningCreateView();
+    return;
+  }
+
+  if(name==="production"){
+    productionCreateView();
+    return;
+  }
+
+  if(name==="inventory"){
+    inventoryView();
+    return;
+  }
+
+  if(VIEWS[name]){
+    renderDataView(name);
+  }
+}
+
+/* ============================================================
+   EVENTS
+============================================================ */
+function bindEvents(){
+  $("#themeBtn").onclick=toggleTheme;
+  $("#logoutBtn").onclick=logout;
+
+  $$(".nav").forEach(btn=>{
+    btn.onclick=()=>openView(btn.dataset.view);
+  });
+
+  $("#modalClose").onclick=()=>{
+    $("#modal").classList.remove("show");
+  };
+
+  $("#modal").onclick=e=>{
+    if(e.target.id==="modal"){
+      $("#modal").classList.remove("show");
+    }
+  };
 }
 
 /* ============================================================
    STARTUP
+   نکته مهم:
+   - ابتدا DOM و CSS کامل آماده شده‌اند.
+   - سپس JS اجرا می‌شود.
+   - هیچ API قبل از این مرحله فراخوانی نمی‌شود.
+   - APIها مستقل بارگذاری می‌شوند.
 ============================================================ */
 async function initializeApplication(){
- theme();
- const t=token();
- if(!t){location.href="Login.html";return}
- $("#theme").onclick=toggleTheme;
- $("#logout").onclick=logout;
+  applyTheme();
+  bindEvents();
 
- $$(".nav").forEach(b=>b.onclick=()=>openView(b.dataset.view));
+  if(!getToken()){
+    location.href="Login.html";
+    return;
+  }
 
- try{
-  await loadUser();
+  try{
+    await loadCurrentUser();
 
-  /* همه API ها مستقل هستند؛ شکست یک API جلوی بقیه را نمی‌گیرد. */
-  const results=await loadAll();
-  const failed=results.filter(x=>!x.ok);
+    /*
+      Promise.all با Loaderهای مستقل:
+      شکست یک endpoint باعث توقف دریافت endpointهای دیگر نمی‌شود.
+    */
+    const results=await loadAllDatasets();
 
-  $("#status").textContent=failed.length?"برخی سرویس‌ها خطا دارند":"اتصال به Worker موفق";
-  $("#status").classList.toggle("bad",failed.length>0);
+    const failed=results.filter(r=>!r.ok);
 
-  await openView("dashboard");
+    if(failed.length===0){
+      setStatus("اتصال به Worker موفق");
+    }else{
+      setStatus(
+        `${numberFa(failed.length)} سرویس دارای خطاست`,
+        true
+      );
+    }
 
-  if(failed.length)message(failed.length+" API نیاز به بررسی دارد.","warning");
- }catch(e){
-  console.error("STARTUP",e);
-  $("#status").textContent="اتصال ناموفق";
-  $("#status").classList.add("bad");
-  $("#main").innerHTML=`<section class="head"><div><h1>خطا در اتصال</h1><p>اطلاعات از Worker دریافت نشد.</p></div></section><div class="error"><b>${esc(e.code||"ERROR")}</b><br>${esc(e.message||"خطای ناشناخته")}</div><button id="retry" class="btn">تلاش مجدد</button>`;
-  $("#retry").onclick=initializeApplication;
- }finally{loading(false)}
+    await openView("dashboard");
+
+    if(failed.length){
+      showMessage(
+        "اطلاعات برخی بخش‌ها دریافت نشد؛ از دکمه بروزرسانی همان بخش استفاده کنید.",
+        "warning"
+      );
+    }
+
+  }catch(error){
+    console.error("NINI_TO_STARTUP_ERROR",error);
+
+    setStatus("اتصال ناموفق",true);
+
+    $("#main").innerHTML=`
+      <section class="head">
+        <div>
+          <h1>خطا در اتصال</h1>
+          <p>امکان دریافت اطلاعات سامانه از Worker وجود ندارد.</p>
+        </div>
+        <span class="status bad">اتصال ناموفق</span>
+      </section>
+
+      <div class="error">
+        <b>${esc(error.code || "ERROR")}</b>
+        <br>
+        ${esc(error.message || "خطای ناشناخته")}
+      </div>
+
+      <button id="retryBtn" class="btn" type="button">
+        تلاش مجدد
+      </button>
+    `;
+
+    $("#retryBtn").onclick=initializeApplication;
+
+  }finally{
+    setLoading(false);
+  }
 }
 
-window.addEventListener("error",e=>{console.error(e.error||e.message);loading(false)});
-window.addEventListener("unhandledrejection",e=>{console.error(e.reason);loading(false)});
-document.addEventListener("DOMContentLoaded",initializeApplication);
+/* ============================================================
+   GLOBAL ERROR SAFETY
+============================================================ */
+window.addEventListener("error",event=>{
+  console.error("GLOBAL_ERROR",event.error || event.message);
+  setLoading(false);
+});
+
+window.addEventListener("unhandledrejection",event=>{
+  console.error("UNHANDLED_REJECTION",event.reason);
+  setLoading(false);
+});
+
+/* ============================================================
+   START
+============================================================ */
+document.addEventListener(
+  "DOMContentLoaded",
+  initializeApplication,
+  {once:true}
+);
 </script>
+
 </body>
 </html>
