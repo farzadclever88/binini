@@ -484,8 +484,52 @@ document
                 );
 
 
-            const value =
-                input.value.trim();
+            const rawValue =
+    input.value.trim();
+
+
+const value =
+    rawValue
+        .replace(
+            /۰/g,
+            "0"
+        )
+        .replace(
+            /۱/g,
+            "1"
+        )
+        .replace(
+            /۲/g,
+            "2"
+        )
+        .replace(
+            /۳/g,
+            "3"
+        )
+        .replace(
+            /۴/g,
+            "4"
+        )
+        .replace(
+            /۵/g,
+            "5"
+        )
+        .replace(
+            /۶/g,
+            "6"
+        )
+        .replace(
+            /۷/g,
+            "7"
+        )
+        .replace(
+            /۸/g,
+            "8"
+        )
+        .replace(
+            /۹/g,
+            "9"
+        );
 
 
             if(!value){
@@ -540,19 +584,31 @@ document
 
             result.innerHTML =
 
-                "✅ DatePicker درست کار می‌کند."
-                +
-                "<br><br>"
-                +
-                "تاریخ انتخاب‌شده:"
-                +
-                "<br>"
-                +
-                "<strong>"
-                +
-                value
-                +
-                "</strong>";
+    "✅ DatePicker درست کار می‌کند."
+    +
+    "<br><br>"
+    +
+    "مقدار اصلی:"
+    +
+    "<br>"
+    +
+    "<strong>"
+    +
+    rawValue
+    +
+    "</strong>"
+    +
+    "<br><br>"
+    +
+    "مقدار استاندارد:"
+    +
+    "<br>"
+    +
+    "<strong>"
+    +
+    value
+    +
+    "</strong>";
 
 
             result.className =
