@@ -7403,6 +7403,74 @@ function openBomForm(
     initPersianDatePickers();
 
 
+/* ============================================================
+   TEMP DATEPICKER TEST - BEGIN
+   این بخش فقط برای تست است و بعداً کامل حذف می‌شود.
+============================================================ */
+
+setTimeout(
+    function(){
+
+        const testInput =
+            document.querySelector(
+                "#bomForm .jalali-date"
+            );
+
+        if(!testInput){
+
+            alert(
+                "❌ Input تاریخ در فرم BOM پیدا نشد."
+            );
+
+            return;
+
+        }
+
+
+        if(
+            typeof window.jQuery ===
+            "undefined"
+        ){
+
+            alert(
+                "❌ jQuery در index.html وجود ندارد."
+            );
+
+            return;
+
+        }
+
+
+        if(
+            typeof jQuery.fn.pDatepicker !==
+            "function"
+        ){
+
+            alert(
+                "❌ pDatepicker در index.html وجود ندارد."
+            );
+
+            return;
+
+        }
+
+
+        alert(
+            "✅ jQuery و pDatepicker موجود هستند."
+        );
+
+    },
+    300
+);
+
+
+/* ============================================================
+   TEMP DATEPICKER TEST - END
+   این بخش فقط برای تست است و بعداً کامل حذف می‌شود.
+============================================================ */
+
+    
+
     $("#cancelBom")
         .addEventListener(
             "click",
