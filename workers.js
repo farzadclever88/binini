@@ -262,8 +262,56 @@ function generateToken() {
         .join("");
 
 }
+// ============================================================
+// get Production List
+// ============================================================
 
+async function getProductionList(env) {
+    const result = await env.DB.prepare(`
+        SELECT
+            pr.id,
 
+            pr.product_id,
+            p.code AS product_code,
+            p.name AS product_name,
+            p.unit_id,
+
+            pr.planning_daily_id,
+
+            pd.plan_date,
+            pd.bom_id,
+            pd.planned_quantity,
+
+            bh.code AS bom_code,
+            bh.version AS bom_version,
+            bh.status AS bom_status,
+
+            pr.produced_quantity,
+            pr.production_date,
+            pr.status,
+
+            pr.created_by,
+            pr.created_at
+
+        FROM production pr
+
+        LEFT JOIN products p
+            ON p.id = pr.product_id
+
+        LEFT JOIN planning_daily pd
+            ON pd.id = pr.planning_daily_id
+
+        LEFT JOIN bom_headers bh
+            ON bh.id = pd.bom_id
+
+        ORDER BY
+            pr.id DESC
+    `).all();
+
+    return json({
+        items: result.results || []
+    });
+}
 // ============================================================
 // JSON BODY
 // ============================================================
