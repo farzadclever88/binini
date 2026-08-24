@@ -3600,12 +3600,18 @@ async function createProductionPlan(
             request
         );
 
+
+    // --------------------------------------------------------
+    // VALIDATE INPUT
+    // --------------------------------------------------------
+
     const planDate =
         validatePersianDate(
             body.plan_date,
             "تاریخ برنامه تولید",
             "PLAN-001"
         );
+
 
     const bomId =
         positiveId(
@@ -3614,12 +3620,18 @@ async function createProductionPlan(
             "PLAN-002"
         );
 
+
     const plannedQuantity =
         positiveNumber(
             body.planned_quantity,
             "مقدار برنامه تولید",
             "PLAN-003"
         );
+
+
+    // --------------------------------------------------------
+    // LOAD ACTIVE BOM
+    // --------------------------------------------------------
 
     const bom =
         await env.DB
@@ -3644,10 +3656,11 @@ async function createProductionPlan(
                 LIMIT 1
 
             `)
-
-            .bind(bomId)
-
+            .bind(
+                bomId
+            )
             .first();
+
 
     if (!bom) {
 
@@ -3662,6 +3675,338 @@ async function createProductionPlan(
         );
 
     }
+
+
+    // --------------------------------------------------------
+    // FIND RAW MATERIAL WAREHOUSE
+    // --------------------------------------------------------
+
+    const warehouse =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id
+
+                FROM warehouses
+
+                WHERE
+
+                    warehouse_type =
+                    'material'
+
+                    AND
+
+                    status =
+                    'active'
+
+                ORDER BY
+
+                    id
+
+                LIMIT 1
+
+            `)
+            .first();
+
+
+    if (!warehouse) {
+
+        throw new AppError(
+
+            "PLAN-005",
+
+            "انبار مواد اولیه فعال پیدا نشد.",
+
+            404
+
+        );
+
+    }
+
+
+    const rawWarehouseId =
+        warehouse.id;
+
+
+    // --------------------------------------------------------
+    // LOAD BOM MATERIALS
+    // --------------------------------------------------------
+
+    const materialsResult =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    bd.part_id,
+
+                    bd.consumption_factor,
+
+                    bd.scrap_percent,
+
+                    p.code AS part_code,
+
+                    p.name AS part_name
+
+                FROM bom_details bd
+
+                INNER JOIN parts p
+
+                    ON p.id =
+                       bd.part_id
+
+                WHERE
+
+                    bd.bom_id = ?
+
+                    AND
+
+                    bd.status = 'active'
+
+                    AND
+
+                    p.status = 'active'
+
+                ORDER BY
+
+                    bd.id
+
+            `)
+            .bind(
+                bomId
+            )
+            .all();
+
+
+    const materials =
+        materialsResult.results || [];
+
+
+    if (
+        materials.length === 0
+    ) {
+
+        throw new AppError(
+
+            "PLAN-006",
+
+            "برای BOM انتخاب‌شده هیچ قطعه فعالی تعریف نشده است.",
+
+            409
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // CHECK MATERIAL AVAILABILITY
+    //
+    // Required quantity:
+    //
+    // consumption_factor
+    // ×
+    // planned_quantity
+    //
+    // + scrap
+    //
+    // Inventory is NOT changed here.
+    // --------------------------------------------------------
+
+    const stockCheck = [];
+
+    const shortages = [];
+
+
+    for (
+        const material
+        of materials
+    ) {
+
+        const consumptionFactor =
+            Number(
+                material.consumption_factor
+            );
+
+
+        const scrapPercent =
+            Number(
+                material.scrap_percent || 0
+            );
+
+
+        const baseRequired =
+            consumptionFactor *
+            Number(
+                plannedQuantity
+            );
+
+
+        const requiredQuantity =
+            baseRequired *
+            (
+                1 +
+                (
+                    scrapPercent /
+                    100
+                )
+            );
+
+
+        const availableQuantity =
+            Number(
+                await getInventoryBalance(
+
+                    env,
+
+                    rawWarehouseId,
+
+                    "part",
+
+                    material.part_id
+
+                ) || 0
+            );
+
+
+        const sufficient =
+            availableQuantity >=
+            requiredQuantity;
+
+
+        const check = {
+
+            part_id:
+                material.part_id,
+
+            part_code:
+                material.part_code,
+
+            part_name:
+                material.part_name,
+
+            consumption_factor:
+                consumptionFactor,
+
+            scrap_percent:
+                scrapPercent,
+
+            planned_quantity:
+                Number(
+                    plannedQuantity
+                ),
+
+            required_quantity:
+                requiredQuantity,
+
+            available_quantity:
+                availableQuantity,
+
+            sufficient
+
+        };
+
+
+        stockCheck.push(
+            check
+        );
+
+
+        if (!sufficient) {
+
+            shortages.push(
+                check
+            );
+
+        }
+
+    }
+
+
+    // --------------------------------------------------------
+    // FAIL IF ANY MATERIAL IS SHORT
+    //
+    // Logical AND:
+    //
+    // part 1 sufficient
+    // AND
+    // part 2 sufficient
+    // AND
+    // part 3 sufficient
+    // ...
+    //
+    // --------------------------------------------------------
+
+    if (
+        shortages.length > 0
+    ) {
+
+        const shortageText =
+            shortages
+                .map(
+                    item => {
+
+                        const shortage =
+                            item.required_quantity -
+                            item.available_quantity;
+
+                        return (
+
+                            `«${item.part_name}» ` +
+                            `موجودی: ${item.available_quantity} ` +
+                            `موردنیاز: ${item.required_quantity} ` +
+                            `کسری: ${shortage}`
+
+                        );
+
+                    }
+                )
+                .join(" | ");
+
+
+        throw new AppError(
+
+            "PLAN-007",
+
+            `امکان ثبت برنامه تولید وجود ندارد. موجودی مواد اولیه کافی نیست: ${shortageText}`,
+
+            409,
+
+            {
+
+                bom_id:
+                    bomId,
+
+                planned_quantity:
+                    Number(
+                        plannedQuantity
+                    ),
+
+                warehouse_id:
+                    rawWarehouseId,
+
+                materials:
+                    stockCheck,
+
+                shortages
+
+            }
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // INSERT PRODUCTION PLAN
+    //
+    // IMPORTANT:
+    // No inventory is changed here.
+    // Inventory will be consumed only when
+    // registerProduction() is executed.
+    // --------------------------------------------------------
 
     const result =
         await env.DB
@@ -3699,7 +4044,6 @@ async function createProductionPlan(
                 )
 
             `)
-
             .bind(
 
                 planDate,
@@ -3711,8 +4055,16 @@ async function createProductionPlan(
                 user.id
 
             )
-
             .run();
+
+
+    const planningId =
+        result.meta.last_row_id;
+
+
+    // --------------------------------------------------------
+    // AUDIT
+    // --------------------------------------------------------
 
     await writeAudit(
 
@@ -3724,25 +4076,56 @@ async function createProductionPlan(
 
         "planning_daily",
 
-        result.meta.last_row_id,
+        planningId,
 
-        body
+        {
+
+            ...body,
+
+            material_check:
+                stockCheck
+
+        }
 
     );
+
+
+    // --------------------------------------------------------
+    // RESPONSE
+    // --------------------------------------------------------
 
     return {
 
         id:
-            result.meta.last_row_id,
+            planningId,
 
         message:
-            "برنامه تولید با موفقیت ثبت شد."
+            "برنامه تولید با موفقیت ثبت شد. موجودی مواد اولیه بررسی شد و هیچ موجودی در این مرحله کسر نشد.",
+
+        planning: {
+
+            plan_date:
+                planDate,
+
+            bom_id:
+                bomId,
+
+            planned_quantity:
+                Number(
+                    plannedQuantity
+                ),
+
+            status:
+                "planned"
+
+        },
+
+        material_check:
+            stockCheck
 
     };
 
 }
-
-
 // ============================================================
 // GET PRODUCTION PLANS
 // ============================================================
