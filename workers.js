@@ -265,19 +265,17 @@ function generateToken() {
 // ============================================================
 // get Production List
 // ============================================================
+async function getProductionList(env, origin = "*") {
 
-async function getProductionList(env) {
     const result = await env.DB.prepare(`
         SELECT
             pr.id,
-
             pr.product_id,
             p.code AS product_code,
             p.name AS product_name,
             p.unit_id,
 
             pr.planning_daily_id,
-
             pd.plan_date,
             pd.bom_id,
             pd.planned_quantity,
@@ -304,13 +302,16 @@ async function getProductionList(env) {
         LEFT JOIN bom_headers bh
             ON bh.id = pd.bom_id
 
-        ORDER BY
-            pr.id DESC
+        ORDER BY pr.id DESC
     `).all();
 
-    return json({
-        items: result.results || []
-    });
+    return jsonResponse(
+        {
+            items: result.results || []
+        },
+        200,
+        origin
+    );
 }
 // ============================================================
 // JSON BODY
