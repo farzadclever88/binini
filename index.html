@@ -3923,128 +3923,6 @@ function apiDateToJalali(
 }
 
 
-/* ============================================================
-   PERSIAN DATEPICKER
-============================================================ */
-
-function initPersianDatePickers(){
-
-    if(
-        typeof window.jQuery ===
-        "undefined"
-    ){
-
-        return;
-
-    }
-
-
-    if(
-        typeof jQuery.fn.pDatepicker !==
-        "function"
-    ){
-
-        return;
-
-    }
-
-
-    const inputs = [
-
-        ...$$(".jalali-date"),
-
-        ...$$(
-            'input[data-date-type="jalali"]'
-        ),
-
-        ...$$(
-            'input[name*="date" i]'
-        ),
-
-        ...$$(
-            'input[id*="date" i]'
-        )
-
-    ];
-
-
-    const uniqueInputs =
-        [...new Set(inputs)];
-
-
-    uniqueInputs.forEach(
-        input => {
-
-            if(
-                !input ||
-                input.tagName !== "INPUT" ||
-                input.type !== "text"
-            ){
-
-                return;
-
-            }
-
-
-            if(
-                input.dataset
-                    .persianDateReady === "1"
-            ){
-
-                return;
-
-            }
-
-
-            input.classList.add(
-                "jalali-date"
-            );
-
-
-            input.setAttribute(
-                "autocomplete",
-                "off"
-            );
-
-const $ =
-    window.jQuery;
-
-const jQuery =
-    window.jQuery;
-            
-            jQuery(input).pDatepicker({
-
-                format:
-                    "YYYY/MM/DD",
-
-                autoClose:
-                    true,
-
-                initialValue:
-                    false,
-
-                persianDigit:
-                    true,
-
-                calendarType:
-                    "persian",
-
-                observer:
-                    true,
-
-                responsive:
-                    true
-
-            });
-
-
-            input.dataset
-                .persianDateReady = "1";
-
-        }
-    );
-
-    }
     /* ============================================================
    VALIDATION
 ============================================================ */
@@ -8402,7 +8280,7 @@ function openPlanningForm(
     }
 
 
-    initPersianDatePickers();
+
 
 
     bindNumberWords();
@@ -8823,7 +8701,7 @@ function openProductionForm(){
     );
 
 
-    initPersianDatePickers();
+ 
 
 
     bindNumberWords();
