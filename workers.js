@@ -1119,7 +1119,45 @@ async function getBomDetails(
 
                     d.scrap_percent,
 
-                    d.status
+                    d.status,
+
+                    COALESCE(
+                        (
+                            SELECT
+                                SUM(
+                                    ib.quantity
+                                )
+
+                            FROM inventory_balances ib
+
+                            INNER JOIN warehouses w
+
+                                ON w.id =
+                                   ib.warehouse_id
+
+                            WHERE
+
+                                ib.item_type =
+                                'part'
+
+                                AND
+
+                                ib.item_id =
+                                d.part_id
+
+                                AND
+
+                                w.warehouse_type =
+                                'material'
+
+                                AND
+
+                                w.status =
+                                'active'
+
+                        ),
+                        0
+                    ) AS inventory_quantity
 
                 FROM bom_details d
 
@@ -1150,7 +1188,6 @@ async function getBomDetails(
     return result.results;
 
 }
-
 
 // ============================================================
 // BARCODE SEARCH
