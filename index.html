@@ -5327,7 +5327,6 @@ async function renderEntityView(
 }
     
 function initPersianDatePickers(){
-
     window.jQuery(".jalali-date").datepicker({
         dateFormat: "yyyy/mm/dd",
         autoSize: false
@@ -7022,7 +7021,7 @@ async function renderBomsView(){
                 openBomForm();
     );
 
-    initPersianDatePickers();
+   
     
     $("#refreshBoms")
         .addEventListener(
@@ -8448,7 +8447,7 @@ async function submitPlanningForm(
 
         refreshAllDropdowns();
         renderPlanningView();
-        initPersianDatePickers();
+   
     }
 
     catch(error){
