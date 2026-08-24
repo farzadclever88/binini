@@ -3844,12 +3844,6 @@ function normalizeDateDigits(
 
 }
 
-
-/*
- * برای Backend فعلی:
- * تاریخ را به YYYY-MM-DD می‌فرستیم.
- */
-
 function jalaliDisplayToApi(
     value
 ){
@@ -3857,14 +3851,11 @@ function jalaliDisplayToApi(
     value =
         normalizeDateDigits(
             value
-        ).replace(
-            /\//g,
-            "-"
-        );
+        ).trim();
 
 
     if(
-        !/^\d{4}-\d{1,2}-\d{1,2}$/.test(
+        !/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(
             value
         )
     ){
@@ -3875,28 +3866,20 @@ function jalaliDisplayToApi(
 
 
     const parts =
-        value.split("-")
+        value.split("/")
             .map(Number);
 
 
-    const g =
-        jalaliToGregorian(
-            parts[0],
-            parts[1],
-            parts[2]
-        );
-
-
     return [
-        g.gy,
-        pad2(g.gm),
-        pad2(g.gd)
+        parts[0],
+        pad2(parts[1]),
+        pad2(parts[2])
 
-    ].join("-");
+    ].join("/");
 
 }
 
-
+    
 function apiDateToJalali(
     value
 ){
