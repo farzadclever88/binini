@@ -4745,7 +4745,7 @@ async function handleGet(
     //
     // --------------------------------------------------------
 if (path === "/api/production") {
-    return await getProductionList(env);
+    return await getProductionList(env, origin);
 }
     if (
         path ===
