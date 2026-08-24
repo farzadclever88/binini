@@ -4696,7 +4696,9 @@ async function handleGet(
     // No inventory is changed here.
     //
     // --------------------------------------------------------
-
+if (path === "/api/production") {
+    return await getProductionList(env);
+}
     if (
         path ===
         "/api/production/material-requirement"
