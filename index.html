@@ -5325,7 +5325,15 @@ async function renderEntityView(
     );
 
 }
+    
+function initPersianDatePickers(){
 
+    window.jQuery(".jalali-date").datepicker({
+        dateFormat: "yyyy/mm/dd",
+        autoSize: false
+    });
+
+}
 
 /* ============================================================
    GRID ACTIONS
@@ -10408,9 +10416,7 @@ else{
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-    <script>
-    window.jQuery(".jalali-date").datepicker();
-</script>
+
 </body>
 
 </html>
