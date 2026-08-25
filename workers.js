@@ -6008,11 +6008,13 @@ async function handlePut(
 ) {
 
     // --------------------------------------------------------
-    // PRODUCTS
+    // UPDATE PRODUCT
     // --------------------------------------------------------
 
     if (
-        path === "/api/products"
+        path.startsWith(
+            "/api/products/"
+        )
     ) {
 
         return await updateProduct(
@@ -6021,7 +6023,34 @@ async function handlePut(
 
             env,
 
-            user
+            user,
+
+            path
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // UPDATE UNIT
+    // --------------------------------------------------------
+
+    if (
+        path.startsWith(
+            "/api/units/"
+        )
+    ) {
+
+        return await updateUnit(
+
+            request,
+
+            env,
+
+            user,
+
+            path
 
         );
 
