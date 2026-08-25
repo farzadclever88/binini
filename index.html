@@ -4438,7 +4438,6 @@ function emptyState(
 
 }
 
-
 /* ============================================================
    TABLE BUILDER
 ============================================================ */
@@ -4449,21 +4448,77 @@ function buildTable(
     options = {}
 ){
 
-    if(!rows.length){
+    const safeRows =
+        Array.isArray(rows)
+            ? rows
+            : [];
 
-        return emptyState(
-            options.empty ||
-            "اطلاعاتی ثبت نشده است."
-        );
+
+    /* ---------------------------------------------------------
+       TABLE TOOLBAR
+    --------------------------------------------------------- */
+
+    let toolbarHtml = "";
+
+
+    if(
+        options.exportExcel !== false &&
+        safeRows.length
+    ){
+
+        toolbarHtml = `
+
+            <div class="table-toolbar">
+
+                <button
+                    type="button"
+                    class="btn secondary small"
+                    data-table-export="excel"
+                >
+                    📊 خروجی Excel
+                </button>
+
+            </div>
+
+        `;
 
     }
 
 
+    /* ---------------------------------------------------------
+       EMPTY STATE
+    --------------------------------------------------------- */
+
+    if(!safeRows.length){
+
+        return `
+
+            ${toolbarHtml}
+
+            ${emptyState(
+                options.empty ||
+                "اطلاعاتی ثبت نشده است."
+            )}
+
+        `;
+
+    }
+
+
+    /* ---------------------------------------------------------
+       TABLE
+    --------------------------------------------------------- */
+
     let html = `
+
+        ${toolbarHtml}
 
         <div class="table-container">
 
-            <table class="data-table">
+            <table
+                class="data-table"
+                data-exportable="true"
+            >
 
                 <thead>
 
@@ -4509,7 +4564,7 @@ function buildTable(
     `;
 
 
-    rows.forEach(
+    safeRows.forEach(
         row => {
 
             html += "<tr>";
@@ -4581,7 +4636,9 @@ function buildTable(
 
 
                     html += `
+
                         <td>
+
                             ${
                                 column.raw
                                     ? String(
@@ -4592,7 +4649,9 @@ function buildTable(
                                         "-"
                                       )
                             }
+
                         </td>
+
                     `;
 
                 }
@@ -4654,8 +4713,6 @@ function buildTable(
     return html;
 
 }
-
-
 /* ============================================================
    STATUS BADGE
 ============================================================ */
