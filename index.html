@@ -8822,14 +8822,23 @@ function openProductionForm(){
     );
 
 
-    populateSelect(
-        ".warehouse-select",
-        STATE.warehouses,
-        "id",
-        item =>
-            `${item.code || ""} - ${item.name || ""}`,
-        "انتخاب انبار"
-    );
+  const productionWarehouses =
+    (STATE.warehouses || [])
+        .filter(
+            item =>
+                item.warehouse_type === "finished" ||
+                item.warehouse_type === "general"
+        );
+
+
+populateSelect(
+    ".warehouse-select",
+    productionWarehouses,
+    "id",
+    item =>
+        `${item.code || ""} - ${item.name || ""}`,
+    "انتخاب انبار محصول"
+);
 
 
     initPersianDatePickers();
