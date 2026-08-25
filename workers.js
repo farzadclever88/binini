@@ -5587,32 +5587,196 @@ async function handlePost(
     }
 
 
+// --------------------------------------------------------
+// INVENTORY RECEIPT
+// --------------------------------------------------------
+
+if (
+    path ===
+    "/api/inventory/receipt"
+) {
+
+    const body =
+        await readJson(
+            request
+        );
+
+
     // --------------------------------------------------------
-    // INVENTORY RECEIPT
+    // VALIDATE WAREHOUSE
+    // --------------------------------------------------------
+
+    const warehouseId =
+        positiveId(
+
+            body.warehouse_id,
+
+            "انبار",
+
+            "INV-100"
+
+        );
+
+
+    const warehouse =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id,
+
+                    code,
+
+                    name,
+
+                    warehouse_type,
+
+                    status
+
+                FROM warehouses
+
+                WHERE id = ?
+
+                LIMIT 1
+
+            `)
+
+            .bind(
+                warehouseId
+            )
+
+            .first();
+
+
+    if (!warehouse) {
+
+        throw new AppError(
+
+            "INV-103",
+
+            "انبار موردنظر پیدا نشد.",
+
+            404
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // WAREHOUSE MUST BE ACTIVE
     // --------------------------------------------------------
 
     if (
-        path ===
-        "/api/inventory/receipt"
+        warehouse.status !==
+        "active"
     ) {
 
-        const body =
-            await readJson(
-                request
+        throw new AppError(
+
+            "INV-104",
+
+            "امکان ورود موجودی به انبار غیرفعال وجود ندارد.",
+
+            409
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // MANUAL RECEIPT IS ALLOWED ONLY FOR:
+    //
+    // material = مواد اولیه
+    // general  = انبار عمومی
+    //
+    // finished = FORBIDDEN
+    // --------------------------------------------------------
+
+    if (
+        ![
+            "material",
+            "general"
+        ].includes(
+            warehouse.warehouse_type
+        )
+    ) {
+
+        if (
+            warehouse.warehouse_type ===
+            "finished"
+        ) {
+
+            throw new AppError(
+
+                "INV-105",
+
+                "ورود دستی به انبار محصول نهایی مجاز نیست. محصول نهایی فقط از طریق ثبت تولید وارد انبار می‌شود.",
+
+                409,
+
+                {
+
+                    warehouse_id:
+                        warehouse.id,
+
+                    warehouse_type:
+                        warehouse.warehouse_type
+
+                }
+
             );
 
-        const warehouseId =
-            positiveId(
+        }
 
-                body.warehouse_id,
 
-                "انبار",
+        throw new AppError(
 
-                "INV-100"
+            "INV-106",
 
-            );
+            "ورود دستی برای این نوع انبار مجاز نیست.",
 
-        const partId =
+            409,
+
+            {
+
+                warehouse_id:
+                    warehouse.id,
+
+                warehouse_type:
+                    warehouse.warehouse_type
+
+            }
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // DETERMINE ITEM TYPE
+    //
+    // material → part
+    // general  → product
+    // --------------------------------------------------------
+
+    let itemType;
+
+    let itemId;
+
+
+    if (
+        warehouse.warehouse_type ===
+        "material"
+    ) {
+
+        itemType =
+            "part";
+
+
+        itemId =
             positiveId(
 
                 body.part_id,
@@ -5623,84 +5787,168 @@ async function handlePost(
 
             );
 
-        const quantity =
-            positiveNumber(
+    }
 
-                body.quantity,
+    else if (
+        warehouse.warehouse_type ===
+        "general"
+    ) {
 
-                "مقدار ورود",
+        itemType =
+            "product";
 
-                "INV-102"
 
-            );
+        itemId =
+            positiveId(
 
-        const balance =
-            await changeInventory(
+                body.product_id,
 
-                env,
+                "محصول",
 
-                {
-
-                    warehouseId,
-
-                    itemType:
-                        "part",
-
-                    itemId:
-                        partId,
-
-                    delta:
-                        quantity,
-
-                    transactionType:
-                        "RECEIPT",
-
-                    userId:
-                        user.id,
-
-                    referenceType:
-                        body.reference_type ||
-                        "manual",
-
-                    referenceId:
-                        body.reference_id ||
-                        null,
-
-                    description:
-                        body.description ||
-                        "ورود مواد اولیه"
-
-                }
+                "INV-107"
 
             );
-
-        await writeAudit(
-
-            env,
-
-            user.id,
-
-            "INVENTORY_RECEIPT",
-
-            "parts",
-
-            partId,
-
-            body
-
-        );
-
-        return {
-
-            message:
-                "ورود موجودی با موفقیت ثبت شد.",
-
-            balance
-
-        };
 
     }
 
+
+    // --------------------------------------------------------
+    // VALIDATE QUANTITY
+    // --------------------------------------------------------
+
+    const quantity =
+        positiveNumber(
+
+            body.quantity,
+
+            "مقدار ورود",
+
+            "INV-102"
+
+        );
+
+
+    // --------------------------------------------------------
+    // UPDATE INVENTORY
+    // --------------------------------------------------------
+
+    const balance =
+        await changeInventory(
+
+            env,
+
+            {
+
+                warehouseId,
+
+                itemType,
+
+                itemId,
+
+                delta:
+                    quantity,
+
+                transactionType:
+                    "RECEIPT",
+
+                userId:
+                    user.id,
+
+                referenceType:
+                    body.reference_type ||
+                    "manual",
+
+                referenceId:
+                    body.reference_id ||
+                    null,
+
+                description:
+                    body.description ||
+                    (
+                        warehouse.warehouse_type ===
+                        "material"
+
+                            ? "ورود مواد اولیه"
+
+                            : "ورود کالای خریداری‌شده به انبار عمومی"
+                    )
+
+            }
+
+        );
+
+
+    // --------------------------------------------------------
+    // AUDIT
+    // --------------------------------------------------------
+
+    await writeAudit(
+
+        env,
+
+        user.id,
+
+        "INVENTORY_RECEIPT",
+
+        itemType === "part"
+            ? "parts"
+            : "products",
+
+        itemId,
+
+        {
+
+            ...body,
+
+            warehouse_id:
+                warehouseId,
+
+            warehouse_type:
+                warehouse.warehouse_type,
+
+            item_type:
+                itemType,
+
+            item_id:
+                itemId
+
+        }
+
+    );
+
+
+    return {
+
+        message:
+            "ورود موجودی با موفقیت ثبت شد.",
+
+        balance,
+
+        warehouse:{
+
+            id:
+                warehouse.id,
+
+            code:
+                warehouse.code,
+
+            name:
+                warehouse.name,
+
+            type:
+                warehouse.warehouse_type
+
+        },
+
+        item_type:
+            itemType,
+
+        item_id:
+            itemId
+
+    };
+
+}
 
     // --------------------------------------------------------
     // INVENTORY ISSUE
