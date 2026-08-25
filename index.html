@@ -4945,19 +4945,44 @@ document.addEventListener(
         }
 
 
-        const container =
-            button.closest(
-                ".card-body"
-            ) ||
+        /* -----------------------------------------------------
+           FIND TABLE
+        ----------------------------------------------------- */
+
+        let parent =
             button.parentElement;
 
+        let table =
+            null;
 
-        const table =
-            container
-                ?.querySelector(
+
+        while(
+            parent &&
+            !table
+        ){
+
+            table =
+                parent.querySelector(
                     "table.data-table"
                 );
 
+
+            if(table){
+
+                break;
+
+            }
+
+
+            parent =
+                parent.parentElement;
+
+        }
+
+
+        /* -----------------------------------------------------
+           TABLE NOT FOUND
+        ----------------------------------------------------- */
 
         if(!table){
 
@@ -4971,6 +4996,10 @@ document.addEventListener(
         }
 
 
+        /* -----------------------------------------------------
+           FILE NAME
+        ----------------------------------------------------- */
+
         const date =
             new Date()
                 .toISOString()
@@ -4980,9 +5009,17 @@ document.addEventListener(
                 );
 
 
+        const fileName =
+            `export-${date}.csv`;
+
+
+        /* -----------------------------------------------------
+           EXPORT
+        ----------------------------------------------------- */
+
         exportTableToExcel(
             table,
-            `export-${date}.csv`
+            fileName
         );
 
     }
