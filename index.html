@@ -6229,36 +6229,41 @@ async function submitProductForm(
 
     try{
 
-        const result =
-            await apiRequest(
+ const result =
+    await apiRequest(
+        "/api/products",
+        {
+
+            method:
                 editing
-                    ? `/api/products/${encodeURIComponent(form.id.value)}`
-                    : "/api/products",
-                {
+                    ? "PUT"
+                    : "POST",
 
-                    method:
-                        editing
-                            ? "PUT"
-                            : "POST",
+            body:{
 
-                    body:{
+                id:
+                    editing
+                        ? Number(
+                            form.elements.id.value
+                        )
+                        : undefined,
 
-                        code,
+                code,
 
-                        name,
+                name,
 
-                        unit_id:
-                            unitId
+                unit_id:
+                    unitId
 
-                    },
+            },
 
-                    loadingText:
-                        editing
-                            ? "در حال ویرایش محصول..."
-                            : "در حال ثبت محصول..."
+            loadingText:
+                editing
+                    ? "در حال ویرایش محصول..."
+                    : "در حال ثبت محصول..."
 
-                }
-            );
+        }
+    );
 
 
         showMessage(
