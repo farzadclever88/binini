@@ -10000,44 +10000,77 @@ async function submitInventoryMovement(
     clearFormErrors(form);
 
 
+    // ========================================================
+    // WAREHOUSE
+    // ========================================================
+
     const warehouseId =
         selectNumericValue(
+
             form,
+
             "warehouse_id"
+
         );
 
 
-    const partId =
+    // ========================================================
+    // ITEM
+    // ========================================================
+
+    const itemId =
         selectNumericValue(
+
             form,
-            "part_id"
+
+            "item_id"
+
         );
 
+
+    // ========================================================
+    // QUANTITY
+    // ========================================================
 
     const quantity =
         numericValue(
+
             form,
+
             "quantity"
+
         );
 
+
+    // ========================================================
+    // VALIDATION
+    // ========================================================
 
     if(!warehouseId){
 
         setFieldError(
+
             form,
+
             "warehouse_id",
+
             "انبار را انتخاب کنید."
+
         );
 
     }
 
 
-    if(!partId){
+    if(!itemId){
 
         setFieldError(
+
             form,
-            "part_id",
-            "قطعه را انتخاب کنید."
+
+            "item_id",
+
+            "قلم موجودی را انتخاب کنید."
+
         );
 
     }
@@ -10046,9 +10079,13 @@ async function submitInventoryMovement(
     if(quantity <= 0){
 
         setFieldError(
+
             form,
+
             "quantity",
+
             "مقدار باید بیشتر از صفر باشد."
+
         );
 
     }
@@ -10056,7 +10093,7 @@ async function submitInventoryMovement(
 
     if(
         !warehouseId ||
-        !partId ||
+        !itemId ||
         quantity <= 0
     ){
 
@@ -10065,72 +10102,256 @@ async function submitInventoryMovement(
     }
 
 
+    // ========================================================
+    // FIND SELECTED WAREHOUSE
+    // ========================================================
+
+    const warehouse =
+        STATE.warehouses.find(
+
+            item =>
+                Number(item.id) ===
+                warehouseId
+
+        );
+
+
+    if(!warehouse){
+
+        showMessage(
+
+            "انبار انتخاب‌شده پیدا نشد.",
+
+            "error"
+
+        );
+
+        return;
+
+    }
+
+
+    // ========================================================
+    // DETERMINE ITEM TYPE
+    // ========================================================
+
+    let itemType;
+
+
+    if(
+        warehouse.warehouse_type ===
+        "material"
+    ){
+
+        itemType =
+            "part";
+
+    }
+
+    else if(
+        warehouse.warehouse_type ===
+            "general"
+        ||
+        warehouse.warehouse_type ===
+            "finished"
+    ){
+
+        itemType =
+            "product";
+
+    }
+
+    else{
+
+        showMessage(
+
+            "نوع انبار انتخاب‌شده برای این عملیات مجاز نیست.",
+
+            "error"
+
+        );
+
+        return;
+
+    }
+
+
+    // ========================================================
+    // EXTRA SAFETY
+    // ========================================================
+
+    if(
+        type === "receipt" &&
+        warehouse.warehouse_type ===
+        "finished"
+    ){
+
+        showMessage(
+
+            "ورود دستی به انبار محصول نهایی مجاز نیست. محصول نهایی فقط از طریق ثبت تولید وارد انبار می‌شود.",
+
+            "error"
+
+        );
+
+        return;
+
+    }
+
+
+    if(
+        type === "issue" &&
+        warehouse.warehouse_type ===
+        "material"
+    ){
+
+        showMessage(
+
+            "خروج دستی از انبار مواد اولیه مجاز نیست. مصرف مواد اولیه باید بر اساس BOM و از طریق ثبت تولید انجام شود.",
+
+            "error"
+
+        );
+
+        return;
+
+    }
+
+
+    // ========================================================
+    // ENDPOINT
+    // ========================================================
+
     const endpoint =
         type === "receipt"
+
             ? "/api/inventory/receipt"
+
             : "/api/inventory/issue";
 
+
+    // ========================================================
+    // REQUEST BODY
+    // ========================================================
+
+    const body = {
+
+        warehouse_id:
+            warehouseId,
+
+        quantity,
+
+        reference_type:
+            "manual",
+
+        description:
+            form.description.value
+                .trim() ||
+            (
+                type === "receipt"
+
+                    ? "ورود موجودی"
+
+                    : "خروج موجودی"
+            )
+
+    };
+
+
+    // --------------------------------------------------------
+    // MATERIAL → PART
+    // --------------------------------------------------------
+
+    if(
+        itemType === "part"
+    ){
+
+        body.part_id =
+            itemId;
+
+    }
+
+
+    // --------------------------------------------------------
+    // GENERAL / FINISHED → PRODUCT
+    // --------------------------------------------------------
+
+    if(
+        itemType === "product"
+    ){
+
+        body.product_id =
+            itemId;
+
+    }
+
+
+    // ========================================================
+    // API REQUEST
+    // ========================================================
 
     try{
 
         const result =
             await apiRequest(
+
                 endpoint,
+
                 {
 
-                    method:"POST",
+                    method:
+                        "POST",
 
-                    body:{
-
-                        warehouse_id:
-                            warehouseId,
-
-                        part_id:
-                            partId,
-
-                        quantity,
-
-                        reference_type:
-                            "manual",
-
-                        description:
-                            form.description.value
-                                .trim() ||
-                            (
-                                type ===
-                                "receipt"
-                                    ? "ورود مواد اولیه"
-                                    : "خروج مواد اولیه"
-                            )
-
-                    },
+                    body,
 
                     loadingText:
+
                         type === "receipt"
+
                             ? "در حال ثبت ورود موجودی..."
+
                             : "در حال ثبت خروج موجودی..."
 
                 }
+
             );
 
 
+        // ====================================================
+        // SUCCESS
+        // ====================================================
+
         showMessage(
+
             result.message ||
+
             (
                 type === "receipt"
+
                     ? "ورود موجودی ثبت شد."
+
                     : "خروج موجودی ثبت شد."
+
             )
+
         );
 
 
         closeModal();
 
 
+        // ====================================================
+        // REFRESH INVENTORY
+        // ====================================================
+
         await loadCollection(
+
             "inventory",
+
             "/api/inventory",
+
             "موجودی انبار"
+
         );
 
 
@@ -10141,8 +10362,11 @@ async function submitInventoryMovement(
     catch(error){
 
         showMessage(
+
             error.message,
+
             "error"
+
         );
 
     }
