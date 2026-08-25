@@ -5637,7 +5637,365 @@ async function handlePost(
     );
 
 }
+// ============================================================
+// UPDATE PRODUCT
+// ============================================================
 
+async function updateProduct(
+    request,
+    env,
+    user
+) {
+
+    const body =
+        await readJson(
+            request
+        );
+
+
+    // --------------------------------------------------------
+    // PRODUCT ID
+    // --------------------------------------------------------
+
+    const productId =
+        positiveId(
+            body.id,
+            "محصول",
+            "PROD-UPDATE-001"
+        );
+
+
+    // --------------------------------------------------------
+    // READ FIELDS
+    // --------------------------------------------------------
+
+    const code =
+        String(
+            body.code || ""
+        ).trim();
+
+    const name =
+        String(
+            body.name || ""
+        ).trim();
+
+    const unitId =
+        positiveId(
+            body.unit_id,
+            "واحد اندازه‌گیری",
+            "PROD-UPDATE-002"
+        );
+
+
+    // --------------------------------------------------------
+    // VALIDATE BASIC DATA
+    // --------------------------------------------------------
+
+    if (!code) {
+
+        throw new AppError(
+
+            "PROD-UPDATE-003",
+
+            "کد محصول الزامی است.",
+
+            400
+
+        );
+
+    }
+
+
+    if (!name) {
+
+        throw new AppError(
+
+            "PROD-UPDATE-004",
+
+            "نام محصول الزامی است.",
+
+            400
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // STATUS
+    // --------------------------------------------------------
+
+    const status =
+        body.status === "inactive"
+            ? "inactive"
+            : "active";
+
+
+    // --------------------------------------------------------
+    // CHECK PRODUCT
+    // --------------------------------------------------------
+
+    const product =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id,
+
+                    code,
+
+                    name,
+
+                    unit_id,
+
+                    status
+
+                FROM products
+
+                WHERE id = ?
+
+                LIMIT 1
+
+            `)
+            .bind(
+                productId
+            )
+            .first();
+
+
+    if (!product) {
+
+        throw new AppError(
+
+            "PROD-UPDATE-005",
+
+            "محصول موردنظر پیدا نشد.",
+
+            404
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // CHECK UNIT
+    // --------------------------------------------------------
+
+    const unit =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id,
+
+                    status
+
+                FROM units
+
+                WHERE id = ?
+
+                LIMIT 1
+
+            `)
+            .bind(
+                unitId
+            )
+            .first();
+
+
+    if (!unit) {
+
+        throw new AppError(
+
+            "PROD-UPDATE-006",
+
+            "واحد اندازه‌گیری انتخاب‌شده وجود ندارد.",
+
+            404
+
+        );
+
+    }
+
+
+    if (
+        unit.status !==
+        "active"
+    ) {
+
+        throw new AppError(
+
+            "PROD-UPDATE-007",
+
+            "واحد اندازه‌گیری انتخاب‌شده فعال نیست.",
+
+            409
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // CHECK DUPLICATE CODE
+    // --------------------------------------------------------
+
+    const duplicate =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id
+
+                FROM products
+
+                WHERE
+
+                    code = ?
+
+                    AND
+
+                    id != ?
+
+                LIMIT 1
+
+            `)
+            .bind(
+
+                code,
+
+                productId
+
+            )
+            .first();
+
+
+    if (duplicate) {
+
+        throw new AppError(
+
+            "PROD-UPDATE-008",
+
+            "این کد محصول قبلاً برای محصول دیگری ثبت شده است.",
+
+            409
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // UPDATE
+    // --------------------------------------------------------
+
+    await env.DB
+        .prepare(`
+
+            UPDATE products
+
+            SET
+
+                code = ?,
+
+                name = ?,
+
+                unit_id = ?,
+
+                status = ?
+
+            WHERE
+
+                id = ?
+
+        `)
+        .bind(
+
+            code,
+
+            name,
+
+            unitId,
+
+            status,
+
+            productId
+
+        )
+        .run();
+
+
+    // --------------------------------------------------------
+    // AUDIT
+    // --------------------------------------------------------
+
+    await writeAudit(
+
+        env,
+
+        user.id,
+
+        "UPDATE",
+
+        "products",
+
+        productId,
+
+        {
+
+            before: {
+
+                code:
+                    product.code,
+
+                name:
+                    product.name,
+
+                unit_id:
+                    product.unit_id,
+
+                status:
+                    product.status
+
+            },
+
+            after: {
+
+                code,
+
+                name,
+
+                unit_id:
+                    unitId,
+
+                status
+
+            }
+
+        }
+
+    );
+
+
+    // --------------------------------------------------------
+    // RESPONSE
+    // --------------------------------------------------------
+
+    return {
+
+        id:
+            productId,
+
+        message:
+            "محصول با موفقیت ویرایش شد."
+
+    };
+
+}
 // ============================================================
 // PUT REQUEST ROUTER
 // ============================================================
