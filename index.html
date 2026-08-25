@@ -9544,7 +9544,6 @@ function renderInventoryView(){
 
 }
 
-
 /* ============================================================
    INVENTORY MOVEMENT FORM
 ============================================================ */
@@ -9555,6 +9554,62 @@ function openInventoryMovementForm(
 
     const receipt =
         type === "receipt";
+
+
+    /*
+     * --------------------------------------------------------
+     * MANUAL INVENTORY RULE
+     *
+     * receipt:
+     *   material = قطعه
+     *   general  = محصول خریداری‌شده
+     *
+     * issue:
+     *   material = مجاز نیست
+     *   general  = محصول
+     *   finished = محصول
+     *
+     * --------------------------------------------------------
+     */
+
+
+    const allowedWarehouses =
+        STATE.warehouses.filter(
+            item => {
+
+                if(
+                    item.status !==
+                    "active"
+                ){
+
+                    return false;
+
+                }
+
+
+                if(receipt){
+
+                    return (
+                        item.warehouse_type ===
+                            "material"
+                        ||
+                        item.warehouse_type ===
+                            "general"
+                    );
+
+                }
+
+
+                return (
+                    item.warehouse_type ===
+                        "general"
+                    ||
+                    item.warehouse_type ===
+                        "finished"
+                );
+
+            }
+        );
 
 
     openModal(
@@ -9571,6 +9626,11 @@ function openInventoryMovementForm(
             >
 
                 <div class="form-grid">
+
+
+                    <!-- =====================================
+                         WAREHOUSE
+                    ====================================== -->
 
                     <div class="form-group">
 
@@ -9592,25 +9652,33 @@ function openInventoryMovementForm(
                     </div>
 
 
+                    <!-- =====================================
+                         ITEM
+                    ====================================== -->
+
                     <div class="form-group">
 
                         <label class="form-label">
-                            قطعه *
+                            قلم موجودی *
                         </label>
 
                         <select
-                            class="form-control part-select"
-                            name="part_id"
+                            class="form-control item-select"
+                            name="item_id"
                             required
                         ></select>
 
                         <small
                             class="form-error"
-                            data-error-for="part_id"
+                            data-error-for="item_id"
                         ></small>
 
                     </div>
 
+
+                    <!-- =====================================
+                         QUANTITY
+                    ====================================== -->
 
                     <div class="form-group">
 
@@ -9641,6 +9709,10 @@ function openInventoryMovementForm(
                     </div>
 
 
+                    <!-- =====================================
+                         DESCRIPTION
+                    ====================================== -->
+
                     <div class="form-group full">
 
                         <label class="form-label">
@@ -9652,8 +9724,8 @@ function openInventoryMovementForm(
                             name="description"
                             placeholder="${
                                 receipt
-                                    ? "شرح ورود مواد اولیه"
-                                    : "شرح خروج مواد اولیه"
+                                    ? "شرح ورود موجودی"
+                                    : "شرح خروج موجودی"
                             }"
                         ></textarea>
 
@@ -9696,55 +9768,218 @@ function openInventoryMovementForm(
     );
 
 
-populateSelect(
-    ".warehouse-select",
-    STATE.warehouses.filter(
-        item =>
-            item.status === "active" &&
-            (
-                item.warehouse_type === "finished" ||
-                item.warehouse_type === "general"
-            )
-    ),
-    "id",
-    item =>
-        `${item.code || ""} - ${item.name || ""}`,
-    "انتخاب انبار محصول"
-);
-
+    // ========================================================
+    // WAREHOUSE SELECT
+    // ========================================================
 
     populateSelect(
-        ".part-select",
-        STATE.parts,
+
+        ".warehouse-select",
+
+        allowedWarehouses,
+
         "id",
+
         item =>
             `${item.code || ""} - ${item.name || ""}`,
-        "انتخاب قطعه"
+
+        receipt
+            ? "انتخاب انبار مواد اولیه یا عمومی"
+            : "انتخاب انبار عمومی یا محصول"
+
     );
 
+
+    // ========================================================
+    // INITIAL ITEM SELECT
+    // ========================================================
+
+    populateSelect(
+
+        ".item-select",
+
+        [],
+
+        "id",
+
+        item => "",
+
+        "ابتدا انبار را انتخاب کنید"
+
+    );
+
+
+    // ========================================================
+    // CHANGE WAREHOUSE
+    // ========================================================
+
+    const warehouseSelect =
+        $("#inventoryMovementForm")
+            .elements
+            .warehouse_id;
+
+
+    const itemSelect =
+        $("#inventoryMovementForm")
+            .elements
+            .item_id;
+
+
+    warehouseSelect
+        .addEventListener(
+
+            "change",
+
+            () => {
+
+                const warehouseId =
+                    Number(
+                        warehouseSelect.value
+                    );
+
+
+                const warehouse =
+                    allowedWarehouses.find(
+                        item =>
+                            Number(item.id) ===
+                            warehouseId
+                    );
+
+
+                if(!warehouse){
+
+                    populateSelect(
+
+                        ".item-select",
+
+                        [],
+
+                        "id",
+
+                        item => "",
+
+                        "ابتدا انبار را انتخاب کنید"
+
+                    );
+
+                    return;
+
+                }
+
+
+                // ------------------------------------------------
+                // MATERIAL WAREHOUSE
+                // ------------------------------------------------
+
+                if(
+                    warehouse.warehouse_type ===
+                    "material"
+                ){
+
+                    populateSelect(
+
+                        ".item-select",
+
+                        STATE.parts.filter(
+                            item =>
+                                item.status ===
+                                "active"
+                        ),
+
+                        "id",
+
+                        item =>
+                            `${item.code || ""} - ${item.name || ""}`,
+
+                        "انتخاب قطعه"
+
+                    );
+
+                    return;
+
+                }
+
+
+                // ------------------------------------------------
+                // GENERAL / FINISHED WAREHOUSE
+                // ------------------------------------------------
+
+                if(
+                    warehouse.warehouse_type ===
+                        "general"
+                    ||
+                    warehouse.warehouse_type ===
+                        "finished"
+                ){
+
+                    populateSelect(
+
+                        ".item-select",
+
+                        STATE.products.filter(
+                            item =>
+                                item.status ===
+                                "active"
+                        ),
+
+                        "id",
+
+                        item =>
+                            `${item.code || ""} - ${item.name || ""}`,
+
+                        "انتخاب محصول"
+
+                    );
+
+                }
+
+            }
+
+        );
+
+
+    // ========================================================
+    // NUMBER WORDS
+    // ========================================================
 
     bindNumberWords();
 
 
+    // ========================================================
+    // CANCEL
+    // ========================================================
+
     $("#cancelInventoryMovement")
         .addEventListener(
+
             "click",
+
             closeModal
+
         );
 
+
+    // ========================================================
+    // SUBMIT
+    // ========================================================
 
     $("#inventoryMovementForm")
         .addEventListener(
+
             "submit",
+
             event =>
                 submitInventoryMovement(
+
                     event,
+
                     type
+
                 )
+
         );
 
 }
-
 
 /* ============================================================
    INVENTORY MOVEMENT SUBMIT
