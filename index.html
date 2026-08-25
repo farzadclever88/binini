@@ -4713,6 +4713,280 @@ function buildTable(
     return html;
 
 }
+
+/* ============================================================
+   EXPORT TABLE TO EXCEL
+============================================================ */
+
+function exportTableToExcel(
+    table,
+    fileName = "export.xlsx"
+){
+
+    if(!table){
+
+        showMessage(
+            "جدولی برای خروجی گرفتن پیدا نشد.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const rows = [];
+
+
+    /* ---------------------------------------------------------
+       HEADER
+    --------------------------------------------------------- */
+
+    const headers =
+        Array.from(
+            table.querySelectorAll(
+                "thead th"
+            )
+        )
+        .map(
+            th =>
+                th.innerText
+                    .trim()
+        );
+
+
+    /*
+       ستون عملیات برای Excel کاربردی ندارد.
+       بنابراین اگر وجود داشت حذفش می‌کنیم.
+    */
+
+    if(
+        headers[
+            headers.length - 1
+        ] === "عملیات"
+    ){
+
+        headers.pop();
+
+    }
+
+
+    rows.push(headers);
+
+
+    /* ---------------------------------------------------------
+       BODY
+    --------------------------------------------------------- */
+
+    table
+        .querySelectorAll(
+            "tbody tr"
+        )
+        .forEach(
+            tr => {
+
+                const cells =
+                    Array.from(
+                        tr.querySelectorAll(
+                            "td"
+                        )
+                    )
+                    .map(
+                        td =>
+                            td.innerText
+                                .trim()
+                    );
+
+
+                if(
+                    cells[
+                        cells.length - 1
+                    ] === ""
+                ){
+
+                    return;
+
+                }
+
+
+                if(
+                    cells.length >
+                    headers.length
+                ){
+
+                    cells.splice(
+                        headers.length
+                    );
+
+                }
+
+
+                rows.push(
+                    cells
+                );
+
+            }
+        );
+
+
+    /* ---------------------------------------------------------
+       CREATE CSV
+       Excel can open UTF-8 CSV correctly.
+    --------------------------------------------------------- */
+
+    const csv =
+        rows
+            .map(
+                row =>
+                    row
+                        .map(
+                            value => {
+
+                                const text =
+                                    String(
+                                        value ??
+                                        ""
+                                    );
+
+
+                                return `"${text
+                                    .replace(
+                                        /"/g,
+                                        '""'
+                                    )}"`;
+
+                            }
+                        )
+                        .join(",")
+            )
+            .join("\r\n");
+
+
+    /* ---------------------------------------------------------
+       UTF-8 BOM
+       Required for correct Persian display in Excel.
+    --------------------------------------------------------- */
+
+    const blob =
+        new Blob(
+
+            [
+                "\uFEFF",
+                csv
+            ],
+
+            {
+                type:
+                    "text/csv;charset=utf-8;"
+            }
+
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+
+    link.download =
+        fileName
+            .replace(
+                /\.xlsx$/i,
+                ".csv"
+            );
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    link.remove();
+
+
+    URL.revokeObjectURL(
+        url
+    );
+
+}
+
+/* ============================================================
+   TABLE EXPORT EVENT
+============================================================ */
+
+document.addEventListener(
+    "click",
+    event => {
+
+        const button =
+            event.target.closest(
+                "[data-table-export='excel']"
+            );
+
+
+        if(!button){
+
+            return;
+
+        }
+
+
+        const container =
+            button.closest(
+                ".card-body"
+            ) ||
+            button.parentElement;
+
+
+        const table =
+            container
+                ?.querySelector(
+                    "table.data-table"
+                );
+
+
+        if(!table){
+
+            showMessage(
+                "جدول برای خروجی Excel پیدا نشد.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        const date =
+            new Date()
+                .toISOString()
+                .slice(
+                    0,
+                    10
+                );
+
+
+        exportTableToExcel(
+            table,
+            `export-${date}.csv`
+        );
+
+    }
+);
 /* ============================================================
    STATUS BADGE
 ============================================================ */
