@@ -9328,14 +9328,21 @@ function openInventoryMovementForm(
     );
 
 
-    populateSelect(
-        ".warehouse-select",
-        STATE.warehouses,
-        "id",
+populateSelect(
+    ".warehouse-select",
+    STATE.warehouses.filter(
         item =>
-            `${item.code || ""} - ${item.name || ""}`,
-        "انتخاب انبار"
-    );
+            item.status === "active" &&
+            (
+                item.warehouse_type === "finished" ||
+                item.warehouse_type === "general"
+            )
+    ),
+    "id",
+    item =>
+        `${item.code || ""} - ${item.name || ""}`,
+    "انتخاب انبار محصول"
+);
 
 
     populateSelect(
