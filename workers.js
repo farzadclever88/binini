@@ -3748,7 +3748,86 @@ async function createProductionPlan(
 
     }
 
+    // --------------------------------------------------------
+    // CHECK DUPLICATE PRODUCTION PLAN
+    //
+    // یک BOM مشخص نباید در یک تاریخ مشخص
+    // بیش از یک بار برنامه‌ریزی شود.
+    // --------------------------------------------------------
 
+    const existingPlan =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id,
+
+                    plan_date,
+
+                    bom_id,
+
+                    planned_quantity,
+
+                    status
+
+                FROM planning_daily
+
+                WHERE
+
+                    plan_date = ?
+
+                    AND
+
+                    bom_id = ?
+
+                LIMIT 1
+
+            `)
+            .bind(
+
+                planDate,
+
+                bomId
+
+            )
+            .first();
+
+
+    if (existingPlan) {
+
+        throw new AppError(
+
+            "PLAN-008",
+
+            "برای این تاریخ، این BOM قبلاً در برنامه تولید ثبت شده است.",
+
+            409,
+
+            {
+
+                existing_plan_id:
+                    existingPlan.id,
+
+                plan_date:
+                    existingPlan.plan_date,
+
+                bom_id:
+                    existingPlan.bom_id,
+
+                planned_quantity:
+                    Number(
+                        existingPlan.planned_quantity
+                    ),
+
+                status:
+                    existingPlan.status
+
+            }
+
+        );
+
+    }
     // --------------------------------------------------------
     // FIND RAW MATERIAL WAREHOUSE
     // --------------------------------------------------------
