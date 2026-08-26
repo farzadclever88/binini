@@ -9654,6 +9654,190 @@ async function getDashboardSnapshot(
     };
 
 }
+
+// ============================================================
+// DASHBOARD DETAILS
+// ============================================================
+
+async function getDashboardDetails(
+    env,
+    filters = {}
+){
+
+    let detailSql = `
+
+        SELECT *
+
+        FROM dashboard_snapshot_details
+
+        WHERE 1 = 1
+
+    `;
+
+
+    const detailBindings = [];
+
+
+    if(filters.snapshotId){
+
+        detailSql += `
+            AND snapshot_id = ?
+        `;
+
+        detailBindings.push(
+            filters.snapshotId
+        );
+
+    }
+
+
+    if(filters.planningId){
+
+        detailSql += `
+            AND planning_id = ?
+        `;
+
+        detailBindings.push(
+            filters.planningId
+        );
+
+    }
+
+
+    if(filters.productId){
+
+        detailSql += `
+            AND product_id = ?
+        `;
+
+        detailBindings.push(
+            filters.productId
+        );
+
+    }
+
+
+    detailSql += `
+
+        ORDER BY
+            plan_date DESC,
+            product_name,
+            planning_id
+
+    `;
+
+
+    const detailsResult =
+        await env.DB
+            .prepare(
+                detailSql
+            )
+            .bind(
+                ...detailBindings
+            )
+            .all();
+
+
+    let materialSql = `
+
+        SELECT *
+
+        FROM dashboard_snapshot_materials
+
+        WHERE 1 = 1
+
+    `;
+
+
+    const materialBindings = [];
+
+
+    if(filters.snapshotId){
+
+        materialSql += `
+            AND snapshot_id = ?
+        `;
+
+        materialBindings.push(
+            filters.snapshotId
+        );
+
+    }
+
+
+    if(filters.planningId){
+
+        materialSql += `
+            AND planning_id = ?
+        `;
+
+        materialBindings.push(
+            filters.planningId
+        );
+
+    }
+
+
+    if(filters.productId){
+
+        materialSql += `
+            AND product_id = ?
+        `;
+
+        materialBindings.push(
+            filters.productId
+        );
+
+    }
+
+
+    materialSql += `
+
+        ORDER BY
+
+            CASE severity
+
+                WHEN 'red'
+                THEN 1
+
+                WHEN 'yellow'
+                THEN 2
+
+                ELSE 3
+
+            END,
+
+            planning_id,
+
+            part_name
+
+    `;
+
+
+    const materialsResult =
+        await env.DB
+            .prepare(
+                materialSql
+            )
+            .bind(
+                ...materialBindings
+            )
+            .all();
+
+
+    return {
+
+        items:
+            detailsResult.results ||
+            [],
+
+        materials:
+            materialsResult.results ||
+            []
+
+    };
+
+}
 // ============================================================
 // DELETE SESSION / FUTURE DELETE ROUTES
 // ============================================================
