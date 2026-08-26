@@ -341,7 +341,7 @@ async function getProductionList(
             .all();
 
 
-   return result.results || [];
+    return result.results || [];
 
 }
 
@@ -878,7 +878,7 @@ function databaseError(
 
     );
 
-  }
+}
 // ============================================================
 // LOOKUP / DROPDOWN APIs
 // ============================================================
@@ -2845,7 +2845,7 @@ async function createBom(
 
     }
 
-          }
+}
 
 
 // ============================================================
@@ -3094,67 +3094,67 @@ async function addBomDetail(
 
 async function updateBomDetail(
     request,
-        env,
-            user
-            ) {
+    env,
+    user
+) {
 
-                const body =
-                        await readJson(
-                                    request
-                                            );
+    const body =
+        await readJson(
+            request
+        );
 
-                                                const detailId =
-                                                        positiveId(
-                                                                    body.id,
-                                                                                "جزء BOM",
-                                                                                            "BOMDETAIL-009"
-                                                                                                    );
+    const detailId =
+        positiveId(
+            body.id,
+            "جزء BOM",
+            "BOMDETAIL-009"
+        );
 
-                                                                                                        const partId =
-                                                                                                                positiveId(
-                                                                                                                            body.part_id,
-                                                                                                                                        "قطعه",
-                                                                                                                                                    "BOMDETAIL-010"
-                                                                                                                                                            );
+    const partId =
+        positiveId(
+            body.part_id,
+            "قطعه",
+            "BOMDETAIL-010"
+        );
 
-                                                                                                                                                                const consumptionFactor =
-                                                                                                                                                                        positiveNumber(
-                                                                                                                                                                                    body.consumption_factor,
-                                                                                                                                                                                                "ضریب مصرف",
-                                                                                                                                                                                                            "BOMDETAIL-011"
-                                                                                                                                                                                                                    );
+    const consumptionFactor =
+        positiveNumber(
+            body.consumption_factor,
+            "ضریب مصرف",
+            "BOMDETAIL-011"
+        );
 
-                                                                                                                                                                                                                        const scrapPercent =
-                                                                                                                                                                                                                                nonNegativeNumber(
-                                                                                                                                                                                                                                            body.scrap_percent ?? 0,
-                                                                                                                                                                                                                                                        "درصد ضایعات",
-                                                                                                                                                                                                                                                                    "BOMDETAIL-012"
-                                                                                                                                                                                                                                                                            );
+    const scrapPercent =
+        nonNegativeNumber(
+            body.scrap_percent ?? 0,
+            "درصد ضایعات",
+            "BOMDETAIL-012"
+        );
 
-                                                                                                                                                                                                                                                                                if (
-                                                                                                                                                                                                                                                                                        scrapPercent > 100
-                                                                                                                                                                                                                                                                                            ) {
+    if (
+        scrapPercent > 100
+    ) {
 
-                                                                                                                                                                                                                                                                                                    throw new AppError(
+        throw new AppError(
 
-                                                                                                                                                                                                                                                                                                                "BOMDETAIL-013",
+            "BOMDETAIL-013",
 
-                                                                                                                                                                                                                                                                                                                            "درصد ضایعات نمی‌تواند بیشتر از 100 باشد.",
+            "درصد ضایعات نمی‌تواند بیشتر از 100 باشد.",
 
-                                                                                                                                                                                                                                                                                                                                        400
+            400
 
-                                                                                                                                                                                                                                                                                                                                                );
+        );
 
-                                                                                                                                                                                                                                                                                                                                                    }
+    }
 
 
-                                                                                                                                                                                                                                                                                                                                                        // ========================================================
-                                                                                                                                                                                                                                                                                                                                                            // FIND EXISTING DETAIL
-                                                                                                                                                                                                                                                                                                                                                                // ========================================================
+    // ========================================================
+    // FIND EXISTING DETAIL
+    // ========================================================
 
-                                                                                                                                                                                                                                                                                                                                                                    const existing =
-                                                                                                                                                                                                                                                                                                                                                                            await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                        .prepare(`
+    const existing =
+        await env.DB
+            .prepare(`
 
                                                                                                                                                                                                                                                                                                                                                                                                         SELECT
 
@@ -3180,35 +3180,35 @@ async function updateBomDetail(
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 `)
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .bind(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            detailId
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        )
+            .bind(
+                detailId
+            )
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .first();
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        if (!existing) {
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                throw new AppError(
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            "BOMDETAIL-014",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "جزء BOM موردنظر پیدا نشد.",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    404
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            );
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
+            .first();
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // ========================================================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // CHECK BOM
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // ========================================================
+    if (!existing) {
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                const bom =
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .prepare(`
+        throw new AppError(
+
+            "BOMDETAIL-014",
+
+            "جزء BOM موردنظر پیدا نشد.",
+
+            404
+
+        );
+
+    }
+
+
+    // ========================================================
+    // CHECK BOM
+    // ========================================================
+
+    const bom =
+        await env.DB
+            .prepare(`
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     SELECT
 
@@ -3228,35 +3228,35 @@ async function updateBomDetail(
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 `)
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .bind(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            existing.bom_id
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        )
+            .bind(
+                existing.bom_id
+            )
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .first();
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        if (!bom) {
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                throw new AppError(
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            "BOMDETAIL-015",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "BOM مربوط به این جزء وجود ندارد یا فعال نیست.",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    404
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            );
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
+            .first();
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // ========================================================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // CHECK PART
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // ========================================================
+    if (!bom) {
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                const part =
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .prepare(`
+        throw new AppError(
+
+            "BOMDETAIL-015",
+
+            "BOM مربوط به این جزء وجود ندارد یا فعال نیست.",
+
+            404
+
+        );
+
+    }
+
+
+    // ========================================================
+    // CHECK PART
+    // ========================================================
+
+    const part =
+        await env.DB
+            .prepare(`
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     SELECT
 
@@ -3276,36 +3276,36 @@ async function updateBomDetail(
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 `)
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .bind(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            partId
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        )
+            .bind(
+                partId
+            )
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .first();
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        if (!part) {
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                throw new AppError(
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            "BOMDETAIL-016",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "قطعه انتخاب‌شده وجود ندارد یا فعال نیست.",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    404
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            );
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
+            .first();
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // ========================================================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // UPDATE
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // ========================================================
+    if (!part) {
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                try {
+        throw new AppError(
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .prepare(`
+            "BOMDETAIL-016",
+
+            "قطعه انتخاب‌شده وجود ندارد یا فعال نیست.",
+
+            404
+
+        );
+
+    }
+
+
+    // ========================================================
+    // UPDATE
+    // ========================================================
+
+    try {
+
+        await env.DB
+            .prepare(`
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     UPDATE bom_details
 
@@ -3323,66 +3323,66 @@ async function updateBomDetail(
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 `)
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .bind(
+            .bind(
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            partId,
+                partId,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            consumptionFactor,
+                consumptionFactor,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            scrapPercent,
+                scrapPercent,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            detailId
+                detailId
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        )
+            )
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .run();
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // ====================================================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // AUDIT
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // ====================================================
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    await writeAudit(
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                env,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            user.id,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "UPDATE",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "bom_details",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                detailId,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            body
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    );
+            .run();
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
+        // ====================================================
+        // AUDIT
+        // ====================================================
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            catch (error) {
+        await writeAudit(
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    throw databaseError(
+            env,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                error,
+            user.id,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            "BOMDETAIL-017",
+            "UPDATE",
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "ویرایش جزء BOM انجام نشد. ممکن است این قطعه قبلاً در همین BOM ثبت شده باشد."
+            "bom_details",
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                );
+            detailId,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }
+            body
+
+        );
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // ========================================================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // RETURN UPDATED RECORD
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                // ========================================================
+    }
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    const updated =
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        .prepare(`
+    catch (error) {
+
+        throw databaseError(
+
+            error,
+
+            "BOMDETAIL-017",
+
+            "ویرایش جزء BOM انجام نشد. ممکن است این قطعه قبلاً در همین BOM ثبت شده باشد."
+
+        );
+
+    }
+
+
+    // ========================================================
+    // RETURN UPDATED RECORD
+    // ========================================================
+
+    const updated =
+        await env.DB
+            .prepare(`
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         SELECT
 
@@ -3424,59 +3424,59 @@ async function updateBomDetail(
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         `)
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .bind(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    detailId
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                )
+            .bind(
+                detailId
+            )
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .first();
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                return {
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        item:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    updated,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            message:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "جزء BOM با موفقیت ویرایش شد."
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            };
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
+            .first();
 
 
+    return {
+
+        item:
+            updated,
+
+        message:
+            "جزء BOM با موفقیت ویرایش شد."
+
+    };
+
+}
 
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // ============================================================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // DELETE BOM DETAIL
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // ============================================================
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            async function deleteBomDetail(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                request,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    env,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        user
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ) {
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            const body =
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    await readJson(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                request
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        );
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            const detailId =
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    positiveId(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                body.id,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            "جزء BOM",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "BOMDETAIL-018"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                );
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // ========================================================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // FIND EXISTING DETAIL
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // ========================================================
+// ============================================================
+// DELETE BOM DETAIL
+// ============================================================
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                const existing =
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .prepare(`
+async function deleteBomDetail(
+    request,
+    env,
+    user
+) {
+
+    const body =
+        await readJson(
+            request
+        );
+
+    const detailId =
+        positiveId(
+            body.id,
+            "جزء BOM",
+            "BOMDETAIL-018"
+        );
+
+
+    // ========================================================
+    // FIND EXISTING DETAIL
+    // ========================================================
+
+    const existing =
+        await env.DB
+            .prepare(`
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     SELECT
 
@@ -3502,35 +3502,35 @@ async function updateBomDetail(
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             `)
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        .bind(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        detailId
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    )
+            .bind(
+                detailId
+            )
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .first();
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    if (!existing) {
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            throw new AppError(
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "BOMDETAIL-019",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "جزء BOM موردنظر پیدا نشد.",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                404
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        );
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
+            .first();
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                // ========================================================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // CHECK BOM
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // ========================================================
+    if (!existing) {
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            const bom =
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .prepare(`
+        throw new AppError(
+
+            "BOMDETAIL-019",
+
+            "جزء BOM موردنظر پیدا نشد.",
+
+            404
+
+        );
+
+    }
+
+
+    // ========================================================
+    // CHECK BOM
+    // ========================================================
+
+    const bom =
+        await env.DB
+            .prepare(`
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 SELECT
 
@@ -3550,36 +3550,36 @@ async function updateBomDetail(
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             `)
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        .bind(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        existing.bom_id
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    )
+            .bind(
+                existing.bom_id
+            )
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .first();
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    if (!bom) {
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            throw new AppError(
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "BOMDETAIL-020",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "BOM مربوط به این جزء وجود ندارد یا فعال نیست.",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                404
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        );
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
+            .first();
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                // ========================================================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // DELETE
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // ========================================================
+    if (!bom) {
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            try {
+        throw new AppError(
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .prepare(`
+            "BOMDETAIL-020",
+
+            "BOM مربوط به این جزء وجود ندارد یا فعال نیست.",
+
+            404
+
+        );
+
+    }
+
+
+    // ========================================================
+    // DELETE
+    // ========================================================
+
+    try {
+
+        await env.DB
+            .prepare(`
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 DELETE FROM bom_details
 
@@ -3589,68 +3589,68 @@ async function updateBomDetail(
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 `)
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .bind(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            detailId
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        )
+            .bind(
+                detailId
+            )
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .run();
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // ====================================================
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // AUDIT
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // ====================================================
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    await writeAudit(
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                env,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            user.id,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "DELETE",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "bom_details",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                detailId,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            existing
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    );
+            .run();
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
+        // ====================================================
+        // AUDIT
+        // ====================================================
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            catch (error) {
+        await writeAudit(
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    throw databaseError(
+            env,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                error,
+            user.id,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            "BOMDETAIL-021",
+            "DELETE",
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "حذف جزء BOM انجام نشد."
+            "bom_details",
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                );
+            detailId,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }
+            existing
+
+        );
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        return {
+    }
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                id:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            detailId,
+    catch (error) {
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    bom_id:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                existing.bom_id,
+        throw databaseError(
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        deleted:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    true,
+            error,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            message:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "جزء BOM با موفقیت حذف شد."
+            "BOMDETAIL-021",
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            };
+            "حذف جزء BOM انجام نشد."
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
+        );
+
+    }
+
+
+    return {
+
+        id:
+            detailId,
+
+        bom_id:
+            existing.bom_id,
+
+        deleted:
+            true,
+
+        message:
+            "جزء BOM با موفقیت حذف شد."
+
+    };
+
+}
 
 // ============================================================
 // CREATE PRODUCTION PLAN
@@ -5882,7 +5882,7 @@ async function registerProduction(
 
     const newStatus =
         newProduced >=
-        plannedQuantity
+            plannedQuantity
             ? "completed"
             : "in_progress";
 
@@ -5999,7 +5999,20 @@ async function handleGet(
     url
 ) {
 
+    // --------------------------------------------------------
+// DASHBOARD SNAPSHOT
+// --------------------------------------------------------
 
+if (
+    path ===
+    "/api/dashboard"
+) {
+
+    return await getDashboardSnapshot(
+        env
+    );
+
+}
     // --------------------------------------------------------
     // CURRENT USER
     // --------------------------------------------------------
@@ -6228,44 +6241,44 @@ async function handleGet(
 
 
     // --------------------------------------------------------
-// CALCULATE MATERIAL REQUIREMENT
-// --------------------------------------------------------
-//
-// This endpoint is used by the daily production planning grid.
-//
-// It receives planning_id,
-// then loads BOM and planned quantity directly
-// from planning_daily.
-//
-// No inventory is changed here.
-// --------------------------------------------------------
-
-if (
-    path ===
-    "/api/production/material-requirement"
-) {
-
-    const planningId =
-        url.searchParams.get(
-            "planning_id"
-        );
-
-
-    const validPlanningId =
-        positiveId(
-            planningId,
-            "برنامه تولید",
-            "PLAN-120"
-        );
-
-
+    // CALCULATE MATERIAL REQUIREMENT
     // --------------------------------------------------------
-    // LOAD PRODUCTION PLAN
+    //
+    // This endpoint is used by the daily production planning grid.
+    //
+    // It receives planning_id,
+    // then loads BOM and planned quantity directly
+    // from planning_daily.
+    //
+    // No inventory is changed here.
     // --------------------------------------------------------
 
-    const plan =
-        await env.DB
-            .prepare(`
+    if (
+        path ===
+        "/api/production/material-requirement"
+    ) {
+
+        const planningId =
+            url.searchParams.get(
+                "planning_id"
+            );
+
+
+        const validPlanningId =
+            positiveId(
+                planningId,
+                "برنامه تولید",
+                "PLAN-120"
+            );
+
+
+        // --------------------------------------------------------
+        // LOAD PRODUCTION PLAN
+        // --------------------------------------------------------
+
+        const plan =
+            await env.DB
+                .prepare(`
 
                 SELECT
 
@@ -6297,50 +6310,50 @@ if (
                 LIMIT 1
 
             `)
-            .bind(
-                validPlanningId
-            )
-            .first();
+                .bind(
+                    validPlanningId
+                )
+                .first();
 
 
-    if (!plan) {
+        if (!plan) {
 
-        throw new AppError(
+            throw new AppError(
 
-            "PLAN-121",
+                "PLAN-121",
 
-            "برنامه تولید پیدا نشد.",
+                "برنامه تولید پیدا نشد.",
 
-            404
+                404
 
-        );
+            );
 
-    }
-
-
-    // --------------------------------------------------------
-    // CALCULATE REQUIRED MATERIALS
-    // --------------------------------------------------------
-
-    const materials =
-        await calculateMaterialRequirement(
-
-            env,
-
-            plan.bom_id,
-
-            plan.planned_quantity
-
-        );
+        }
 
 
-    // --------------------------------------------------------
-    // FIND RAW MATERIAL WAREHOUSE
-    // --------------------------------------------------------
+        // --------------------------------------------------------
+        // CALCULATE REQUIRED MATERIALS
+        // --------------------------------------------------------
 
-    const warehouse =
-        await env.DB
-            .prepare(`
+        const materials =
+            await calculateMaterialRequirement(
+
+                env,
+
+                plan.bom_id,
+
+                plan.planned_quantity
+
+            );
+
+
+        // --------------------------------------------------------
+        // FIND RAW MATERIAL WAREHOUSE
+        // --------------------------------------------------------
+
+        const warehouse =
+            await env.DB
+                .prepare(`
 
                 SELECT
 
@@ -6369,175 +6382,175 @@ if (
                 LIMIT 1
 
             `)
-            .first();
+                .first();
 
 
-    if (!warehouse) {
+        if (!warehouse) {
 
-        throw new AppError(
+            throw new AppError(
 
-            "PLAN-122",
+                "PLAN-122",
 
-            "انبار مواد اولیه فعال پیدا نشد.",
+                "انبار مواد اولیه فعال پیدا نشد.",
 
-            404
-
-        );
-
-    }
-
-
-    // --------------------------------------------------------
-    // CHECK STOCK
-    // --------------------------------------------------------
-
-    const stockCheck = [];
-
-
-    for (
-        const material
-        of materials
-    ) {
-
-        const available =
-            Number(
-
-                await getInventoryBalance(
-
-                    env,
-
-                    warehouse.id,
-
-                    "part",
-
-                    material.part_id
-
-                ) || 0
+                404
 
             );
 
+        }
 
-        const required =
-            Number(
-                material.required_quantity
+
+        // --------------------------------------------------------
+        // CHECK STOCK
+        // --------------------------------------------------------
+
+        const stockCheck = [];
+
+
+        for (
+            const material
+            of materials
+        ) {
+
+            const available =
+                Number(
+
+                    await getInventoryBalance(
+
+                        env,
+
+                        warehouse.id,
+
+                        "part",
+
+                        material.part_id
+
+                    ) || 0
+
+                );
+
+
+            const required =
+                Number(
+                    material.required_quantity
+                );
+
+
+            stockCheck.push({
+
+                part_id:
+                    material.part_id,
+
+                part_code:
+                    material.part_code,
+
+                part_name:
+                    material.part_name,
+
+                unit_name:
+                    material.unit_name,
+
+                required_quantity:
+                    required,
+
+                available_quantity:
+                    available,
+
+                shortage:
+                    Math.max(
+
+                        0,
+
+                        required -
+                        available
+
+                    ),
+
+                sufficient:
+                    available >=
+                    required
+
+            });
+
+        }
+
+
+        const shortages =
+            stockCheck.filter(
+                item =>
+                    !item.sufficient
             );
 
 
-        stockCheck.push({
+        // --------------------------------------------------------
+        // RESPONSE
+        // --------------------------------------------------------
 
-            part_id:
-                material.part_id,
+        return {
 
-            part_code:
-                material.part_code,
+            planning_id:
+                plan.id,
 
-            part_name:
-                material.part_name,
+            plan_date:
+                plan.plan_date,
 
-            unit_name:
-                material.unit_name,
+            bom_id:
+                plan.bom_id,
 
-            required_quantity:
-                required,
+            bom_code:
+                plan.bom_code,
 
-            available_quantity:
-                available,
+            product_id:
+                plan.product_id,
 
-            shortage:
-                Math.max(
-
-                    0,
-
-                    required -
-                    available
-
+            planned_quantity:
+                Number(
+                    plan.planned_quantity
                 ),
 
-            sufficient:
-                available >=
-                required
+            warehouse: {
 
-        });
+                id:
+                    warehouse.id,
+
+                code:
+                    warehouse.code,
+
+                name:
+                    warehouse.name
+
+            },
+
+            materials:
+                stockCheck,
+
+            shortages,
+
+            sufficient:
+                shortages.length === 0
+
+        };
+
+    }
+    // --------------------------------------------------------
+    // PRODUCTION LIST
+    // --------------------------------------------------------
+
+    if (
+        path === "/api/production"
+    ) {
+
+        return {
+
+            items:
+                await getProductionList(
+                    env
+                )
+
+        };
 
     }
 
-
-    const shortages =
-        stockCheck.filter(
-            item =>
-                !item.sufficient
-        );
-
-
-    // --------------------------------------------------------
-    // RESPONSE
-    // --------------------------------------------------------
-
-    return {
-
-        planning_id:
-            plan.id,
-
-        plan_date:
-            plan.plan_date,
-
-        bom_id:
-            plan.bom_id,
-
-        bom_code:
-            plan.bom_code,
-
-        product_id:
-            plan.product_id,
-
-        planned_quantity:
-            Number(
-                plan.planned_quantity
-            ),
-
-        warehouse: {
-
-            id:
-                warehouse.id,
-
-            code:
-                warehouse.code,
-
-            name:
-                warehouse.name
-
-        },
-
-        materials:
-            stockCheck,
-
-        shortages,
-
-        sufficient:
-            shortages.length === 0
-
-    };
-
-}
-// --------------------------------------------------------
-// PRODUCTION LIST
-// --------------------------------------------------------
-
-if (
-    path === "/api/production"
-) {
-
-    return {
-
-        items:
-            await getProductionList(
-                env
-            )
-
-    };
-
-}
-    
     // --------------------------------------------------------
     // UNKNOWN GET
     // --------------------------------------------------------
@@ -6723,40 +6736,40 @@ async function handlePost(
     }
 
 
-// --------------------------------------------------------
-// INVENTORY RECEIPT
-// --------------------------------------------------------
-
-if (
-    path ===
-    "/api/inventory/receipt"
-) {
-
-    const body =
-        await readJson(
-            request
-        );
-
-
     // --------------------------------------------------------
-    // VALIDATE WAREHOUSE
+    // INVENTORY RECEIPT
     // --------------------------------------------------------
 
-    const warehouseId =
-        positiveId(
+    if (
+        path ===
+        "/api/inventory/receipt"
+    ) {
 
-            body.warehouse_id,
-
-            "انبار",
-
-            "INV-100"
-
-        );
+        const body =
+            await readJson(
+                request
+            );
 
 
-    const warehouse =
-        await env.DB
-            .prepare(`
+        // --------------------------------------------------------
+        // VALIDATE WAREHOUSE
+        // --------------------------------------------------------
+
+        const warehouseId =
+            positiveId(
+
+                body.warehouse_id,
+
+                "انبار",
+
+                "INV-100"
+
+            );
+
+
+        const warehouse =
+            await env.DB
+                .prepare(`
 
                 SELECT
 
@@ -6778,78 +6791,101 @@ if (
 
             `)
 
-            .bind(
-                warehouseId
-            )
+                .bind(
+                    warehouseId
+                )
 
-            .first();
-
-
-    if (!warehouse) {
-
-        throw new AppError(
-
-            "INV-103",
-
-            "انبار موردنظر پیدا نشد.",
-
-            404
-
-        );
-
-    }
+                .first();
 
 
-    // --------------------------------------------------------
-    // WAREHOUSE MUST BE ACTIVE
-    // --------------------------------------------------------
+        if (!warehouse) {
 
-    if (
-        warehouse.status !==
-        "active"
-    ) {
+            throw new AppError(
 
-        throw new AppError(
+                "INV-103",
 
-            "INV-104",
+                "انبار موردنظر پیدا نشد.",
 
-            "امکان ورود موجودی به انبار غیرفعال وجود ندارد.",
+                404
 
-            409
+            );
 
-        );
-
-    }
+        }
 
 
-    // --------------------------------------------------------
-    // MANUAL RECEIPT IS ALLOWED ONLY FOR:
-    //
-    // material = مواد اولیه
-    // general  = انبار عمومی
-    //
-    // finished = FORBIDDEN
-    // --------------------------------------------------------
-
-    if (
-        ![
-            "material",
-            "general"
-        ].includes(
-            warehouse.warehouse_type
-        )
-    ) {
+        // --------------------------------------------------------
+        // WAREHOUSE MUST BE ACTIVE
+        // --------------------------------------------------------
 
         if (
-            warehouse.warehouse_type ===
-            "finished"
+            warehouse.status !==
+            "active"
         ) {
 
             throw new AppError(
 
-                "INV-105",
+                "INV-104",
 
-                "ورود دستی به انبار محصول نهایی مجاز نیست. محصول نهایی فقط از طریق ثبت تولید وارد انبار می‌شود.",
+                "امکان ورود موجودی به انبار غیرفعال وجود ندارد.",
+
+                409
+
+            );
+
+        }
+
+
+        // --------------------------------------------------------
+        // MANUAL RECEIPT IS ALLOWED ONLY FOR:
+        //
+        // material = مواد اولیه
+        // general  = انبار عمومی
+        //
+        // finished = FORBIDDEN
+        // --------------------------------------------------------
+
+        if (
+            ![
+                "material",
+                "general"
+            ].includes(
+                warehouse.warehouse_type
+            )
+        ) {
+
+            if (
+                warehouse.warehouse_type ===
+                "finished"
+            ) {
+
+                throw new AppError(
+
+                    "INV-105",
+
+                    "ورود دستی به انبار محصول نهایی مجاز نیست. محصول نهایی فقط از طریق ثبت تولید وارد انبار می‌شود.",
+
+                    409,
+
+                    {
+
+                        warehouse_id:
+                            warehouse.id,
+
+                        warehouse_type:
+                            warehouse.warehouse_type
+
+                    }
+
+                );
+
+            }
+
+
+            throw new AppError(
+
+                "INV-106",
+
+                "ورود دستی برای این نوع انبار مجاز نیست.",
 
                 409,
 
@@ -6868,179 +6904,190 @@ if (
         }
 
 
-        throw new AppError(
+        // --------------------------------------------------------
+        // DETERMINE ITEM TYPE
+        //
+        // material → part
+        // general  → product
+        // --------------------------------------------------------
 
-            "INV-106",
+        let itemType;
 
-            "ورود دستی برای این نوع انبار مجاز نیست.",
-
-            409,
-
-            {
-
-                warehouse_id:
-                    warehouse.id,
-
-                warehouse_type:
-                    warehouse.warehouse_type
-
-            }
-
-        );
-
-    }
+        let itemId;
 
 
-    // --------------------------------------------------------
-    // DETERMINE ITEM TYPE
-    //
-    // material → part
-    // general  → product
-    // --------------------------------------------------------
+        if (
+            warehouse.warehouse_type ===
+            "material"
+        ) {
 
-    let itemType;
-
-    let itemId;
+            itemType =
+                "part";
 
 
-    if (
-        warehouse.warehouse_type ===
-        "material"
-    ) {
+            itemId =
+                positiveId(
 
-        itemType =
-            "part";
+                    body.part_id,
 
+                    "قطعه",
 
-        itemId =
-            positiveId(
+                    "INV-101"
 
-                body.part_id,
+                );
 
-                "قطعه",
+        }
 
-                "INV-101"
+        else if (
+            warehouse.warehouse_type ===
+            "general"
+        ) {
 
-            );
-
-    }
-
-    else if (
-        warehouse.warehouse_type ===
-        "general"
-    ) {
-
-        itemType =
-            "product";
+            itemType =
+                "product";
 
 
-        itemId =
-            positiveId(
+            itemId =
+                positiveId(
 
-                body.product_id,
+                    body.product_id,
 
-                "محصول",
+                    "محصول",
 
-                "INV-107"
+                    "INV-107"
+
+                );
+
+        }
+
+
+        // --------------------------------------------------------
+        // VALIDATE QUANTITY
+        // --------------------------------------------------------
+
+        const quantity =
+            positiveNumber(
+
+                body.quantity,
+
+                "مقدار ورود",
+
+                "INV-102"
 
             );
 
-    }
+
+        // --------------------------------------------------------
+        // UPDATE INVENTORY
+        // --------------------------------------------------------
+
+        const balance =
+            await changeInventory(
+
+                env,
+
+                {
+
+                    warehouseId,
+
+                    itemType,
+
+                    itemId,
+
+                    delta:
+                        quantity,
+
+                    transactionType:
+                        "RECEIPT",
+
+                    userId:
+                        user.id,
+
+                    referenceType:
+                        body.reference_type ||
+                        "manual",
+
+                    referenceId:
+                        body.reference_id ||
+                        null,
+
+                    description:
+                        body.description ||
+                        (
+                            warehouse.warehouse_type ===
+                                "material"
+
+                                ? "ورود مواد اولیه"
+
+                                : "ورود کالای خریداری‌شده به انبار عمومی"
+                        )
+
+                }
+
+            );
 
 
-    // --------------------------------------------------------
-    // VALIDATE QUANTITY
-    // --------------------------------------------------------
+        // --------------------------------------------------------
+        // AUDIT
+        // --------------------------------------------------------
 
-    const quantity =
-        positiveNumber(
-
-            body.quantity,
-
-            "مقدار ورود",
-
-            "INV-102"
-
-        );
-
-
-    // --------------------------------------------------------
-    // UPDATE INVENTORY
-    // --------------------------------------------------------
-
-    const balance =
-        await changeInventory(
+        await writeAudit(
 
             env,
 
+            user.id,
+
+            "INVENTORY_RECEIPT",
+
+            itemType === "part"
+                ? "parts"
+                : "products",
+
+            itemId,
+
             {
 
-                warehouseId,
+                ...body,
 
-                itemType,
+                warehouse_id:
+                    warehouseId,
 
-                itemId,
+                warehouse_type:
+                    warehouse.warehouse_type,
 
-                delta:
-                    quantity,
+                item_type:
+                    itemType,
 
-                transactionType:
-                    "RECEIPT",
-
-                userId:
-                    user.id,
-
-                referenceType:
-                    body.reference_type ||
-                    "manual",
-
-                referenceId:
-                    body.reference_id ||
-                    null,
-
-                description:
-                    body.description ||
-                    (
-                        warehouse.warehouse_type ===
-                        "material"
-
-                            ? "ورود مواد اولیه"
-
-                            : "ورود کالای خریداری‌شده به انبار عمومی"
-                    )
+                item_id:
+                    itemId
 
             }
 
         );
 
 
-    // --------------------------------------------------------
-    // AUDIT
-    // --------------------------------------------------------
+        return {
 
-    await writeAudit(
+            message:
+                "ورود موجودی با موفقیت ثبت شد.",
 
-        env,
+            balance,
 
-        user.id,
+            warehouse: {
 
-        "INVENTORY_RECEIPT",
+                id:
+                    warehouse.id,
 
-        itemType === "part"
-            ? "parts"
-            : "products",
+                code:
+                    warehouse.code,
 
-        itemId,
+                name:
+                    warehouse.name,
 
-        {
+                type:
+                    warehouse.warehouse_type
 
-            ...body,
-
-            warehouse_id:
-                warehouseId,
-
-            warehouse_type:
-                warehouse.warehouse_type,
+            },
 
             item_type:
                 itemType,
@@ -7048,43 +7095,9 @@ if (
             item_id:
                 itemId
 
-        }
+        };
 
-    );
-
-
-    return {
-
-        message:
-            "ورود موجودی با موفقیت ثبت شد.",
-
-        balance,
-
-        warehouse:{
-
-            id:
-                warehouse.id,
-
-            code:
-                warehouse.code,
-
-            name:
-                warehouse.name,
-
-            type:
-                warehouse.warehouse_type
-
-        },
-
-        item_type:
-            itemType,
-
-        item_id:
-            itemId
-
-    };
-
-}
+    }
 
     // --------------------------------------------------------
     // INVENTORY ISSUE
@@ -7228,101 +7241,101 @@ if (
 
 async function updateProduct(
     request,
-        env,
-            user
-            ) {
+    env,
+    user
+) {
 
-                const body =
-                        await readJson(
-                                    request
-                                            );
-
-
-                                                // --------------------------------------------------------
-                                                    // PRODUCT ID
-                                                        // --------------------------------------------------------
-
-                                                            const productId =
-                                                                    positiveId(
-                                                                                body.id,
-                                                                                            "محصول",
-                                                                                                        "PROD-UPDATE-001"
-                                                                                                                );
+    const body =
+        await readJson(
+            request
+        );
 
 
-                                                                                                                    // --------------------------------------------------------
-                                                                                                                        // READ FIELDS
-                                                                                                                            // --------------------------------------------------------
+    // --------------------------------------------------------
+    // PRODUCT ID
+    // --------------------------------------------------------
 
-                                                                                                                                const code =
-                                                                                                                                        String(
-                                                                                                                                                    body.code || ""
-                                                                                                                                                            ).trim();
-
-                                                                                                                                                                const name =
-                                                                                                                                                                        String(
-                                                                                                                                                                                    body.name || ""
-                                                                                                                                                                                            ).trim();
-
-                                                                                                                                                                                                const unitId =
-                                                                                                                                                                                                        positiveId(
-                                                                                                                                                                                                                    body.unit_id,
-                                                                                                                                                                                                                                "واحد اندازه‌گیری",
-                                                                                                                                                                                                                                            "PROD-UPDATE-002"
-                                                                                                                                                                                                                                                    );
+    const productId =
+        positiveId(
+            body.id,
+            "محصول",
+            "PROD-UPDATE-001"
+        );
 
 
-                                                                                                                                                                                                                                                        // --------------------------------------------------------
-                                                                                                                                                                                                                                                            // VALIDATE BASIC DATA
-                                                                                                                                                                                                                                                                // --------------------------------------------------------
+    // --------------------------------------------------------
+    // READ FIELDS
+    // --------------------------------------------------------
 
-                                                                                                                                                                                                                                                                    if (!code) {
+    const code =
+        String(
+            body.code || ""
+        ).trim();
 
-                                                                                                                                                                                                                                                                            throw new AppError(
+    const name =
+        String(
+            body.name || ""
+        ).trim();
 
-                                                                                                                                                                                                                                                                                        "PROD-UPDATE-003",
-
-                                                                                                                                                                                                                                                                                                    "کد محصول الزامی است.",
-
-                                                                                                                                                                                                                                                                                                                400
-
-                                                                                                                                                                                                                                                                                                                        );
-
-                                                                                                                                                                                                                                                                                                                            }
-
-
-                                                                                                                                                                                                                                                                                                                                if (!name) {
-
-                                                                                                                                                                                                                                                                                                                                        throw new AppError(
-
-                                                                                                                                                                                                                                                                                                                                                    "PROD-UPDATE-004",
-
-                                                                                                                                                                                                                                                                                                                                                                "نام محصول الزامی است.",
-
-                                                                                                                                                                                                                                                                                                                                                                            400
-
-                                                                                                                                                                                                                                                                                                                                                                                    );
-
-                                                                                                                                                                                                                                                                                                                                                                                        }
+    const unitId =
+        positiveId(
+            body.unit_id,
+            "واحد اندازه‌گیری",
+            "PROD-UPDATE-002"
+        );
 
 
-                                                                                                                                                                                                                                                                                                                                                                                            // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                // STATUS
-                                                                                                                                                                                                                                                                                                                                                                                                    // --------------------------------------------------------
+    // --------------------------------------------------------
+    // VALIDATE BASIC DATA
+    // --------------------------------------------------------
 
-                                                                                                                                                                                                                                                                                                                                                                                                        const status =
-                                                                                                                                                                                                                                                                                                                                                                                                                body.status === "inactive"
-                                                                                                                                                                                                                                                                                                                                                                                                                            ? "inactive"
-                                                                                                                                                                                                                                                                                                                                                                                                                                        : "active";
+    if (!code) {
+
+        throw new AppError(
+
+            "PROD-UPDATE-003",
+
+            "کد محصول الزامی است.",
+
+            400
+
+        );
+
+    }
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                            // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                // CHECK PRODUCT
-                                                                                                                                                                                                                                                                                                                                                                                                                                                    // --------------------------------------------------------
+    if (!name) {
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                        const product =
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .prepare(`
+        throw new AppError(
+
+            "PROD-UPDATE-004",
+
+            "نام محصول الزامی است.",
+
+            400
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // STATUS
+    // --------------------------------------------------------
+
+    const status =
+        body.status === "inactive"
+            ? "inactive"
+            : "active";
+
+
+    // --------------------------------------------------------
+    // CHECK PRODUCT
+    // --------------------------------------------------------
+
+    const product =
+        await env.DB
+            .prepare(`
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             SELECT
 
@@ -7343,34 +7356,34 @@ async function updateProduct(
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 LIMIT 1
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             `)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        .bind(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        productId
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    )
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .first();
+            .bind(
+                productId
+            )
+            .first();
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    if (!product) {
+    if (!product) {
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            throw new AppError(
+        throw new AppError(
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "PROD-UPDATE-005",
+            "PROD-UPDATE-005",
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "محصول موردنظر پیدا نشد.",
+            "محصول موردنظر پیدا نشد.",
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                404
+            404
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        );
+        );
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
+    }
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // CHECK UNIT
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // --------------------------------------------------------
+    // --------------------------------------------------------
+    // CHECK UNIT
+    // --------------------------------------------------------
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            const unit =
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .prepare(`
+    const unit =
+        await env.DB
+            .prepare(`
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 SELECT
 
@@ -7385,52 +7398,52 @@ async function updateProduct(
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         LIMIT 1
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     `)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .bind(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                unitId
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            )
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        .first();
+            .bind(
+                unitId
+            )
+            .first();
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            if (!unit) {
+    if (!unit) {
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    throw new AppError(
+        throw new AppError(
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "PROD-UPDATE-006",
+            "PROD-UPDATE-006",
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            "واحد اندازه‌گیری انتخاب‌شده وجود ندارد.",
+            "واحد اندازه‌گیری انتخاب‌شده وجود ندارد.",
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        404
+            404
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                );
+        );
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        if (
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                unit.status !==
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "active"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ) {
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    throw new AppError(
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "PROD-UPDATE-007",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            "واحد اندازه‌گیری انتخاب‌شده فعال نیست.",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        409
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                );
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }
+    }
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // CHECK DUPLICATE CODE
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                // --------------------------------------------------------
+    if (
+        unit.status !==
+        "active"
+    ) {
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    const duplicate =
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        .prepare(`
+        throw new AppError(
+
+            "PROD-UPDATE-007",
+
+            "واحد اندازه‌گیری انتخاب‌شده فعال نیست.",
+
+            409
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // CHECK DUPLICATE CODE
+    // --------------------------------------------------------
+
+    const duplicate =
+        await env.DB
+            .prepare(`
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         SELECT
 
@@ -7449,37 +7462,37 @@ async function updateProduct(
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         LIMIT 1
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     `)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .bind(
+            .bind(
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                code,
+                code,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                productId
+                productId
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            )
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        .first();
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            if (duplicate) {
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    throw new AppError(
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "PROD-UPDATE-008",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            "این کد محصول قبلاً برای محصول دیگری ثبت شده است.",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        409
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                );
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }
+            )
+            .first();
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // UPDATE
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                // --------------------------------------------------------
+    if (duplicate) {
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .prepare(`
+        throw new AppError(
+
+            "PROD-UPDATE-008",
+
+            "این کد محصول قبلاً برای محصول دیگری ثبت شده است.",
+
+            409
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // UPDATE
+    // --------------------------------------------------------
+
+    await env.DB
+        .prepare(`
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         UPDATE products
 
@@ -7498,225 +7511,225 @@ async function updateProduct(
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 id = ?
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         `)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .bind(
+        .bind(
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            code,
+            code,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        name,
+            name,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    unitId,
+            unitId,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                status,
+            status,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            productId
+            productId
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    )
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .run();
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // AUDIT
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // --------------------------------------------------------
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            await writeAudit(
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    env,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            user.id,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "UPDATE",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            "products",
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    productId,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        before: {
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        code:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            product.code,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            name:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                product.name,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                unit_id:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    product.unit_id,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    status:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        product.status
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    },
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                after: {
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                code,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                name,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                unit_id:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    unitId,
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    status
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            );
+        )
+        .run();
 
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // RESPONSE
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // --------------------------------------------------------
+    // --------------------------------------------------------
+    // AUDIT
+    // --------------------------------------------------------
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            return {
+    await writeAudit(
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    id:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                productId,
+        env,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        message:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "محصول با موفقیت ویرایش شد."
+        user.id,
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        };
+        "UPDATE",
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
+        "products",
+
+        productId,
+
+        {
+
+            before: {
+
+                code:
+                    product.code,
+
+                name:
+                    product.name,
+
+                unit_id:
+                    product.unit_id,
+
+                status:
+                    product.status
+
+            },
+
+            after: {
+
+                code,
+
+                name,
+
+                unit_id:
+                    unitId,
+
+                status
+
+            }
+
+        }
+
+    );
+
+
+    // --------------------------------------------------------
+    // RESPONSE
+    // --------------------------------------------------------
+
+    return {
+
+        id:
+            productId,
+
+        message:
+            "محصول با موفقیت ویرایش شد."
+
+    };
+
+}
 // ============================================================
 // PUT REQUEST ROUTER
 // ============================================================
 
 async function handlePut(
     request,
-        env,
-            user,
-                path
-                ) {
-
-                  
-      // --------------------------------------------------------
-      // // UPDATE PRODUCT
-      // --------------------------------------------------------
-      
-      if (
-          path === "/api/products"
-          ) {
-          
-              return await updateProduct(
-              
-                      request,
-                      
-                              env,
-                              
-                                      user
-                                      
-                                          );
-                                          
-                                          }              // --------------------------------------------------------
-                                                                                                                                            // UPDATE UNIT
-                                                                                                                                                // --------------------------------------------------------
-
-                                                                                                                                                    if (
-                                                                                                                                                            path.startsWith(
-                                                                                                                                                                        "/api/units/"
-                                                                                                                                                                                )
-                                                                                                                                                                                    ) {
-
-                                                                                                                                                                                            return await updateUnit(
-
-                                                                                                                                                                                                        request,
-
-                                                                                                                                                                                                                    env,
-
-                                                                                                                                                                                                                                user,
-
-                                                                                                                                                                                                                                            path
-
-                                                                                                                                                                                                                                                    );
-
-                                                                                                                                                                                                                                                        }
-
-
-          // --------------------------------------------------------
-// UPDATE PRODUCTION PLAN
-// --------------------------------------------------------
-
-if (
-    path === "/api/planning" ||
-    path.startsWith("/api/planning/")
+    env,
+    user,
+    path
 ) {
 
-    const planningId =
-        path.startsWith("/api/planning/")
-            ? path.split("/").pop()
-            : null;
 
+    // --------------------------------------------------------
+    // // UPDATE PRODUCT
+    // --------------------------------------------------------
 
-    const body =
-        await readJson(
-            request
+    if (
+        path === "/api/products"
+    ) {
+
+        return await updateProduct(
+
+            request,
+
+            env,
+
+            user
+
         );
 
+    }              // --------------------------------------------------------
+    // UPDATE UNIT
+    // --------------------------------------------------------
 
-    if (planningId) {
+    if (
+        path.startsWith(
+            "/api/units/"
+        )
+    ) {
 
-        body.id =
-            planningId;
+        return await updateUnit(
+
+            request,
+
+            env,
+
+            user,
+
+            path
+
+        );
 
     }
 
 
-    const updatedRequest =
-        new Request(
+    // --------------------------------------------------------
+    // UPDATE PRODUCTION PLAN
+    // --------------------------------------------------------
 
-            request,
+    if (
+        path === "/api/planning" ||
+        path.startsWith("/api/planning/")
+    ) {
 
-            {
+        const planningId =
+            path.startsWith("/api/planning/")
+                ? path.split("/").pop()
+                : null;
 
-                body:
-                    JSON.stringify(
-                        body
-                    )
 
-            }
+        const body =
+            await readJson(
+                request
+            );
+
+
+        if (planningId) {
+
+            body.id =
+                planningId;
+
+        }
+
+
+        const updatedRequest =
+            new Request(
+
+                request,
+
+                {
+
+                    body:
+                        JSON.stringify(
+                            body
+                        )
+
+                }
+
+            );
+
+
+        return await updateProductionPlan(
+
+            updatedRequest,
+
+            env,
+
+            user
 
         );
 
+    }
 
-    return await updateProductionPlan(
 
-        updatedRequest,
 
-        env,
+    // --------------------------------------------------------
+    // UNKNOWN PUT
+    // --------------------------------------------------------
 
-        user
+    throw new AppError(
+
+        "API-405",
+
+        "عملیات PUT برای مسیر موردنظر وجود ندارد.",
+
+        405,
+
+        {
+
+            path
+
+        }
 
     );
 
 }
-
-
-    
-    // --------------------------------------------------------
-                                                                                                                                                                                                                                                                // UNKNOWN PUT
-                                                                                                                                                                                                                                                                    // --------------------------------------------------------
-
-                                                                                                                                                                                                                                                                        throw new AppError(
-
-                                                                                                                                                                                                                                                                                "API-405",
-
-                                                                                                                                                                                                                                                                                        "عملیات PUT برای مسیر موردنظر وجود ندارد.",
-
-                                                                                                                                                                                                                                                                                                405,
-
-                                                                                                                                                                                                                                                                                                        {
-
-                                                                                                                                                                                                                                                                                                                    path
-
-                                                                                                                                                                                                                                                                                                                            }
-
-                                                                                                                                                                                                                                                                                                                                );
-
-                                                                                                                                                                                                                                                                                                                                }
 
 
 // ============================================================
@@ -7725,100 +7738,100 @@ if (
 
 async function updateUnit(
     request,
-        env,
-            user,
-                path
-                ) {
-                
-                    // --------------------------------------------------------
-                        // GET UNIT ID FROM URL
-                            // --------------------------------------------------------
-                            
-                                const idText =
-                                        path.split("/").pop();
-                                        
-                                        
-                                            const unitId =
-                                                    positiveId(
-                                                    
-                                                                idText,
-                                                                
-                                                                            "واحد",
-                                                                            
-                                                                                        "UNIT-001"
-                                                                                        
-                                                                                                );
-                                                                                                
-                                                                                                
-                                                                                                    // --------------------------------------------------------
-                                                                                                        // READ REQUEST BODY
-                                                                                                            // --------------------------------------------------------
-                                                                                                            
-                                                                                                                const body =
-                                                                                                                        await readJson(
-                                                                                                                                    request
-                                                                                                                                            );
-                                                                                                                                            
-                                                                                                                                            
-                                                                                                                                                // --------------------------------------------------------
-                                                                                                                                                    // VALIDATE CODE
-                                                                                                                                                        // --------------------------------------------------------
-                                                                                                                                                        
-                                                                                                                                                            const code =
-                                                                                                                                                                    String(
-                                                                                                                                                                                body.code ||
-                                                                                                                                                                                            ""
-                                                                                                                                                                                                    ).trim();
-                                                                                                                                                                                                    
-                                                                                                                                                                                                    
-                                                                                                                                                                                                        if (!code) {
-                                                                                                                                                                                                        
-                                                                                                                                                                                                                throw new AppError(
-                                                                                                                                                                                                                
-                                                                                                                                                                                                                            "UNIT-002",
-                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                        "کد واحد الزامی است.",
-                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                    400
-                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                            );
-                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                    // --------------------------------------------------------
-                                                                                                                                                                                                                                                                        // VALIDATE NAME
-                                                                                                                                                                                                                                                                            // --------------------------------------------------------
-                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                const name =
-                                                                                                                                                                                                                                                                                        String(
-                                                                                                                                                                                                                                                                                                    body.name ||
-                                                                                                                                                                                                                                                                                                                ""
-                                                                                                                                                                                                                                                                                                                        ).trim();
-                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                            if (!name) {
-                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                    throw new AppError(
-                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                "UNIT-003",
-                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                            "نام واحد الزامی است.",
-                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                        400
-                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                );
-                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                        // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                            // CHECK UNIT EXISTS
-                                                                                                                                                                                                                                                                                                                                                                                                // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                    const existing =
-                                                                                                                                                                                                                                                                                                                                                                                                            await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                        .prepare(`
+    env,
+    user,
+    path
+) {
+
+    // --------------------------------------------------------
+    // GET UNIT ID FROM URL
+    // --------------------------------------------------------
+
+    const idText =
+        path.split("/").pop();
+
+
+    const unitId =
+        positiveId(
+
+            idText,
+
+            "واحد",
+
+            "UNIT-001"
+
+        );
+
+
+    // --------------------------------------------------------
+    // READ REQUEST BODY
+    // --------------------------------------------------------
+
+    const body =
+        await readJson(
+            request
+        );
+
+
+    // --------------------------------------------------------
+    // VALIDATE CODE
+    // --------------------------------------------------------
+
+    const code =
+        String(
+            body.code ||
+            ""
+        ).trim();
+
+
+    if (!code) {
+
+        throw new AppError(
+
+            "UNIT-002",
+
+            "کد واحد الزامی است.",
+
+            400
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // VALIDATE NAME
+    // --------------------------------------------------------
+
+    const name =
+        String(
+            body.name ||
+            ""
+        ).trim();
+
+
+    if (!name) {
+
+        throw new AppError(
+
+            "UNIT-003",
+
+            "نام واحد الزامی است.",
+
+            400
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // CHECK UNIT EXISTS
+    // --------------------------------------------------------
+
+    const existing =
+        await env.DB
+            .prepare(`
                                                                                                                                                                                                                                                                                                                                                                                                                         
                                                                                                                                                                                                                                                                                                                                                                                                                                         SELECT
                                                                                                                                                                                                                                                                                                                                                                                                                                         
@@ -7839,36 +7852,36 @@ async function updateUnit(
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             LIMIT 1
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         `)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .bind(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    unitId
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                )
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .first();
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                if (!existing) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        throw new AppError(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "UNIT-004",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "واحد موردنظر پیدا نشد.",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            404
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    );
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                // CHECK DUPLICATE CODE
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const duplicate =
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .prepare(`
+
+            .bind(
+                unitId
+            )
+
+            .first();
+
+
+    if (!existing) {
+
+        throw new AppError(
+
+            "UNIT-004",
+
+            "واحد موردنظر پیدا نشد.",
+
+            404
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // CHECK DUPLICATE CODE
+    // --------------------------------------------------------
+
+    const duplicate =
+        await env.DB
+            .prepare(`
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             SELECT
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
@@ -7887,45 +7900,45 @@ async function updateUnit(
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             LIMIT 1
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         `)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .bind(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    code,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    unitId
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                )
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .first();
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                if (duplicate) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        throw new AppError(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    "UNIT-005",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "کد واحد تکراری است.",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            409,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        code
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            );
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // UPDATE UNIT
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                await env.DB
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        .prepare(`
+
+            .bind(
+
+                code,
+
+                unitId
+
+            )
+
+            .first();
+
+
+    if (duplicate) {
+
+        throw new AppError(
+
+            "UNIT-005",
+
+            "کد واحد تکراری است.",
+
+            409,
+
+            {
+
+                code
+
+            }
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // UPDATE UNIT
+    // --------------------------------------------------------
+
+    await env.DB
+        .prepare(`
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     UPDATE units
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
@@ -7940,76 +7953,1663 @@ async function updateUnit(
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             id = ?
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     `)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .bind(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        code,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    name,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                unitId
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        )
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .run();
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // AUDIT
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                await writeAudit(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        env,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                user.id,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        "UPDATE",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                "units",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        unitId,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            before: {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            code:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                existing.code,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                name:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    existing.name
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                },
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            after: {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            code,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            name
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    );
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // RESPONSE
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                // --------------------------------------------------------
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    return {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            id:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        unitId,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                message:
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            "واحد با موفقیت ویرایش شد."
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                };
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }                                                                                                                                                                                                                                                                                                                                // ============================================================
+
+        .bind(
+
+            code,
+
+            name,
+
+            unitId
+
+        )
+
+        .run();
+
+
+    // --------------------------------------------------------
+    // AUDIT
+    // --------------------------------------------------------
+
+    await writeAudit(
+
+        env,
+
+        user.id,
+
+        "UPDATE",
+
+        "units",
+
+        unitId,
+
+        {
+
+            before: {
+
+                code:
+                    existing.code,
+
+                name:
+                    existing.name
+
+            },
+
+            after: {
+
+                code,
+
+                name
+
+            }
+
+        }
+
+    );
+
+
+    // --------------------------------------------------------
+    // RESPONSE
+    // --------------------------------------------------------
+
+    return {
+
+        id:
+            unitId,
+
+        message:
+            "واحد با موفقیت ویرایش شد."
+
+    };
+
+}      
+// ============================================================
+// DASHBOARD ANALYTICS RULES
+// ============================================================
+
+const DASHBOARD_RULES = {
+
+    achievement: {
+
+        green: 90,
+
+        yellow: 60
+
+    },
+
+    material: {
+
+        green: "sufficient",
+
+        red: "shortage"
+
+    }
+
+};
+
+
+// ============================================================
+// PRODUCTION SEVERITY
+// ============================================================
+
+function getDashboardProductionSeverity(
+
+    plannedQuantity,
+
+    producedQuantity
+
+){
+
+    const planned =
+        Number(
+            plannedQuantity || 0
+        );
+
+    const produced =
+        Number(
+            producedQuantity || 0
+        );
+
+
+    if(planned <= 0){
+
+        return {
+
+            severity:
+                "yellow",
+
+            code:
+                "NO_PLAN",
+
+            message:
+                "مقدار برنامه تولید معتبر نیست."
+
+        };
+
+    }
+
+
+    const achievement =
+        (
+            produced /
+            planned
+        ) *
+        100;
+
+
+    if(
+        achievement >=
+        DASHBOARD_RULES
+            .achievement
+            .green
+    ){
+
+        return {
+
+            severity:
+                "green",
+
+            code:
+                "ON_TRACK",
+
+            message:
+                `تحقق تولید ${achievement.toFixed(1)}٪ است.`
+
+        };
+
+    }
+
+
+    if(
+        achievement >=
+        DASHBOARD_RULES
+            .achievement
+            .yellow
+    ){
+
+        return {
+
+            severity:
+                "yellow",
+
+            code:
+                "AT_RISK",
+
+            message:
+                `تحقق تولید ${achievement.toFixed(1)}٪ است و نیاز به پیگیری دارد.`
+
+        };
+
+    }
+
+
+    return {
+
+        severity:
+            "red",
+
+        code:
+            "CRITICAL",
+
+        message:
+            `تحقق تولید فقط ${achievement.toFixed(1)}٪ است.`
+
+    };
+
+}
+// ============================================================
+// GET CURRENT INVENTORY BALANCE
+// ============================================================
+
+async function getDashboardInventoryBalance(
+
+    env,
+
+    warehouseId,
+
+    itemType,
+
+    itemId
+
+){
+
+    const result =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    COALESCE(
+                        SUM(quantity),
+                        0
+                    ) AS quantity
+
+                FROM inventory_balances
+
+                WHERE
+                    item_type = ?
+
+                    AND
+
+                    item_id = ?
+
+                    AND
+
+                    (
+                        ? IS NULL
+                        OR warehouse_id = ?
+                    )
+
+            `)
+            .bind(
+
+                itemType,
+
+                itemId,
+
+                warehouseId || null,
+
+                warehouseId || null
+
+            )
+            .first();
+
+
+    return Number(
+        result?.quantity || 0
+    );
+
+}
+
+// ============================================================
+// DASHBOARD INVENTORY SUMMARY
+// ============================================================
+
+async function getDashboardInventorySummary(
+    env
+){
+
+    const result =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    item_type,
+
+                    COUNT(*) AS item_count,
+
+                    SUM(
+                        CASE
+                            WHEN quantity > 0
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) AS positive_items,
+
+                    SUM(
+                        CASE
+                            WHEN quantity = 0
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) AS zero_items
+
+                FROM inventory_balances
+
+                GROUP BY
+                    item_type
+
+            `)
+            .all();
+
+
+    const rows =
+        result.results || [];
+
+
+    let parts = {
+
+        item_count: 0,
+
+        positive_items: 0,
+
+        zero_items: 0
+
+    };
+
+
+    let products = {
+
+        item_count: 0,
+
+        positive_items: 0,
+
+        zero_items: 0
+
+    };
+
+
+    for(
+        const row
+        of rows
+    ){
+
+        const target =
+            row.item_type ===
+            "part"
+
+                ? parts
+
+                : products;
+
+
+        target.item_count =
+            Number(
+                row.item_count || 0
+            );
+
+
+        target.positive_items =
+            Number(
+                row.positive_items || 0
+            );
+
+
+        target.zero_items =
+            Number(
+                row.zero_items || 0
+            );
+
+    }
+
+
+    return {
+
+        parts,
+
+        products,
+
+        total_item_lines:
+            parts.item_count +
+            products.item_count,
+
+        positive_item_lines:
+            parts.positive_items +
+            products.positive_items,
+
+        zero_item_lines:
+            parts.zero_items +
+            products.zero_items
+
+    };
+
+}
+
+// ============================================================
+// DASHBOARD MATERIAL REQUIREMENT
+// ============================================================
+
+async function getDashboardMaterialRequirements(
+
+    env,
+
+    planningRow,
+
+    remainingProductQuantity
+
+){
+
+    const bomId =
+        Number(
+            planningRow.bom_id
+        );
+
+
+    if(
+        !bomId ||
+        remainingProductQuantity <= 0
+    ){
+
+        return [];
+
+    }
+
+
+    const warehouse =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id
+
+                FROM warehouses
+
+                WHERE
+
+                    warehouse_type =
+                    'material'
+
+                    AND
+
+                    status =
+                    'active'
+
+                ORDER BY
+                    id
+
+                LIMIT 1
+
+            `)
+            .first();
+
+
+    if(!warehouse){
+
+        return [];
+
+    }
+
+
+    const materialsResult =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    bd.part_id,
+
+                    bd.consumption_factor,
+
+                    bd.scrap_percent,
+
+                    p.code AS part_code,
+
+                    p.name AS part_name,
+
+                    u.name AS unit_name
+
+                FROM bom_details bd
+
+                INNER JOIN parts p
+
+                    ON p.id =
+                       bd.part_id
+
+                INNER JOIN units u
+
+                    ON u.id =
+                       p.unit_id
+
+                WHERE
+
+                    bd.bom_id = ?
+
+                    AND
+
+                    bd.status =
+                    'active'
+
+                    AND
+
+                    p.status =
+                    'active'
+
+                ORDER BY
+                    bd.id
+
+            `)
+            .bind(
+                bomId
+            )
+            .all();
+
+
+    const materials =
+        materialsResult.results || [];
+
+
+    const rows = [];
+
+
+    for(
+        const material
+        of materials
+    ){
+
+        const factor =
+            Number(
+                material.consumption_factor || 0
+            );
+
+
+        const scrap =
+            Number(
+                material.scrap_percent || 0
+            );
+
+
+        const requiredQuantity =
+
+            factor *
+            remainingProductQuantity *
+            (
+                1 +
+                scrap / 100
+            );
+
+
+        const availableQuantity =
+            await getDashboardInventoryBalance(
+
+                env,
+
+                warehouse.id,
+
+                "part",
+
+                material.part_id
+
+            );
+
+
+        const shortageQuantity =
+            Math.max(
+
+                0,
+
+                requiredQuantity -
+                availableQuantity
+
+            );
+
+
+        const sufficient =
+            shortageQuantity <= 0;
+
+
+        let severity =
+            "green";
+
+
+        let severityCode =
+            "AVAILABLE";
+
+
+        let severityMessage =
+            "موجودی مواد اولیه برای ادامه تولید کافی است.";
+
+
+        if(!sufficient){
+
+            severity =
+                "red";
+
+
+            severityCode =
+                "MATERIAL_SHORTAGE";
+
+
+            severityMessage =
+                `برای ${material.part_name} مقدار ${shortageQuantity} کسری وجود دارد.`;
+
+        }
+
+
+        rows.push({
+
+            snapshot_id:
+                null,
+
+            planning_id:
+                planningRow.planning_id,
+
+            product_id:
+                planningRow.product_id,
+
+            bom_id:
+                bomId,
+
+            warehouse_id:
+                warehouse.id,
+
+            part_id:
+                material.part_id,
+
+            part_code:
+                material.part_code,
+
+            part_name:
+                material.part_name,
+
+            unit_name:
+                material.unit_name,
+
+            planned_quantity:
+                Number(
+                    planningRow.planned_quantity || 0
+                ),
+
+            produced_quantity:
+                Number(
+                    planningRow.produced_quantity || 0
+                ),
+
+            remaining_product_quantity,
+
+            consumption_factor:
+                factor,
+
+            scrap_percent:
+                scrap,
+
+            required_quantity:
+                requiredQuantity,
+
+            available_quantity:
+                availableQuantity,
+
+            shortage_quantity:
+                shortageQuantity,
+
+            sufficient:
+                sufficient
+                    ? 1
+                    : 0,
+
+            severity,
+
+            severity_code:
+                severityCode,
+
+            severity_message:
+                severityMessage
+
+        });
+
+    }
+
+
+    return rows;
+
+}
+
+// ============================================================
+// BUILD DASHBOARD SNAPSHOT
+// ============================================================
+
+async function buildDashboardSnapshot(
+    env,
+    businessDate
+){
+
+    const snapshotAt =
+        new Date().toISOString();
+
+
+    const details =
+        await getDashboardProductionDetails(
+
+            env,
+
+            businessDate
+
+        );
+
+
+    let totalPlanned =
+        0;
+
+
+    let totalProduced =
+        0;
+
+
+    let totalRemaining =
+        0;
+
+
+    let activePlans =
+        0;
+
+
+    let completedPlans =
+        0;
+
+
+    let notStartedPlans =
+        0;
+
+
+    let productsOnTrack =
+        0;
+
+
+    let productsAtRisk =
+        0;
+
+
+    let productsCritical =
+        0;
+
+
+    let materialShortagePlans =
+        0;
+
+
+    let materialShortageItems =
+        0;
+
+
+    const detailRows =
+        [];
+
+
+    const materialRows =
+        [];
+
+
+    for(
+        const row
+        of details
+    ){
+
+        const planned =
+            Number(
+                row.planned_quantity || 0
+            );
+
+
+        const produced =
+            Number(
+                row.produced_quantity || 0
+            );
+
+
+        const remaining =
+            Math.max(
+
+                0,
+
+                planned -
+                produced
+
+            );
+
+
+        const achievement =
+            planned > 0
+
+                ? (
+                    produced /
+                    planned
+                ) * 100
+
+                : 0;
+
+
+        totalPlanned +=
+            planned;
+
+
+        totalProduced +=
+            produced;
+
+
+        totalRemaining +=
+            remaining;
+
+
+        const severity =
+            getDashboardProductionSeverity(
+
+                planned,
+
+                produced
+
+            );
+
+
+        if(
+            severity.severity ===
+            "green"
+        ){
+
+            productsOnTrack++;
+
+        }
+
+        else if(
+            severity.severity ===
+            "yellow"
+        ){
+
+            productsAtRisk++;
+
+        }
+
+        else{
+
+            productsCritical++;
+
+        }
+
+
+        if(
+            row.plan_status ===
+            "completed"
+        ){
+
+            completedPlans++;
+
+        }
+
+        else if(
+            row.plan_status ===
+            "in_progress"
+        ){
+
+            activePlans++;
+
+        }
+
+        else{
+
+            notStartedPlans++;
+
+        }
+
+
+        detailRows.push({
+
+            detail_type:
+                "production_plan",
+
+            entity_id:
+                row.planning_id,
+
+            planning_id:
+                row.planning_id,
+
+            product_id:
+                row.product_id,
+
+            bom_id:
+                row.bom_id,
+
+            plan_date:
+                row.plan_date,
+
+            product_code:
+                row.product_code,
+
+            product_name:
+                row.product_name,
+
+            bom_code:
+                row.bom_code,
+
+            planned_quantity:
+                planned,
+
+            produced_quantity:
+                produced,
+
+            remaining_quantity:
+                remaining,
+
+            achievement_percent:
+                achievement,
+
+            status:
+                row.plan_status,
+
+            severity:
+                severity.severity,
+
+            severity_code:
+                severity.code,
+
+            severity_message:
+                severity.message
+
+        });
+
+
+        // ----------------------------------------------------
+        // MATERIAL ANALYSIS
+        // ----------------------------------------------------
+
+        const materials =
+            await getDashboardMaterialRequirements(
+
+                env,
+
+                row,
+
+                remaining
+
+            );
+
+
+        let hasMaterialShortage =
+            false;
+
+
+        for(
+            const material
+            of materials
+        ){
+
+            materialRows.push(
+                material
+            );
+
+
+            if(
+                material.sufficient !== 1
+            ){
+
+                hasMaterialShortage =
+                    true;
+
+
+                materialShortageItems++;
+
+            }
+
+        }
+
+
+        if(
+            hasMaterialShortage
+        ){
+
+            materialShortagePlans++;
+
+        }
+
+    }
+
+
+    const totalPlans =
+        details.length;
+
+
+    const totalProducts =
+        new Set(
+
+            details.map(
+                item =>
+                    item.product_id
+            )
+
+        ).size;
+
+
+    const achievementPercent =
+        totalPlanned > 0
+
+            ? (
+                totalProduced /
+                totalPlanned
+            ) * 100
+
+            : 0;
+
+
+    const inventorySummary =
+        await getDashboardInventorySummary(
+            env
+        );
+
+
+    // --------------------------------------------------------
+    // ALERTS
+    // --------------------------------------------------------
+
+    const greenAlerts =
+        productsOnTrack;
+
+
+    const yellowAlerts =
+        productsAtRisk +
+        materialShortagePlans;
+
+
+    const redAlerts =
+        productsCritical +
+        materialShortageItems;
+
+
+    // --------------------------------------------------------
+    // CREATE SNAPSHOT
+    // --------------------------------------------------------
+
+    const snapshotResult =
+        await env.DB
+            .prepare(`
+
+                INSERT INTO dashboard_snapshots (
+
+                    snapshot_at,
+
+                    business_date,
+
+                    total_planned,
+
+                    total_produced,
+
+                    total_remaining,
+
+                    achievement_percent,
+
+                    total_plans,
+
+                    active_plans,
+
+                    completed_plans,
+
+                    not_started_plans,
+
+                    total_products,
+
+                    products_on_track,
+
+                    products_at_risk,
+
+                    products_critical,
+
+                    inventory_item_count,
+
+                    inventory_total,
+
+                    green_alerts,
+
+                    yellow_alerts,
+
+                    red_alerts
+
+                )
+
+                VALUES (
+
+                    ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+
+                )
+
+            `)
+            .bind(
+
+                snapshotAt,
+
+                businessDate,
+
+                totalPlanned,
+
+                totalProduced,
+
+                totalRemaining,
+
+                achievementPercent,
+
+                totalPlans,
+
+                activePlans,
+
+                completedPlans,
+
+                notStartedPlans,
+
+                totalProducts,
+
+                productsOnTrack,
+
+                productsAtRisk,
+
+                productsCritical,
+
+                inventorySummary
+                    .positive_item_lines,
+
+                null,
+
+                greenAlerts,
+
+                yellowAlerts,
+
+                redAlerts
+
+            )
+            .run();
+
+
+    const snapshotId =
+        snapshotResult
+            .meta
+            .last_row_id;
+
+
+    // --------------------------------------------------------
+    // PRODUCTION DETAILS
+    // --------------------------------------------------------
+
+    for(
+        const detail
+        of detailRows
+    ){
+
+        await env.DB
+            .prepare(`
+
+                INSERT INTO
+                dashboard_snapshot_details (
+
+                    snapshot_id,
+
+                    detail_type,
+
+                    entity_id,
+
+                    planning_id,
+
+                    product_id,
+
+                    bom_id,
+
+                    plan_date,
+
+                    product_code,
+
+                    product_name,
+
+                    bom_code,
+
+                    planned_quantity,
+
+                    produced_quantity,
+
+                    remaining_quantity,
+
+                    achievement_percent,
+
+                    status,
+
+                    severity,
+
+                    severity_code,
+
+                    severity_message
+
+                )
+
+                VALUES (
+
+                    ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+
+                )
+
+            `)
+            .bind(
+
+                snapshotId,
+
+                detail.detail_type,
+
+                detail.entity_id,
+
+                detail.planning_id,
+
+                detail.product_id,
+
+                detail.bom_id,
+
+                detail.plan_date,
+
+                detail.product_code,
+
+                detail.product_name,
+
+                detail.bom_code,
+
+                detail.planned_quantity,
+
+                detail.produced_quantity,
+
+                detail.remaining_quantity,
+
+                detail.achievement_percent,
+
+                detail.status,
+
+                detail.severity,
+
+                detail.severity_code,
+
+                detail.severity_message
+
+            )
+            .run();
+
+    }
+
+
+    // --------------------------------------------------------
+    // MATERIAL DETAILS
+    // --------------------------------------------------------
+
+    for(
+        const material
+        of materialRows
+    ){
+
+        await env.DB
+            .prepare(`
+
+                INSERT INTO
+                dashboard_snapshot_materials (
+
+                    snapshot_id,
+
+                    planning_id,
+
+                    product_id,
+
+                    bom_id,
+
+                    warehouse_id,
+
+                    part_id,
+
+                    part_code,
+
+                    part_name,
+
+                    unit_name,
+
+                    planned_quantity,
+
+                    produced_quantity,
+
+                    remaining_product_quantity,
+
+                    consumption_factor,
+
+                    scrap_percent,
+
+                    required_quantity,
+
+                    available_quantity,
+
+                    shortage_quantity,
+
+                    sufficient,
+
+                    severity,
+
+                    severity_code,
+
+                    severity_message
+
+                )
+
+                VALUES (
+
+                    ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+
+                )
+
+            `)
+            .bind(
+
+                snapshotId,
+
+                material.planning_id,
+
+                material.product_id,
+
+                material.bom_id,
+
+                material.warehouse_id,
+
+                material.part_id,
+
+                material.part_code,
+
+                material.part_name,
+
+                material.unit_name,
+
+                material.planned_quantity,
+
+                material.produced_quantity,
+
+                material.remaining_product_quantity,
+
+                material.consumption_factor,
+
+                material.scrap_percent,
+
+                material.required_quantity,
+
+                material.available_quantity,
+
+                material.shortage_quantity,
+
+                material.sufficient,
+
+                material.severity,
+
+                material.severity_code,
+
+                material.severity_message
+
+            )
+            .run();
+
+    }
+
+
+    return {
+
+        snapshot_id:
+            snapshotId,
+
+        snapshot_at:
+            snapshotAt,
+
+        business_date:
+            businessDate,
+
+        total_planned:
+            totalPlanned,
+
+        total_produced:
+            totalProduced,
+
+        total_remaining:
+            totalRemaining,
+
+        achievement_percent:
+            achievementPercent,
+
+        total_plans:
+            totalPlans,
+
+        active_plans:
+            activePlans,
+
+        completed_plans:
+            completedPlans,
+
+        not_started_plans:
+            notStartedPlans,
+
+        total_products:
+            totalProducts,
+
+        inventory:
+            inventorySummary,
+
+        green_alerts:
+            greenAlerts,
+
+        yellow_alerts:
+            yellowAlerts,
+
+        red_alerts:
+            redAlerts,
+
+        material_shortage_plans:
+            materialShortagePlans,
+
+        material_shortage_items:
+            materialShortageItems
+
+    };
+
+}
+
+// ============================================================
+// CLEAN DASHBOARD HISTORY
+// ============================================================
+
+async function cleanupDashboardSnapshots(
+    env
+){
+
+    await env.DB
+        .prepare(`
+
+            DELETE FROM
+            dashboard_snapshot_materials
+
+            WHERE snapshot_id IN (
+
+                SELECT id
+
+                FROM dashboard_snapshots
+
+                WHERE snapshot_at <
+                    datetime(
+                        'now',
+                        '-30 days'
+                    )
+
+            )
+
+        `)
+        .run();
+
+
+    await env.DB
+        .prepare(`
+
+            DELETE FROM
+            dashboard_snapshot_details
+
+            WHERE snapshot_id IN (
+
+                SELECT id
+
+                FROM dashboard_snapshots
+
+                WHERE snapshot_at <
+                    datetime(
+                        'now',
+                        '-30 days'
+                    )
+
+            )
+
+        `)
+        .run();
+
+
+    await env.DB
+        .prepare(`
+
+            DELETE FROM
+            dashboard_snapshots
+
+            WHERE snapshot_at <
+                datetime(
+                    'now',
+                    '-30 days'
+                )
+
+        `)
+        .run();
+
+}
+
+// ============================================================
+// REFRESH DASHBOARD SNAPSHOT
+// ============================================================
+
+async function refreshDashboardSnapshot(
+    env
+){
+
+    const businessDate =
+        new Date()
+            .toISOString()
+            .slice(
+                0,
+                10
+            );
+
+
+    await cleanupDashboardSnapshots(
+        env
+    );
+
+
+    return await buildDashboardSnapshot(
+
+        env,
+
+        businessDate
+
+    );
+
+}
+
+// ============================================================
+// GET DASHBOARD SNAPSHOT
+// ============================================================
+
+async function getDashboardSnapshot(
+    env
+){
+
+    const snapshot =
+        await env.DB
+            .prepare(`
+
+                SELECT *
+
+                FROM dashboard_snapshots
+
+                ORDER BY
+                    snapshot_at DESC
+
+                LIMIT 1
+
+            `)
+            .first();
+
+
+    if(!snapshot){
+
+        return {
+
+            snapshot:
+                null,
+
+            details:
+                [],
+
+            materials:
+                [],
+
+            message:
+                "هنوز Snapshot داشبورد ساخته نشده است."
+
+        };
+
+    }
+
+
+    const detailsResult =
+        await env.DB
+            .prepare(`
+
+                SELECT *
+
+                FROM dashboard_snapshot_details
+
+                WHERE
+                    snapshot_id = ?
+
+                ORDER BY
+
+                    CASE severity
+
+                        WHEN 'red'
+                        THEN 1
+
+                        WHEN 'yellow'
+                        THEN 2
+
+                        ELSE 3
+
+                    END,
+
+                    product_name,
+
+                    planning_id
+
+            `)
+            .bind(
+                snapshot.id
+            )
+            .all();
+
+
+    const materialsResult =
+        await env.DB
+            .prepare(`
+
+                SELECT *
+
+                FROM dashboard_snapshot_materials
+
+                WHERE
+                    snapshot_id = ?
+
+                ORDER BY
+
+                    CASE severity
+
+                        WHEN 'red'
+                        THEN 1
+
+                        WHEN 'yellow'
+                        THEN 2
+
+                        ELSE 3
+
+                    END,
+
+                    planning_id,
+
+                    part_name
+
+            `)
+            .bind(
+                snapshot.id
+            )
+            .all();
+
+
+    return {
+
+        snapshot,
+
+        details:
+            detailsResult.results ||
+            [],
+
+        materials:
+            materialsResult.results ||
+            []
+
+    };
+
+}
+// ============================================================
 // DELETE SESSION / FUTURE DELETE ROUTES
 // ============================================================
 
@@ -8307,39 +9907,39 @@ export default {
 
             }
 
-// =================================================
-// PUT
-// =================================================
+            // =================================================
+            // PUT
+            // =================================================
 
-if (
-    request.method ===
-        "PUT"
-        ) {
+            if (
+                request.method ===
+                "PUT"
+            ) {
 
-            const result =
+                const result =
                     await handlePut(
 
-                                request,
+                        request,
 
-                                            env,
+                        env,
 
-                                                        user,
+                        user,
 
-                                                                    path
+                        path
 
-                                                                            );
+                    );
 
-                                                                                return successResponse(
+                return successResponse(
 
-                                                                                        result,
+                    result,
 
-                                                                                                200,
+                    200,
 
-                                                                                                        origin
+                    origin
 
-                                                                                                            );
+                );
 
-                                                                                                            }
+            }
             // =================================================
             // DELETE
             // =================================================
