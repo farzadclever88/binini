@@ -6233,58 +6233,297 @@ async function handleGet(
 
 
     // --------------------------------------------------------
-    // CALCULATE MATERIAL REQUIREMENT
+// CALCULATE MATERIAL REQUIREMENT
+// --------------------------------------------------------
+//
+// This endpoint is used by the daily production planning grid.
+//
+// It receives planning_id,
+// then loads BOM and planned quantity directly
+// from planning_daily.
+//
+// No inventory is changed here.
+// --------------------------------------------------------
+
+if (
+    path ===
+    "/api/production/material-requirement"
+) {
+
+    const planningId =
+        url.searchParams.get(
+            "planning_id"
+        );
+
+
+    const validPlanningId =
+        positiveId(
+            planningId,
+            "برنامه تولید",
+            "PLAN-120"
+        );
+
+
     // --------------------------------------------------------
-    //
-    // This endpoint is extremely important for Index.html.
-    //
-    // User selects:
-    //
-    // BOM
-    // +
-    // Production Quantity
-    //
-    // Worker returns required materials.
-    //
-    // No inventory is changed here.
-    //
+    // LOAD PRODUCTION PLAN
     // --------------------------------------------------------
-if (path === "/api/production") {
-    return await getProductionList(env);
-}
-    if (
-        path ===
-        "/api/production/material-requirement"
-    ) {
 
-        const bomId =
-            url.searchParams.get(
-                "bom_id"
-            );
+    const plan =
+        await env.DB
+            .prepare(`
 
-        const quantity =
-            url.searchParams.get(
-                "quantity"
-            );
+                SELECT
 
-        return {
+                    pl.id,
 
-            items:
-                await calculateMaterialRequirement(
+                    pl.plan_date,
 
-                    env,
+                    pl.bom_id,
 
-                    bomId,
+                    pl.planned_quantity,
 
-                    quantity
+                    pl.status,
 
-                )
+                    b.product_id,
 
-        };
+                    b.code AS bom_code
+
+                FROM planning_daily pl
+
+                INNER JOIN bom_headers b
+
+                    ON b.id =
+                       pl.bom_id
+
+                WHERE
+
+                    pl.id = ?
+
+                LIMIT 1
+
+            `)
+            .bind(
+                validPlanningId
+            )
+            .first();
+
+
+    if (!plan) {
+
+        throw new AppError(
+
+            "PLAN-121",
+
+            "برنامه تولید پیدا نشد.",
+
+            404
+
+        );
 
     }
 
 
+    // --------------------------------------------------------
+    // CALCULATE REQUIRED MATERIALS
+    // --------------------------------------------------------
+
+    const materials =
+        await calculateMaterialRequirement(
+
+            env,
+
+            plan.bom_id,
+
+            plan.planned_quantity
+
+        );
+
+
+    // --------------------------------------------------------
+    // FIND RAW MATERIAL WAREHOUSE
+    // --------------------------------------------------------
+
+    const warehouse =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id,
+
+                    code,
+
+                    name
+
+                FROM warehouses
+
+                WHERE
+
+                    warehouse_type =
+                    'material'
+
+                    AND
+
+                    status =
+                    'active'
+
+                ORDER BY
+
+                    id
+
+                LIMIT 1
+
+            `)
+            .first();
+
+
+    if (!warehouse) {
+
+        throw new AppError(
+
+            "PLAN-122",
+
+            "انبار مواد اولیه فعال پیدا نشد.",
+
+            404
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // CHECK STOCK
+    // --------------------------------------------------------
+
+    const stockCheck = [];
+
+
+    for (
+        const material
+        of materials
+    ) {
+
+        const available =
+            Number(
+
+                await getInventoryBalance(
+
+                    env,
+
+                    warehouse.id,
+
+                    "part",
+
+                    material.part_id
+
+                ) || 0
+
+            );
+
+
+        const required =
+            Number(
+                material.required_quantity
+            );
+
+
+        stockCheck.push({
+
+            part_id:
+                material.part_id,
+
+            part_code:
+                material.part_code,
+
+            part_name:
+                material.part_name,
+
+            unit_name:
+                material.unit_name,
+
+            required_quantity:
+                required,
+
+            available_quantity:
+                available,
+
+            shortage:
+                Math.max(
+
+                    0,
+
+                    required -
+                    available
+
+                ),
+
+            sufficient:
+                available >=
+                required
+
+        });
+
+    }
+
+
+    const shortages =
+        stockCheck.filter(
+            item =>
+                !item.sufficient
+        );
+
+
+    // --------------------------------------------------------
+    // RESPONSE
+    // --------------------------------------------------------
+
+    return {
+
+        planning_id:
+            plan.id,
+
+        plan_date:
+            plan.plan_date,
+
+        bom_id:
+            plan.bom_id,
+
+        bom_code:
+            plan.bom_code,
+
+        product_id:
+            plan.product_id,
+
+        planned_quantity:
+            Number(
+                plan.planned_quantity
+            ),
+
+        warehouse: {
+
+            id:
+                warehouse.id,
+
+            code:
+                warehouse.code,
+
+            name:
+                warehouse.name
+
+        },
+
+        materials:
+            stockCheck,
+
+        shortages,
+
+        sufficient:
+            shortages.length === 0
+
+    };
+
+}
     // --------------------------------------------------------
     // UNKNOWN GET
     // --------------------------------------------------------
