@@ -9420,28 +9420,9 @@ function renderProductionView(){
     rows,
 
     {
-        empty:
-            "برنامه تولیدی ثبت نشده است.",
-
-        actions:
-            true,
-
-        rowActions:
-            row => `
-
-                <button
-                    type="button"
-                    class="btn small secondary"
-                    data-action="material-request"
-                    data-id="${row.id}"
-                >
-                    📦 درخواست مواد
-                </button>
-
-            `
-
-    }
-
+    empty:
+        "رکورد تولیدی ثبت نشده است."
+}
 )
                 }
 
