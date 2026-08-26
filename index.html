@@ -8611,7 +8611,90 @@ function renderPlanningView(){
 
             }
         );
+const planningTable =
+    $("#mainContent .data-table");
 
+
+if (planningTable) {
+
+    planningTable.addEventListener(
+        "click",
+        event => {
+
+            const button =
+                event.target.closest(
+                    "[data-action]"
+                );
+
+
+            if (!button) {
+
+                return;
+
+            }
+
+
+            const action =
+                button.dataset.action;
+
+
+            const id =
+                Number(
+                    button.dataset.id
+                );
+
+
+            const row =
+                STATE.planning.find(
+                    item =>
+                        Number(item.id) === id
+                );
+
+
+            if (!row) {
+
+                showMessage(
+                    "رکورد برنامه تولید پیدا نشد.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                action ===
+                "edit"
+            ) {
+
+                openPlanningForm(
+                    row
+                );
+
+                return;
+
+            }
+
+
+            if (
+                action ===
+                "delete"
+            ) {
+
+                showMessage(
+                    "حذف برنامه تولید فعلاً غیرفعال است.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+        }
+    );
+
+}
 }
 
 
