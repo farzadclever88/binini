@@ -7383,17 +7383,55 @@ async function handlePut(
                                                                                                                                                                                                                                                         }
 
 
-            // --------------------------------------------------------
+          // --------------------------------------------------------
 // UPDATE PRODUCTION PLAN
 // --------------------------------------------------------
 
 if (
-    path === "/api/planning"
+    path === "/api/planning" ||
+    path.startsWith("/api/planning/")
 ) {
+
+    const planningId =
+        path.startsWith("/api/planning/")
+            ? path.split("/").pop()
+            : null;
+
+
+    const body =
+        await readJson(
+            request
+        );
+
+
+    if (planningId) {
+
+        body.id =
+            planningId;
+
+    }
+
+
+    const updatedRequest =
+        new Request(
+
+            request,
+
+            {
+
+                body:
+                    JSON.stringify(
+                        body
+                    )
+
+            }
+
+        );
+
 
     return await updateProductionPlan(
 
-        request,
+        updatedRequest,
 
         env,
 
@@ -7401,7 +7439,10 @@ if (
 
     );
 
-}                                                                                                                                                                                                                                                
+}
+
+
+    
     // --------------------------------------------------------
                                                                                                                                                                                                                                                                 // UNKNOWN PUT
                                                                                                                                                                                                                                                                     // --------------------------------------------------------
