@@ -4361,7 +4361,811 @@ async function getProductionPlans(
     return result.results;
 
 }
+// ============================================================
+// UPDATE PRODUCTION PLAN
+// ============================================================
 
+async function updateProductionPlan(
+    request,
+    env,
+    user
+) {
+
+    const body =
+        await readJson(
+            request
+        );
+
+
+    // --------------------------------------------------------
+    // VALIDATE INPUT
+    // --------------------------------------------------------
+
+    const planningId =
+        positiveId(
+            body.id ||
+            body.planning_daily_id,
+            "برنامه تولید",
+            "PLAN-101"
+        );
+
+
+    const planDate =
+        validatePersianDate(
+            body.plan_date,
+            "تاریخ برنامه تولید",
+            "PLAN-102"
+        );
+
+
+    const bomId =
+        positiveId(
+            body.bom_id,
+            "BOM",
+            "PLAN-103"
+        );
+
+
+    const plannedQuantity =
+        positiveNumber(
+            body.planned_quantity,
+            "مقدار برنامه تولید",
+            "PLAN-104"
+        );
+
+
+    // --------------------------------------------------------
+    // LOAD EXISTING PLAN
+    // --------------------------------------------------------
+
+    const existingPlan =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id,
+
+                    plan_date,
+
+                    bom_id,
+
+                    planned_quantity,
+
+                    status
+
+                FROM planning_daily
+
+                WHERE
+
+                    id = ?
+
+                LIMIT 1
+
+            `)
+            .bind(
+                planningId
+            )
+            .first();
+
+
+    if (!existingPlan) {
+
+        throw new AppError(
+
+            "PLAN-105",
+
+            "برنامه تولید پیدا نشد.",
+
+            404
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // CHECK PLAN STATUS
+    // --------------------------------------------------------
+
+    if (
+        ![
+            "planned",
+            "in_progress"
+        ].includes(
+            existingPlan.status
+        )
+    ) {
+
+        throw new AppError(
+
+            "PLAN-106",
+
+            "این برنامه تولید در وضعیت قابل ویرایش نیست.",
+
+            409
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // LOAD ACTIVE BOM
+    // --------------------------------------------------------
+
+    const bom =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id,
+
+                    product_id
+
+                FROM bom_headers
+
+                WHERE
+
+                    id = ?
+
+                    AND
+
+                    status = 'active'
+
+                LIMIT 1
+
+            `)
+            .bind(
+                bomId
+            )
+            .first();
+
+
+    if (!bom) {
+
+        throw new AppError(
+
+            "PLAN-107",
+
+            "BOM انتخاب‌شده معتبر نیست.",
+
+            404
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // CHECK DUPLICATE DATE + BOM
+    //
+    // خود برنامه فعلی باید از این بررسی مستثنی باشد.
+    // --------------------------------------------------------
+
+    const duplicatePlan =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id
+
+                FROM planning_daily
+
+                WHERE
+
+                    plan_date = ?
+
+                    AND
+
+                    bom_id = ?
+
+                    AND
+
+                    id != ?
+
+                LIMIT 1
+
+            `)
+            .bind(
+
+                planDate,
+
+                bomId,
+
+                planningId
+
+            )
+            .first();
+
+
+    if (duplicatePlan) {
+
+        throw new AppError(
+
+            "PLAN-108",
+
+            "برای این تاریخ، این BOM قبلاً در برنامه تولید ثبت شده است.",
+
+            409,
+
+            {
+
+                existing_plan_id:
+                    duplicatePlan.id
+
+            }
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // CHECK ALREADY PRODUCED
+    // --------------------------------------------------------
+
+    const produced =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    COALESCE(
+
+                        SUM(
+                            produced_quantity
+                        ),
+
+                        0
+
+                    ) AS total
+
+                FROM production
+
+                WHERE
+
+                    planning_daily_id = ?
+
+                    AND
+
+                    status = 'completed'
+
+            `)
+            .bind(
+                planningId
+            )
+            .first();
+
+
+    const alreadyProduced =
+        Number(
+            produced?.total || 0
+        );
+
+
+    // --------------------------------------------------------
+    // NEW PLAN CANNOT BE LESS THAN ALREADY PRODUCED
+    // --------------------------------------------------------
+
+    if (
+        plannedQuantity <
+        alreadyProduced
+    ) {
+
+        throw new AppError(
+
+            "PLAN-109",
+
+            `مقدار برنامه تولید نمی‌تواند کمتر از مقدار تولیدشده باشد. تولیدشده تاکنون: ${alreadyProduced}`,
+
+            409,
+
+            {
+
+                already_produced:
+                    alreadyProduced,
+
+                requested_plan_quantity:
+                    plannedQuantity
+
+            }
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // DETERMINE QUANTITY CHANGE
+    // --------------------------------------------------------
+
+    const oldPlannedQuantity =
+        Number(
+            existingPlan.planned_quantity
+        );
+
+
+    const quantityIncrease =
+        Math.max(
+
+            0,
+
+            plannedQuantity -
+            oldPlannedQuantity
+
+        );
+
+
+    // --------------------------------------------------------
+    // NO INCREASE
+    //
+    // اگر مقدار افزایش نداشته باشد،
+    // بررسی موجودی اضافه لازم نیست.
+    // --------------------------------------------------------
+
+    let stockCheck = [];
+
+
+    // --------------------------------------------------------
+    // CHECK ADDITIONAL MATERIAL STOCK
+    //
+    // فقط مقدار اضافه‌شده بررسی می‌شود.
+    // --------------------------------------------------------
+
+    if (
+        quantityIncrease > 0
+    ) {
+
+        // ----------------------------------------------------
+        // FIND RAW MATERIAL WAREHOUSE
+        // ----------------------------------------------------
+
+        const warehouse =
+            await env.DB
+                .prepare(`
+
+                    SELECT
+
+                        id
+
+                    FROM warehouses
+
+                    WHERE
+
+                        warehouse_type =
+                        'material'
+
+                        AND
+
+                        status =
+                        'active'
+
+                    ORDER BY
+
+                        id
+
+                    LIMIT 1
+
+                `)
+                .first();
+
+
+        if (!warehouse) {
+
+            throw new AppError(
+
+                "PLAN-110",
+
+                "انبار مواد اولیه فعال پیدا نشد.",
+
+                404
+
+            );
+
+        }
+
+
+        const rawWarehouseId =
+            warehouse.id;
+
+
+        // ----------------------------------------------------
+        // LOAD BOM MATERIALS
+        // ----------------------------------------------------
+
+        const materialsResult =
+            await env.DB
+                .prepare(`
+
+                    SELECT
+
+                        bd.part_id,
+
+                        bd.consumption_factor,
+
+                        bd.scrap_percent,
+
+                        p.code AS part_code,
+
+                        p.name AS part_name
+
+                    FROM bom_details bd
+
+                    INNER JOIN parts p
+
+                        ON p.id =
+                           bd.part_id
+
+                    WHERE
+
+                        bd.bom_id = ?
+
+                        AND
+
+                        bd.status = 'active'
+
+                        AND
+
+                        p.status = 'active'
+
+                    ORDER BY
+
+                        bd.id
+
+                `)
+                .bind(
+                    bomId
+                )
+                .all();
+
+
+        const materials =
+            materialsResult.results || [];
+
+
+        if (
+            materials.length === 0
+        ) {
+
+            throw new AppError(
+
+                "PLAN-111",
+
+                "برای BOM انتخاب‌شده هیچ قطعه فعالی تعریف نشده است.",
+
+                409
+
+            );
+
+        }
+
+
+        // ----------------------------------------------------
+        // CHECK ADDITIONAL MATERIAL REQUIREMENT
+        // ----------------------------------------------------
+
+        const shortages = [];
+
+
+        for (
+            const material
+            of materials
+        ) {
+
+            const consumptionFactor =
+                Number(
+                    material.consumption_factor
+                );
+
+
+            const scrapPercent =
+                Number(
+                    material.scrap_percent || 0
+                );
+
+
+            const baseRequired =
+                consumptionFactor *
+                quantityIncrease;
+
+
+            const requiredQuantity =
+                baseRequired *
+                (
+                    1 +
+                    (
+                        scrapPercent /
+                        100
+                    )
+                );
+
+
+            const availableQuantity =
+                Number(
+
+                    await getInventoryBalance(
+
+                        env,
+
+                        rawWarehouseId,
+
+                        "part",
+
+                        material.part_id
+
+                    ) || 0
+
+                );
+
+
+            const sufficient =
+                availableQuantity >=
+                requiredQuantity;
+
+
+            const check = {
+
+                part_id:
+                    material.part_id,
+
+                part_code:
+                    material.part_code,
+
+                part_name:
+                    material.part_name,
+
+                consumption_factor:
+                    consumptionFactor,
+
+                scrap_percent:
+                    scrapPercent,
+
+                additional_planned_quantity:
+                    quantityIncrease,
+
+                required_quantity:
+                    requiredQuantity,
+
+                available_quantity:
+                    availableQuantity,
+
+                sufficient
+
+            };
+
+
+            stockCheck.push(
+                check
+            );
+
+
+            if (!sufficient) {
+
+                shortages.push(
+                    check
+                );
+
+            }
+
+        }
+
+
+        // ----------------------------------------------------
+        // FAIL IF ADDITIONAL MATERIAL IS SHORT
+        // ----------------------------------------------------
+
+        if (
+            shortages.length > 0
+        ) {
+
+            const shortageText =
+                shortages
+                    .map(
+                        item => {
+
+                            const shortage =
+                                item.required_quantity -
+                                item.available_quantity;
+
+
+                            return (
+
+                                `«${item.part_name}» ` +
+                                `موجودی: ${item.available_quantity} ` +
+                                `موردنیاز اضافه: ${item.required_quantity} ` +
+                                `کسری: ${shortage}`
+
+                            );
+
+                        }
+                    )
+                    .join(" | ");
+
+
+            throw new AppError(
+
+                "PLAN-112",
+
+                `امکان افزایش برنامه تولید وجود ندارد. موجودی مواد اولیه برای مقدار اضافه کافی نیست: ${shortageText}`,
+
+                409,
+
+                {
+
+                    planning_id:
+                        planningId,
+
+                    bom_id:
+                        bomId,
+
+                    old_planned_quantity:
+                        oldPlannedQuantity,
+
+                    new_planned_quantity:
+                        plannedQuantity,
+
+                    quantity_increase:
+                        quantityIncrease,
+
+                    warehouse_id:
+                        rawWarehouseId,
+
+                    materials:
+                        stockCheck,
+
+                    shortages
+
+                }
+
+            );
+
+        }
+
+    }
+
+
+    // --------------------------------------------------------
+    // UPDATE PLAN
+    //
+    // هیچ موجودی در این مرحله تغییر نمی‌کند.
+    // --------------------------------------------------------
+
+    await env.DB
+        .prepare(`
+
+            UPDATE planning_daily
+
+            SET
+
+                plan_date = ?,
+
+                bom_id = ?,
+
+                planned_quantity = ?
+
+            WHERE
+
+                id = ?
+
+        `)
+        .bind(
+
+            planDate,
+
+            bomId,
+
+            plannedQuantity,
+
+            planningId
+
+        )
+        .run();
+
+
+    // --------------------------------------------------------
+    // AUDIT
+    // --------------------------------------------------------
+
+    await writeAudit(
+
+        env,
+
+        user.id,
+
+        "UPDATE",
+
+        "planning_daily",
+
+        planningId,
+
+        {
+
+            before: {
+
+                plan_date:
+                    existingPlan.plan_date,
+
+                bom_id:
+                    existingPlan.bom_id,
+
+                planned_quantity:
+                    oldPlannedQuantity
+
+            },
+
+            after: {
+
+                plan_date:
+                    planDate,
+
+                bom_id:
+                    bomId,
+
+                planned_quantity:
+                    plannedQuantity
+
+            },
+
+            already_produced:
+                alreadyProduced,
+
+            quantity_increase:
+                quantityIncrease,
+
+            material_check:
+                stockCheck
+
+        }
+
+    );
+
+
+    // --------------------------------------------------------
+    // RESPONSE
+    // --------------------------------------------------------
+
+    return {
+
+        id:
+            planningId,
+
+        message:
+            "برنامه تولید با موفقیت بروزرسانی شد. موجودی مواد اولیه در صورت افزایش مقدار برنامه بررسی شد و هیچ موجودی در این مرحله کسر نشد.",
+
+        planning: {
+
+            id:
+                planningId,
+
+            plan_date:
+                planDate,
+
+            bom_id:
+                bomId,
+
+            planned_quantity:
+                plannedQuantity,
+
+            already_produced:
+                alreadyProduced,
+
+            quantity_increase:
+                quantityIncrease,
+
+            status:
+                existingPlan.status
+
+        },
+
+        material_check:
+            stockCheck
+
+    };
+
+}
 // ============================================================
 // REGISTER PRODUCTION
 // ============================================================
