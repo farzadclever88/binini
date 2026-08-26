@@ -5102,8 +5102,111 @@ function statusBadge(
 
 function renderDashboard(){
 
+    const planning =
+        Array.isArray(STATE.planning)
+            ? STATE.planning
+            : [];
+
+    const production =
+        Array.isArray(STATE.production)
+            ? STATE.production
+            : [];
+
+    const inventory =
+        Array.isArray(STATE.inventory)
+            ? STATE.inventory
+            : [];
+
+
+    /* ---------------------------------------------------------
+       PRODUCTION KPI
+    --------------------------------------------------------- */
+
+    const plannedTotal =
+        planning.reduce(
+            (total, item) =>
+                total +
+                toNumber(
+                    item.planned_quantity
+                ),
+            0
+        );
+
+
+    const producedTotal =
+        planning.reduce(
+            (total, item) =>
+                total +
+                toNumber(
+                    item.produced_quantity
+                ),
+            0
+        );
+
+
+    const remainingTotal =
+        Math.max(
+            0,
+            plannedTotal -
+            producedTotal
+        );
+
+
+    const productionCompletion =
+        plannedTotal > 0
+            ? Math.min(
+                100,
+                (
+                    producedTotal /
+                    plannedTotal
+                ) *
+                100
+            )
+            : 0;
+
+
+    /* ---------------------------------------------------------
+       PLAN STATUS
+    --------------------------------------------------------- */
+
+    const completedPlans =
+        planning.filter(
+            item =>
+                item.status ===
+                "completed"
+        ).length;
+
+
+    const activePlans =
+        planning.filter(
+            item =>
+                [
+                    "planned",
+                    "in_progress"
+                ].includes(
+                    item.status
+                )
+        ).length;
+
+
+    const incompletePlans =
+        planning.filter(
+            item =>
+                toNumber(
+                    item.planned_quantity
+                ) >
+                toNumber(
+                    item.produced_quantity
+                )
+        ).length;
+
+
+    /* ---------------------------------------------------------
+       INVENTORY KPI
+    --------------------------------------------------------- */
+
     const inventoryTotal =
-        STATE.inventory.reduce(
+        inventory.reduce(
             (
                 total,
                 item
@@ -5116,25 +5219,80 @@ function renderDashboard(){
         );
 
 
+    const inventoryItems =
+        inventory.filter(
+            item =>
+                toNumber(
+                    item.quantity
+                ) > 0
+        ).length;
+
+
+    const zeroInventoryItems =
+        inventory.filter(
+            item =>
+                toNumber(
+                    item.quantity
+                ) <= 0
+        ).length;
+
+
+    /* ---------------------------------------------------------
+       RECENT / IMPORTANT PLANS
+    --------------------------------------------------------- */
+
+    const importantPlans =
+        planning
+            .slice()
+            .sort(
+                (
+                    a,
+                    b
+                ) =>
+                    String(
+                        b.plan_date ||
+                        ""
+                    ).localeCompare(
+                        String(
+                            a.plan_date ||
+                            ""
+                        )
+                    )
+            )
+            .slice(
+                0,
+                10
+            );
+
+
+    /* ---------------------------------------------------------
+       RENDER
+    --------------------------------------------------------- */
+
     $("#mainContent").innerHTML = `
 
         ${pageHeader(
-            "داشبورد",
-            "نمای کلی سامانه نی‌نی‌تو"
+            "داشبورد مدیریت",
+            "نمای کلی وضعیت تولید، برنامه‌ریزی و موجودی"
         )}
 
 
+        <!-- ===================================================
+             PRODUCTION KPI
+        ==================================================== -->
+
         <section class="stats">
 
+
             <div class="stat-card">
 
                 <span class="stat-label">
-                    واحدها
+                    مجموع برنامه تولید
                 </span>
 
                 <strong class="stat-value">
                     ${formatNumber(
-                        STATE.units.length
+                        plannedTotal
                     )}
                 </strong>
 
@@ -5144,12 +5302,12 @@ function renderDashboard(){
             <div class="stat-card">
 
                 <span class="stat-label">
-                    محصولات
+                    مجموع تولید واقعی
                 </span>
 
                 <strong class="stat-value">
                     ${formatNumber(
-                        STATE.products.length
+                        producedTotal
                     )}
                 </strong>
 
@@ -5159,12 +5317,12 @@ function renderDashboard(){
             <div class="stat-card">
 
                 <span class="stat-label">
-                    قطعات
+                    باقیمانده تولید
                 </span>
 
                 <strong class="stat-value">
                     ${formatNumber(
-                        STATE.parts.length
+                        remainingTotal
                     )}
                 </strong>
 
@@ -5174,12 +5332,27 @@ function renderDashboard(){
             <div class="stat-card">
 
                 <span class="stat-label">
-                    BOM
+                    تحقق تولید
                 </span>
 
                 <strong class="stat-value">
                     ${formatNumber(
-                        STATE.boms.length
+                        productionCompletion
+                    )}%
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span class="stat-label">
+                    برنامه‌های فعال
+                </span>
+
+                <strong class="stat-value">
+                    ${formatNumber(
+                        activePlans
                     )}
                 </strong>
 
@@ -5189,26 +5362,114 @@ function renderDashboard(){
             <div class="stat-card">
 
                 <span class="stat-label">
-                    مجموع موجودی
+                    برنامه‌های تکمیل‌شده
                 </span>
 
                 <strong class="stat-value">
                     ${formatNumber(
-                        inventoryTotal
+                        completedPlans
                     )}
                 </strong>
 
             </div>
+
 
         </section>
 
+
+        <!-- ===================================================
+             MANAGEMENT ALERTS
+        ==================================================== -->
 
         <section class="card">
 
             <div class="card-header">
 
                 <h2 class="card-title">
-                    برنامه تولید
+                    موارد نیازمند توجه
+                </h2>
+
+            </div>
+
+
+            <div class="stats">
+
+
+                <div class="stat-card">
+
+                    <span class="stat-label">
+                        برنامه‌های ناقص
+                    </span>
+
+                    <strong class="stat-value">
+                        ${formatNumber(
+                            incompletePlans
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span class="stat-label">
+                        اقلام دارای موجودی
+                    </span>
+
+                    <strong class="stat-value">
+                        ${formatNumber(
+                            inventoryItems
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span class="stat-label">
+                        اقلام بدون موجودی
+                    </span>
+
+                    <strong class="stat-value">
+                        ${formatNumber(
+                            zeroInventoryItems
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <span class="stat-label">
+                        مجموع موجودی
+                    </span>
+
+                    <strong class="stat-value">
+                        ${formatNumber(
+                            inventoryTotal
+                        )}
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- ===================================================
+             PRODUCTION STATUS
+        ==================================================== -->
+
+        <section class="card">
+
+            <div class="card-header">
+
+                <h2 class="card-title">
+                    وضعیت برنامه تولید
                 </h2>
 
                 <button
@@ -5256,6 +5517,22 @@ function renderDashboard(){
                         },
 
                         {
+                            label:"باقیمانده",
+                            value:r =>
+                                formatNumber(
+                                    Math.max(
+                                        0,
+                                        toNumber(
+                                            r.planned_quantity
+                                        ) -
+                                        toNumber(
+                                            r.produced_quantity
+                                        )
+                                    )
+                                )
+                        },
+
+                        {
                             label:"وضعیت",
                             value:"status",
                             type:"badge",
@@ -5264,14 +5541,13 @@ function renderDashboard(){
 
                     ],
 
-                    STATE.planning.slice(
-                        0,
-                        10
-                    ),
+                    importantPlans,
 
                     {
+
                         empty:
                             "برنامه تولیدی ثبت نشده است."
+
                     }
 
                 )
@@ -5280,12 +5556,16 @@ function renderDashboard(){
         </section>
 
 
+        <!-- ===================================================
+             INVENTORY STATUS
+        ==================================================== -->
+
         <section class="card">
 
             <div class="card-header">
 
                 <h2 class="card-title">
-                    موجودی انبار
+                    وضعیت موجودی انبار
                 </h2>
 
                 <button
@@ -5332,14 +5612,16 @@ function renderDashboard(){
 
                     ],
 
-                    STATE.inventory.slice(
+                    inventory.slice(
                         0,
                         10
                     ),
 
                     {
+
                         empty:
                             "موجودی ثبت نشده است."
+
                     }
 
                 )
@@ -5349,6 +5631,10 @@ function renderDashboard(){
 
     `;
 
+
+    /* ---------------------------------------------------------
+       REFRESH BUTTONS
+    --------------------------------------------------------- */
 
     $$(
         "[data-refresh-section]"
@@ -5366,13 +5652,13 @@ function renderDashboard(){
 
                     const map = {
 
-                        planning:[
+                        planning: [
                             "planning",
                             "/api/planning",
                             "برنامه تولید"
                         ],
 
-                        inventory:[
+                        inventory: [
                             "inventory",
                             "/api/inventory",
                             "موجودی انبار"
@@ -5382,7 +5668,9 @@ function renderDashboard(){
 
 
                     const item =
-                        map[stateName];
+                        map[
+                            stateName
+                        ];
 
 
                     if(!item){
@@ -5393,9 +5681,13 @@ function renderDashboard(){
 
 
                     await loadCollection(
+
                         item[0],
+
                         item[1],
+
                         item[2]
+
                     );
 
 
@@ -5408,8 +5700,6 @@ function renderDashboard(){
     );
 
 }
-
-
 /* ============================================================
    ENTITY DEFINITIONS
 ============================================================ */
