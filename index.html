@@ -9098,44 +9098,89 @@ function renderProductionView(){
             <div class="card-body">
 
                 ${
-                    buildTable(
+      buildTable(
 
-                        [
+    [
 
-                            {
-                                label:"تاریخ",
-                                value:"production_date",
-                                type:"date"
-                            },
+        {
+            label:"تاریخ",
+            value:"plan_date",
+            type:"date"
+        },
 
-                            {
-                                label:"محصول",
-                                value:"product_name"
-                            },
+        {
+            label:"BOM",
+            value:"bom_code"
+        },
 
-                            {
-                                label:"مقدار",
-                                value:"produced_quantity",
-                                type:"number"
-                            },
+        {
+            label:"محصول",
+            value:"product_name"
+        },
 
-                            {
-                                label:"وضعیت",
-                                value:"status",
-                                type:"badge",
-                                raw:true
-                            }
+        {
+            label:"برنامه",
+            value:"planned_quantity",
+            type:"number"
+        },
 
-                        ],
+        {
+            label:"تولید",
+            value:"produced_quantity",
+            type:"number"
+        },
 
-                        rows,
-
-                        {
-                            empty:
-                                "سابقه تولیدی ثبت نشده است."
-                        }
-
+        {
+            label:"باقیمانده",
+            value:r =>
+                formatNumber(
+                    Math.max(
+                        0,
+                        toNumber(
+                            r.planned_quantity
+                        ) -
+                        toNumber(
+                            r.produced_quantity
+                        )
                     )
+                )
+        },
+
+        {
+            label:"وضعیت",
+            value:"status",
+            type:"badge",
+            raw:true
+        }
+
+    ],
+
+    rows,
+
+    {
+        empty:
+            "برنامه تولیدی ثبت نشده است.",
+
+        actions:
+            true,
+
+        rowActions:
+            row => `
+
+                <button
+                    type="button"
+                    class="btn small secondary"
+                    data-action="material-request"
+                    data-id="${row.id}"
+                >
+                    📦 درخواست مواد
+                </button>
+
+            `
+
+    }
+
+)
                 }
 
             </div>
