@@ -6013,6 +6013,51 @@ if (
     );
 
 }
+
+    // --------------------------------------------------------
+// DASHBOARD DRILL DOWN
+// --------------------------------------------------------
+
+if (
+    path ===
+    "/api/dashboard/details"
+) {
+
+    const snapshotId =
+        url.searchParams.get(
+            "snapshot_id"
+        );
+
+
+    const planningId =
+        url.searchParams.get(
+            "planning_id"
+        );
+
+
+    const productId =
+        url.searchParams.get(
+            "product_id"
+        );
+
+
+    return await getDashboardDetails(
+
+        env,
+
+        {
+
+            snapshotId,
+
+            planningId,
+
+            productId
+
+        }
+
+    );
+
+}
     // --------------------------------------------------------
     // CURRENT USER
     // --------------------------------------------------------
