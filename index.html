@@ -8730,6 +8730,257 @@ if (
 }
 
 
+
+
+    
+async function openMaterialRequest(
+    row
+) {
+
+    if (!row?.id) {
+
+        showMessage(
+            "شناسه برنامه تولید معتبر نیست.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const result =
+            await apiRequest(
+
+                `/api/production/material-requirement?planning_id=${encodeURIComponent(
+                    row.id
+                )}`,
+
+                {
+
+                    method:
+                        "GET",
+
+                    loadingText:
+                        "در حال بررسی مواد اولیه..."
+
+                }
+
+            );
+
+
+        const materials =
+            Array.isArray(
+                result.materials
+            )
+                ? result.materials
+                : [];
+
+
+        const shortageCount =
+            Array.isArray(
+                result.shortages
+            )
+                ? result.shortages.length
+                : 0;
+
+
+        openModal(
+
+            "بررسی مواد اولیه",
+
+            `
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <h3 class="card-title">
+                            ${escapeHtml(
+                                result.bom_code ||
+                                row.bom_code ||
+                                "-"
+                            )}
+                        </h3>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+                        <div>
+                            <strong>
+                                محصول:
+                            </strong>
+
+                            ${escapeHtml(
+                                row.product_name ||
+                                "-"
+                            )}
+                        </div>
+
+
+                        <div>
+                            <strong>
+                                مقدار برنامه:
+                            </strong>
+
+                            ${formatNumber(
+                                result.planned_quantity
+                            )}
+                        </div>
+
+
+                        <div>
+                            <strong>
+                                مواد کسری:
+                            </strong>
+
+                            ${formatNumber(
+                                shortageCount
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table
+                        class="data-table"
+                    >
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    قطعه
+                                </th>
+
+                                <th>
+                                    موردنیاز
+                                </th>
+
+                                <th>
+                                    موجودی
+                                </th>
+
+                                <th>
+                                    کسری
+                                </th>
+
+                                <th>
+                                    وضعیت
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            ${
+                                materials
+                                    .map(
+                                        material => `
+
+                                            <tr>
+
+                                                <td>
+                                                    ${escapeHtml(
+                                                        material.part_name ||
+                                                        material.part_code ||
+                                                        "-"
+                                                    )}
+                                                </td>
+
+                                                <td>
+                                                    ${formatNumber(
+                                                        material.required_quantity
+                                                    )}
+                                                </td>
+
+                                                <td>
+                                                    ${formatNumber(
+                                                        material.available_quantity
+                                                    )}
+                                                </td>
+
+                                                <td>
+                                                    ${formatNumber(
+                                                        material.shortage
+                                                    )}
+                                                </td>
+
+                                                <td>
+
+                                                    ${
+                                                        material.sufficient
+                                                            ? statusBadge(
+                                                                "کافی"
+                                                            )
+                                                            : statusBadge(
+                                                                "کسری"
+                                                            )
+                                                    }
+
+                                                </td>
+
+                                            </tr>
+
+                                        `
+                                    )
+                                    .join("")
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            `,
+
+            `
+
+                <button
+                    type="button"
+                    class="btn secondary"
+                    id="closeMaterialRequest"
+                >
+                    بستن
+                </button>
+
+            `
+
+        );
+
+
+        $("#closeMaterialRequest")
+            .addEventListener(
+                "click",
+                closeModal
+            );
+
+
+    }
+
+    catch(error) {
+
+        showMessage(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
 /* ============================================================
    PLANNING FORM
 ============================================================ */
