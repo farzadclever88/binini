@@ -341,12 +341,7 @@ async function getProductionList(
             .all();
 
 
-    return {
-
-        items:
-            result.results || []
-
-    };
+   return result.results || [];
 
 }
 
