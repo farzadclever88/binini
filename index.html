@@ -4658,40 +4658,47 @@ function buildTable(
             );
 
 
+       
             if(options.actions){
 
-                html += `
+    html += `
 
-                    <td>
+        <td>
 
-                        <div class="toolbar">
+            <div class="toolbar">
 
-                            <button
-                                type="button"
-                                class="btn small secondary"
-                                data-action="edit"
-                                data-id="${row.id}"
-                            >
-                                ویرایش
-                            </button>
+                <button
+                    type="button"
+                    class="btn small secondary"
+                    data-action="edit"
+                    data-id="${row.id}"
+                >
+                    ویرایش
+                </button>
 
-                            <button
-                                type="button"
-                                class="btn small danger"
-                                data-action="delete"
-                                data-id="${row.id}"
-                            >
-                                حذف
-                            </button>
+                <button
+                    type="button"
+                    class="btn small danger"
+                    data-action="delete"
+                    data-id="${row.id}"
+                >
+                    حذف
+                </button>
 
-                        </div>
+                ${
+                    typeof options.rowActions ===
+                    "function"
+                        ? options.rowActions(row)
+                        : ""
+                }
 
-                    </td>
+            </div>
 
-                `;
+        </td>
+
+    `;
 
             }
-
 
             html += "</tr>";
 
