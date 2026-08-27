@@ -32,7 +32,293 @@
 <link rel="stylesheet" href="css/bootstrap-datepicker.min.css" />
     
 <style>
+/* ============================================================
+   BININI — GLOBAL TYPOGRAPHY SYSTEM
+   One font for the entire website
+   ============================================================ */
 
+/* ------------------------------------------------------------
+   FONT
+   ------------------------------------------------------------ */
+
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+
+/* ------------------------------------------------------------
+   GLOBAL FONT TOKENS
+   ------------------------------------------------------------ */
+
+:root{
+    --font-family-base:
+        "Vazirmatn",
+        "Tahoma",
+        "Arial",
+        sans-serif;
+
+    --font-weight-normal:400;
+    --font-weight-medium:500;
+    --font-weight-semibold:600;
+    --font-weight-bold:700;
+    --font-weight-extrabold:800;
+    --font-weight-black:900;
+}
+
+
+/* ------------------------------------------------------------
+   EVERYTHING
+   ------------------------------------------------------------ */
+
+html,
+body,
+button,
+input,
+textarea,
+select,
+option,
+optgroup,
+label,
+table,
+thead,
+tbody,
+tfoot,
+tr,
+th,
+td,
+a,
+span,
+div,
+p,
+small,
+strong,
+b,
+em,
+i,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6{
+    font-family:var(--font-family-base);
+}
+
+
+/* ------------------------------------------------------------
+   BODY
+   ------------------------------------------------------------ */
+
+html{
+    font-family:var(--font-family-base);
+}
+
+body{
+    font-family:var(--font-family-base);
+    font-weight:var(--font-weight-normal);
+}
+
+
+/* ------------------------------------------------------------
+   HEADINGS
+   ------------------------------------------------------------ */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6{
+    font-family:var(--font-family-base);
+    font-weight:var(--font-weight-bold);
+}
+
+
+/* ------------------------------------------------------------
+   FORM CONTROLS
+   IMPORTANT:
+   Browser defaults can otherwise use system fonts.
+   ------------------------------------------------------------ */
+
+button,
+input,
+textarea,
+select{
+    font-family:var(--font-family-base);
+}
+
+input,
+textarea,
+select{
+    font-weight:var(--font-weight-normal);
+}
+
+button{
+    font-weight:var(--font-weight-semibold);
+}
+
+option,
+optgroup{
+    font-family:var(--font-family-base);
+}
+
+
+/* ------------------------------------------------------------
+   TABLES
+   ------------------------------------------------------------ */
+
+table,
+th,
+td{
+    font-family:var(--font-family-base);
+}
+
+
+/* ------------------------------------------------------------
+   LINKS
+   ------------------------------------------------------------ */
+
+a{
+    font-family:var(--font-family-base);
+}
+
+
+/* ------------------------------------------------------------
+   NUMBERS / DATA
+   Keep the same Persian UI font while allowing strong numerals.
+   ------------------------------------------------------------ */
+
+.dashboard-page,
+.dashboard-page *,
+.card,
+.card *,
+.modal,
+.modal *,
+table,
+table *,
+.form-group,
+.form-group *,
+.btn,
+.btn *{
+    font-family:var(--font-family-base);
+}
+
+
+/* ------------------------------------------------------------
+   COMMON WEIGHTS
+   ------------------------------------------------------------ */
+
+strong,
+b{
+    font-weight:var(--font-weight-bold);
+}
+
+small{
+    font-weight:var(--font-weight-normal);
+}
+
+
+/* ------------------------------------------------------------
+   PLACEHOLDERS
+   ------------------------------------------------------------ */
+
+::placeholder{
+    font-family:var(--font-family-base);
+    font-weight:400;
+    opacity:.7;
+}
+
+
+/* ------------------------------------------------------------
+   DISABLED CONTROLS
+   ------------------------------------------------------------ */
+
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled{
+    font-family:var(--font-family-base);
+}
+
+
+/* ------------------------------------------------------------
+   SEARCH / DATE / NUMBER / EMAIL / PASSWORD
+   ------------------------------------------------------------ */
+
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"],
+input[type="tel"],
+input[type="url"]{
+    font-family:var(--font-family-base);
+}
+
+
+/* ------------------------------------------------------------
+   MODAL / DIALOG
+   ------------------------------------------------------------ */
+
+dialog,
+[role="dialog"],
+.modal,
+.modal-content,
+.modal-header,
+.modal-body,
+.modal-footer{
+    font-family:var(--font-family-base);
+}
+
+
+/* ------------------------------------------------------------
+   TOOLTIP / POPOVER
+   ------------------------------------------------------------ */
+
+[role="tooltip"],
+.tooltip,
+.popover{
+    font-family:var(--font-family-base);
+}
+
+
+/* ------------------------------------------------------------
+   DASHBOARD
+   ------------------------------------------------------------ */
+
+.dashboard-page{
+    font-family:var(--font-family-base);
+}
+
+.dashboard-page input,
+.dashboard-page select,
+.dashboard-page textarea,
+.dashboard-page button{
+    font-family:var(--font-family-base);
+}
+
+
+/* ------------------------------------------------------------
+   FONT SMOOTHING
+   ------------------------------------------------------------ */
+
+html{
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    text-rendering:optimizeLegibility;
+}
+
+
+/* ------------------------------------------------------------
+   RTL
+   ------------------------------------------------------------ */
+
+html,
+body{
+    direction:rtl;
+}
+    
 /* =========================================================
    THEME
 ========================================================= */
