@@ -2878,27 +2878,36 @@ body.dark-mode .dashboard-modal-container{
 
 }
 
+
 /* ============================================================
    DASHBOARD DETAILS MODAL
+   LIGHT + DARK THEME SAFE
 ============================================================ */
 
 .dashboard-details-overlay{
     position:fixed;
     inset:0;
     z-index:100000;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
     padding:18px;
     box-sizing:border-box;
 
     background:rgba(0,0,0,.52);
+
     backdrop-filter:blur(10px);
     -webkit-backdrop-filter:blur(10px);
 
     overflow:auto;
 }
 
+
+/* ============================================================
+   MODAL CONTAINER
+============================================================ */
 
 .dashboard-details-container{
     position:relative;
@@ -2908,16 +2917,19 @@ body.dark-mode .dashboard-modal-container{
 
     overflow:hidden;
 
-    border:1px solid var(--dash-border);
+    border:1px solid #e2e8f0;
     border-radius:24px;
 
-    background:var(--dash-surface);
-    color:var(--dash-text);
+    background:#ffffff !important;
+    color:#111827 !important;
 
-    box-shadow:
-        0 35px 100px rgba(0,0,0,.35);
+    box-shadow:0 35px 100px rgba(0,0,0,.35);
 }
 
+
+/* ============================================================
+   MODAL HEADER
+============================================================ */
 
 .dashboard-details-overlay .modal-header{
     display:flex;
@@ -2927,34 +2939,86 @@ body.dark-mode .dashboard-modal-container{
 
     padding:18px 21px;
 
-    border-bottom:1px solid var(--dash-border);
+    border-bottom:1px solid #e2e8f0;
 
-    background:var(--dash-surface);
+    background:#ffffff !important;
+    color:#111827 !important;
 }
 
+
+/* تمام متن‌های Header */
+
+.dashboard-details-overlay .modal-header,
+.dashboard-details-overlay .modal-header *{
+    color:#111827;
+}
+
+
+/* متن‌های کم‌رنگ Header */
+
+.dashboard-details-overlay .modal-header .dashboard-modal-subtitle,
+.dashboard-details-overlay .modal-header .dashboard-modal-kicker{
+    color:#64748b;
+}
+
+
+/* ============================================================
+   MODAL BODY
+============================================================ */
 
 .dashboard-details-overlay .modal-body{
     max-height:calc(92vh - 90px);
+
     overflow:auto;
 
     padding:18px 21px 23px;
+
+    background:#ffffff !important;
+    color:#111827 !important;
 }
 
+
+/* تمام متن‌های داخل Body */
+
+.dashboard-details-overlay .modal-body,
+.dashboard-details-overlay .modal-body *{
+    color:inherit;
+}
+
+
+/* متن‌های muted */
+
+.dashboard-details-overlay .modal-body small,
+.dashboard-details-overlay .modal-body span{
+    color:#64748b;
+}
+
+
+/* متن‌های اصلی */
+
+.dashboard-details-overlay .modal-body strong,
+.dashboard-details-overlay .modal-body b,
+.dashboard-details-overlay .modal-body h1,
+.dashboard-details-overlay .modal-body h2,
+.dashboard-details-overlay .modal-body h3,
+.dashboard-details-overlay .modal-body h4{
+    color:#111827;
+}
+
+
+/* ============================================================
+   CLOSE BUTTON
+============================================================ */
 
 .dashboard-details-overlay .modal-close{
     width:36px;
     height:36px;
 
-    border:1px solid var(--dash-border);
+    border:1px solid #e2e8f0;
     border-radius:10px;
 
-    background:color-mix(
-        in srgb,
-        var(--dash-text) 6%,
-        transparent
-    );
-
-    color:var(--dash-text);
+    background:#f8fafc !important;
+    color:#111827 !important;
 
     font-size:23px;
     line-height:1;
@@ -2962,15 +3026,123 @@ body.dark-mode .dashboard-modal-container{
     cursor:pointer;
 }
 
-
 .dashboard-details-overlay .modal-close:hover{
-    background:color-mix(
-        in srgb,
-        var(--dash-text) 11%,
-        transparent
-    );
+    background:#f1f5f9 !important;
+    color:#111827 !important;
 }
 
+
+/* ============================================================
+   DARK MODE
+============================================================ */
+
+[data-theme="dark"] .dashboard-details-container,
+.dark .dashboard-details-container,
+body.dark-mode .dashboard-details-container{
+
+    border-color:rgba(255,255,255,.09);
+
+    background:#111827 !important;
+    color:#f3f4f6 !important;
+}
+
+
+[data-theme="dark"] .dashboard-details-overlay .modal-header,
+.dark .dashboard-details-overlay .modal-header,
+body.dark-mode .dashboard-details-overlay .modal-header{
+
+    border-color:rgba(255,255,255,.09);
+
+    background:#111827 !important;
+    color:#f3f4f6 !important;
+}
+
+
+[data-theme="dark"] .dashboard-details-overlay .modal-header *,
+.dark .dashboard-details-overlay .modal-header *,
+body.dark-mode .dashboard-details-overlay .modal-header *{
+
+    color:#f3f4f6;
+}
+
+
+[data-theme="dark"] .dashboard-details-overlay .modal-header .dashboard-modal-subtitle,
+[data-theme="dark"] .dashboard-details-overlay .modal-header .dashboard-modal-kicker,
+.dark .dashboard-details-overlay .modal-header .dashboard-modal-subtitle,
+.dark .dashboard-details-overlay .modal-header .dashboard-modal-kicker,
+body.dark-mode .dashboard-details-overlay .modal-header .dashboard-modal-subtitle,
+body.dark-mode .dashboard-details-overlay .modal-header .dashboard-modal-kicker{
+
+    color:rgba(243,244,246,.58);
+}
+
+
+[data-theme="dark"] .dashboard-details-overlay .modal-body,
+.dark .dashboard-details-overlay .modal-body,
+body.dark-mode .dashboard-details-overlay .modal-body{
+
+    background:#111827 !important;
+    color:#f3f4f6 !important;
+}
+
+
+[data-theme="dark"] .dashboard-details-overlay .modal-body strong,
+[data-theme="dark"] .dashboard-details-overlay .modal-body b,
+[data-theme="dark"] .dashboard-details-overlay .modal-body h1,
+[data-theme="dark"] .dashboard-details-overlay .modal-body h2,
+[data-theme="dark"] .dashboard-details-overlay .modal-body h3,
+[data-theme="dark"] .dashboard-details-overlay .modal-body h4,
+.dark .dashboard-details-overlay .modal-body strong,
+.dark .dashboard-details-overlay .modal-body b,
+.dark .dashboard-details-overlay .modal-body h1,
+.dark .dashboard-details-overlay .modal-body h2,
+.dark .dashboard-details-overlay .modal-body h3,
+.dark .dashboard-details-overlay .modal-body h4,
+body.dark-mode .dashboard-details-overlay .modal-body strong,
+body.dark-mode .dashboard-details-overlay .modal-body b,
+body.dark-mode .dashboard-details-overlay .modal-body h1,
+body.dark-mode .dashboard-details-overlay .modal-body h2,
+body.dark-mode .dashboard-details-overlay .modal-body h3,
+body.dark-mode .dashboard-details-overlay .modal-body h4{
+
+    color:#f3f4f6;
+}
+
+
+[data-theme="dark"] .dashboard-details-overlay .modal-body small,
+[data-theme="dark"] .dashboard-details-overlay .modal-body span,
+.dark .dashboard-details-overlay .modal-body small,
+.dark .dashboard-details-overlay .modal-body span,
+body.dark-mode .dashboard-details-overlay .modal-body small,
+body.dark-mode .dashboard-details-overlay .modal-body span{
+
+    color:rgba(243,244,246,.58);
+}
+
+
+[data-theme="dark"] .dashboard-details-overlay .modal-close,
+.dark .dashboard-details-overlay .modal-close,
+body.dark-mode .dashboard-details-overlay .modal-close{
+
+    border-color:rgba(255,255,255,.09);
+
+    background:#172033 !important;
+    color:#f3f4f6 !important;
+}
+
+
+[data-theme="dark"] .dashboard-details-overlay .modal-close:hover,
+.dark .dashboard-details-overlay .modal-close:hover,
+body.dark-mode .dashboard-details-overlay .modal-close:hover{
+
+    background:#1e293b !important;
+    color:#ffffff !important;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
 
 @media(max-width:760px){
 
@@ -2990,6 +3162,7 @@ body.dark-mode .dashboard-modal-container{
     }
 
 }
+
 
     
 </style>
