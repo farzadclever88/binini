@@ -10163,9 +10163,7 @@ function dashboardSeverityClass(
 }
 
 
-function renderDashboardView(
-    data
-){
+function renderDashboardView(data){
 
     const snapshot =
         data?.snapshot || {};
@@ -10176,544 +10174,1187 @@ function renderDashboardView(
     const materials =
         data?.materials || [];
 
+    const planned =
+        dashboardNumber(
+            snapshot.total_planned
+        );
+
+    const produced =
+        dashboardNumber(
+            snapshot.total_produced
+        );
+
+    const remaining =
+        dashboardNumber(
+            snapshot.total_remaining
+        );
+
+    const achievement =
+        dashboardNumber(
+            snapshot.achievement_percent
+        );
+
+    const green =
+        dashboardNumber(
+            snapshot.green_alerts
+        );
+
+    const yellow =
+        dashboardNumber(
+            snapshot.yellow_alerts
+        );
+
+    const red =
+        dashboardNumber(
+            snapshot.red_alerts
+        );
+
+    const overallSeverity =
+        achievement >= 90
+            ? "green"
+            : achievement >= 60
+                ? "yellow"
+                : "red";
+
+    const severityText =
+        overallSeverity === "green"
+            ? "وضعیت مطلوب"
+            : overallSeverity === "yellow"
+                ? "نیازمند توجه"
+                : "نیازمند اقدام فوری";
+
+    const severityIcon =
+        overallSeverity === "green"
+            ? "✓"
+            : overallSeverity === "yellow"
+                ? "!"
+                : "⚠";
+
+    const topCritical =
+        details
+            .filter(
+                item =>
+                    item.severity === "red"
+            )
+            .slice(0, 3);
+
+    const topRisk =
+        details
+            .filter(
+                item =>
+                    item.severity === "yellow"
+            )
+            .slice(0, 3);
+
     $("#mainContent").innerHTML = `
 
-        ${pageHeader(
-            "داشبورد",
-            "نمای لحظه‌ای وضعیت تولید و مواد اولیه",
-            details.length
-        )}
+        <div class="dashboard-page">
 
-        <section class="card">
+            <div class="dashboard-topbar">
 
-            <div class="card-header">
+                <div>
 
-                <h2 class="card-title">
-                    وضعیت کلی تولید
-                </h2>
+                    <div class="dashboard-eyebrow">
+                        CONTROL CENTER
+                    </div>
+
+                    <h1 class="dashboard-title">
+                        داشبورد مدیریتی
+                    </h1>
+
+                    <div class="dashboard-subtitle">
+                        نمای لحظه‌ای تولید، تحقق برنامه و وضعیت مواد اولیه
+                    </div>
+
+                </div>
+
+                <div class="dashboard-actions">
+
+                    <div class="dashboard-date">
+                        ${snapshot.business_date || "-"}
+                    </div>
+
+                    <button
+                        type="button"
+                        class="dashboard-refresh-button"
+                        id="refreshDashboardButton"
+                    >
+                        ↻
+                        بروزرسانی
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 EXECUTIVE STATUS
+            ================================================== -->
+
+            <section
+                class="
+                    dashboard-hero
+                    dashboard-severity-${overallSeverity}
+                "
+            >
+
+                <div class="dashboard-hero-main">
+
+                    <div class="dashboard-status-orb">
+
+                        <span>
+                            ${severityIcon}
+                        </span>
+
+                    </div>
+
+                    <div>
+
+                        <div class="dashboard-status-kicker">
+                            وضعیت کلی تولید
+                        </div>
+
+                        <div class="dashboard-status-title">
+                            ${severityText}
+                        </div>
+
+                        <div class="dashboard-status-message">
+
+                            تحقق کلی برنامه تولید:
+
+                            <strong>
+                                ${dashboardPercent(
+                                    achievement
+                                )}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="dashboard-progress">
+
+                    <div class="dashboard-progress-label">
+
+                        <span>
+                            پیشرفت تولید
+                        </span>
+
+                        <strong>
+                            ${dashboardPercent(
+                                achievement
+                            )}
+                        </strong>
+
+                    </div>
+
+                    <div class="dashboard-progress-track">
+
+                        <div
+                            class="
+                                dashboard-progress-fill
+                                dashboard-progress-${overallSeverity}
+                            "
+                            style="
+                                width:
+                                ${Math.min(
+                                    100,
+                                    Math.max(
+                                        0,
+                                        achievement
+                                    )
+                                )}%
+                            "
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 KPI STRIP
+            ================================================== -->
+
+            <section class="dashboard-kpi-grid">
 
                 <button
-                    class="btn"
                     type="button"
-                    id="refreshDashboardButton"
+                    class="dashboard-kpi"
+                    data-dashboard-action="plans"
                 >
-                    بروزرسانی
+
+                    <span class="dashboard-kpi-icon">
+                        ◫
+                    </span>
+
+                    <span class="dashboard-kpi-content">
+
+                        <span class="dashboard-kpi-label">
+                            برنامه تولید
+                        </span>
+
+                        <strong class="dashboard-kpi-value">
+                            ${planned}
+                        </strong>
+
+                        <span class="dashboard-kpi-meta">
+                            ${dashboardNumber(
+                                snapshot.total_plans
+                            )} برنامه
+                        </span>
+
+                    </span>
+
                 </button>
 
+
+                <button
+                    type="button"
+                    class="dashboard-kpi"
+                    data-dashboard-action="produced"
+                >
+
+                    <span class="dashboard-kpi-icon">
+                        ✓
+                    </span>
+
+                    <span class="dashboard-kpi-content">
+
+                        <span class="dashboard-kpi-label">
+                            تولید انجام‌شده
+                        </span>
+
+                        <strong class="dashboard-kpi-value">
+                            ${produced}
+                        </strong>
+
+                        <span class="dashboard-kpi-meta">
+                            ${dashboardPercent(
+                                achievement
+                            )} تحقق
+                        </span>
+
+                    </span>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="dashboard-kpi"
+                    data-dashboard-action="remaining"
+                >
+
+                    <span class="dashboard-kpi-icon">
+                        ◷
+                    </span>
+
+                    <span class="dashboard-kpi-content">
+
+                        <span class="dashboard-kpi-label">
+                            باقیمانده
+                        </span>
+
+                        <strong class="dashboard-kpi-value">
+                            ${remaining}
+                        </strong>
+
+                        <span class="dashboard-kpi-meta">
+                            واحد
+                        </span>
+
+                    </span>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="
+                        dashboard-kpi
+                        dashboard-kpi-danger
+                    "
+                    data-dashboard-action="critical"
+                >
+
+                    <span class="dashboard-kpi-icon">
+                        ⚠
+                    </span>
+
+                    <span class="dashboard-kpi-content">
+
+                        <span class="dashboard-kpi-label">
+                            نیازمند اقدام
+                        </span>
+
+                        <strong class="dashboard-kpi-value">
+                            ${red}
+                        </strong>
+
+                        <span class="dashboard-kpi-meta">
+                            مورد بحرانی
+                        </span>
+
+                    </span>
+
+                </button>
+
+            </section>
+
+
+            <!-- =================================================
+                 STATUS MATRIX
+            ================================================== -->
+
+            <section class="dashboard-section">
+
+                <div class="dashboard-section-header">
+
+                    <div>
+
+                        <div class="dashboard-section-kicker">
+                            HEALTH
+                        </div>
+
+                        <h2>
+                            وضعیت عملیات
+                        </h2>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="dashboard-text-button"
+                        id="dashboardRulesButton"
+                    >
+                        منطق وضعیت
+                        <span>›</span>
+                    </button>
+
+                </div>
+
+
+                <div class="dashboard-status-grid">
+
+                    <button
+                        type="button"
+                        class="
+                            dashboard-status-card
+                            status-green
+                        "
+                        data-dashboard-action="green"
+                    >
+
+                        <div class="dashboard-status-card-head">
+
+                            <span class="dashboard-status-sticker">
+                                ✓
+                            </span>
+
+                            <span>
+                                سالم
+                            </span>
+
+                        </div>
+
+                        <strong>
+                            ${green}
+                        </strong>
+
+                        <small>
+                            در مسیر برنامه
+                        </small>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="
+                            dashboard-status-card
+                            status-yellow
+                        "
+                        data-dashboard-action="yellow"
+                    >
+
+                        <div class="dashboard-status-card-head">
+
+                            <span class="dashboard-status-sticker">
+                                !
+                            </span>
+
+                            <span>
+                                نیازمند توجه
+                            </span>
+
+                        </div>
+
+                        <strong>
+                            ${yellow}
+                        </strong>
+
+                        <small>
+                            در معرض ریسک
+                        </small>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="
+                            dashboard-status-card
+                            status-red
+                        "
+                        data-dashboard-action="red"
+                    >
+
+                        <div class="dashboard-status-card-head">
+
+                            <span class="dashboard-status-sticker">
+                                ⚠
+                            </span>
+
+                            <span>
+                                بحرانی
+                            </span>
+
+                        </div>
+
+                        <strong>
+                            ${red}
+                        </strong>
+
+                        <small>
+                            نیازمند اقدام
+                        </small>
+
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 PRODUCTION OVERVIEW
+            ================================================== -->
+
+            <section class="dashboard-section">
+
+                <div class="dashboard-section-header">
+
+                    <div>
+
+                        <div class="dashboard-section-kicker">
+                            PRODUCTION
+                        </div>
+
+                        <h2>
+                            وضعیت برنامه‌های تولید
+                        </h2>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="dashboard-text-button"
+                        id="dashboardAllPlansButton"
+                    >
+                        مشاهده همه
+                        <span>›</span>
+                    </button>
+
+                </div>
+
+
+                <div class="dashboard-plan-list">
+
+                    ${
+                        details.length
+
+                        ?
+
+                        details
+                            .slice(0, 6)
+                            .map(
+                                item => {
+
+                                    const itemSeverity =
+                                        item.severity ||
+                                        "green";
+
+                                    const itemAchievement =
+                                        dashboardNumber(
+                                            item.achievement_percent
+                                        );
+
+                                    return `
+
+                                        <button
+                                            type="button"
+                                            class="
+                                                dashboard-plan-row
+                                                dashboard-plan-${itemSeverity}
+                                            "
+                                            data-planning-id="${
+                                                item.planning_id
+                                            }"
+                                            data-product-id="${
+                                                item.product_id
+                                            }"
+                                        >
+
+                                            <div class="dashboard-plan-status">
+
+                                                <span>
+                                                    ${
+                                                        itemSeverity === "green"
+                                                            ? "✓"
+                                                            : itemSeverity === "yellow"
+                                                                ? "!"
+                                                                : "⚠"
+                                                    }
+                                                </span>
+
+                                            </div>
+
+
+                                            <div class="dashboard-plan-info">
+
+                                                <strong>
+                                                    ${
+                                                        item.product_name
+                                                        ||
+                                                        "-"
+                                                    }
+                                                </strong>
+
+                                                <small>
+
+                                                    ${
+                                                        item.product_code
+                                                        ||
+                                                        ""
+                                                    }
+
+                                                    ${
+                                                        item.bom_code
+                                                            ? " · " +
+                                                              item.bom_code
+                                                            : ""
+                                                    }
+
+                                                </small>
+
+                                            </div>
+
+
+                                            <div class="dashboard-plan-metric">
+
+                                                <span>
+                                                    برنامه
+                                                </span>
+
+                                                <strong>
+                                                    ${
+                                                        dashboardNumber(
+                                                            item.planned_quantity
+                                                        )
+                                                    }
+                                                </strong>
+
+                                            </div>
+
+
+                                            <div class="dashboard-plan-metric">
+
+                                                <span>
+                                                    تولید
+                                                </span>
+
+                                                <strong>
+                                                    ${
+                                                        dashboardNumber(
+                                                            item.produced_quantity
+                                                        )
+                                                    }
+                                                </strong>
+
+                                            </div>
+
+
+                                            <div class="dashboard-plan-progress">
+
+                                                <div>
+
+                                                    <span>
+                                                        تحقق
+                                                    </span>
+
+                                                    <strong>
+                                                        ${
+                                                            dashboardPercent(
+                                                                itemAchievement
+                                                            )
+                                                        }
+                                                    </strong>
+
+                                                </div>
+
+                                                <div class="dashboard-mini-track">
+
+                                                    <span
+                                                        style="
+                                                            width:
+                                                            ${Math.min(
+                                                                100,
+                                                                Math.max(
+                                                                    0,
+                                                                    itemAchievement
+                                                                )
+                                                            )}%
+                                                        "
+                                                    ></span>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="dashboard-plan-arrow">
+                                                ‹
+                                            </div>
+
+                                        </button>
+
+                                    `;
+
+                                }
+                            )
+                            .join("")
+
+                        :
+
+                        `
+
+                            <div class="dashboard-empty">
+                                برنامه‌ای برای نمایش وجود ندارد.
+                            </div>
+
+                        `
+                    }
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 ACTION CENTER
+            ================================================== -->
+
+            <section class="dashboard-action-grid">
+
+                <button
+                    type="button"
+                    class="
+                        dashboard-action-card
+                        dashboard-action-red
+                    "
+                    data-dashboard-action="critical"
+                >
+
+                    <div class="dashboard-action-icon">
+                        ⚠
+                    </div>
+
+                    <div>
+
+                        <span>
+                            مرکز اقدام
+                        </span>
+
+                        <strong>
+                            ${
+                                red > 0
+                                    ? `${red} مورد نیازمند اقدام فوری`
+                                    : "مورد بحرانی وجود ندارد"
+                            }
+                        </strong>
+
+                    </div>
+
+                    <span class="dashboard-action-arrow">
+                        ‹
+                    </span>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="
+                        dashboard-action-card
+                        dashboard-action-yellow
+                    "
+                    data-dashboard-action="yellow"
+                >
+
+                    <div class="dashboard-action-icon">
+                        !
+                    </div>
+
+                    <div>
+
+                        <span>
+                            پایش
+                        </span>
+
+                        <strong>
+                            ${
+                                yellow > 0
+                                    ? `${yellow} مورد در معرض ریسک`
+                                    : "ریسک فعالی ثبت نشده"
+                            }
+                        </strong>
+
+                    </div>
+
+                    <span class="dashboard-action-arrow">
+                        ‹
+                    </span>
+
+                </button>
+
+            </section>
+
+
+            <!-- =================================================
+                 FOOTER INFO
+            ================================================== -->
+
+            <div class="dashboard-footer">
+
+                <span>
+                    آخرین Snapshot:
+                    ${
+                        snapshot.snapshot_at
+                        ||
+                        "-"
+                    }
+                </span>
+
+                <span>
+                    ${dashboardNumber(
+                        snapshot.active_plans
+                    )}
+                    برنامه فعال
+                </span>
+
+                <span>
+                    ${dashboardNumber(
+                        snapshot.completed_plans
+                    )}
+                    تکمیل‌شده
+                </span>
+
+                <span>
+                    ${dashboardNumber(
+                        snapshot.not_started_plans
+                    )}
+                    شروع‌نشده
+                </span>
+
             </div>
 
-            <div class="dashboard-grid">
+        </div>
 
-                <div class="stat-card">
+    `;
 
-                    <div class="stat-label">
-                        برنامه تولید
+
+    $("#refreshDashboardButton")
+        ?.addEventListener(
+            "click",
+            loadDashboard
+        );
+
+
+    $$(".dashboard-plan-row")
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    async () => {
+
+                        await loadDashboardDetails(
+                            button.dataset.planningId,
+                            button.dataset.productId
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    $$(".dashboard-status-card")
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const action =
+                            button.dataset.dashboardAction;
+
+                        openDashboardStatusModal(
+                            action,
+                            details
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    $$(".dashboard-action-card")
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        openDashboardStatusModal(
+                            button.dataset.dashboardAction,
+                            details
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    $("#dashboardRulesButton")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                openDashboardRulesModal();
+
+            }
+        );
+
+
+    $("#dashboardAllPlansButton")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                openDashboardPlansModal(
+                    details
+                );
+
+            }
+        );
+
+}
+
+   function dashboardStatusLabel(
+    severity
+){
+
+    if(
+        severity === "red"
+    ){
+
+        return "بحرانی";
+
+    }
+
+    if(
+        severity === "yellow"
+    ){
+
+        return "نیازمند توجه";
+
+    }
+
+    return "سالم";
+
+}
+
+
+function dashboardStatusIcon(
+    severity
+){
+
+    if(
+        severity === "red"
+    ){
+
+        return "⚠";
+
+    }
+
+    if(
+        severity === "yellow"
+    ){
+
+        return "!";
+
+    }
+
+    return "✓";
+
+}
+
+
+function dashboardFilterDetails(
+    details,
+    action
+){
+
+    if(
+        action === "green"
+    ){
+
+        return details.filter(
+            item =>
+                item.severity === "green"
+        );
+
+    }
+
+    if(
+        action === "yellow"
+    ){
+
+        return details.filter(
+            item =>
+                item.severity === "yellow"
+        );
+
+    }
+
+    if(
+        action === "red" ||
+        action === "critical"
+    ){
+
+        return details.filter(
+            item =>
+                item.severity === "red"
+        );
+
+    }
+
+    return details;
+
+}
+
+
+function openDashboardStatusModal(
+    action,
+    details
+){
+
+    const rows =
+        dashboardFilterDetails(
+            details,
+            action
+        );
+
+
+    const severity =
+        action === "red" ||
+        action === "critical"
+            ? "red"
+            : action === "yellow"
+                ? "yellow"
+                : "green";
+
+
+    const title =
+        severity === "red"
+            ? "موارد بحرانی"
+            : severity === "yellow"
+                ? "موارد نیازمند توجه"
+                : "موارد سالم";
+
+
+    openDashboardModal(
+        `
+
+            <div class="dashboard-modal-shell">
+
+                <div class="dashboard-modal-header">
+
+                    <div>
+
+                        <span
+                            class="
+                                dashboard-modal-badge
+                                dashboard-modal-${severity}
+                            "
+                        >
+                            ${dashboardStatusIcon(
+                                severity
+                            )}
+                        </span>
+
+                        <div>
+
+                            <div class="dashboard-modal-kicker">
+                                STATUS CENTER
+                            </div>
+
+                            <h2>
+                                ${title}
+                            </h2>
+
+                        </div>
+
                     </div>
 
-                    <div class="stat-value">
-                        ${dashboardNumber(
-                            snapshot.total_planned
-                        )}
-                    </div>
+                    <button
+                        type="button"
+                        class="dashboard-modal-close"
+                        data-dashboard-close
+                    >
+                        ×
+                    </button>
 
                 </div>
 
 
-                <div class="stat-card">
+                <div class="dashboard-modal-body">
 
-                    <div class="stat-label">
-                        تولید انجام‌شده
-                    </div>
+                    ${
+                        rows.length
 
-                    <div class="stat-value">
-                        ${dashboardNumber(
-                            snapshot.total_produced
-                        )}
-                    </div>
+                        ?
 
-                </div>
+                        rows.map(
+                            item => `
 
+                                <button
+                                    type="button"
+                                    class="
+                                        dashboard-modal-plan
+                                        dashboard-modal-plan-${item.severity}
+                                    "
+                                    data-planning-id="${
+                                        item.planning_id
+                                    }"
+                                    data-product-id="${
+                                        item.product_id
+                                    }"
+                                >
 
-                <div class="stat-card">
+                                    <div class="dashboard-modal-plan-icon">
 
-                    <div class="stat-label">
-                        باقیمانده
-                    </div>
+                                        ${dashboardStatusIcon(
+                                            item.severity
+                                        )}
 
-                    <div class="stat-value">
-                        ${dashboardNumber(
-                            snapshot.total_remaining
-                        )}
-                    </div>
+                                    </div>
 
-                </div>
+                                    <div class="dashboard-modal-plan-main">
 
-
-                <div class="stat-card">
-
-                    <div class="stat-label">
-                        درصد تحقق
-                    </div>
-
-                    <div class="stat-value">
-                        ${dashboardPercent(
-                            snapshot.achievement_percent
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-label">
-                        برنامه‌های فعال
-                    </div>
-
-                    <div class="stat-value">
-                        ${dashboardNumber(
-                            snapshot.active_plans
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-label">
-                        برنامه‌های تکمیل‌شده
-                    </div>
-
-                    <div class="stat-value">
-                        ${dashboardNumber(
-                            snapshot.completed_plans
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-label">
-                        در معرض خطر
-                    </div>
-
-                    <div class="stat-value">
-                        ${dashboardNumber(
-                            snapshot.products_at_risk
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-label">
-                        بحرانی
-                    </div>
-
-                    <div class="stat-value">
-                        ${dashboardNumber(
-                            snapshot.products_critical
-                        )}
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <section class="card">
-
-            <div class="card-header">
-
-                <h2 class="card-title">
-                    هشدارها
-                </h2>
-
-            </div>
-
-            <div class="dashboard-grid">
-
-                <div class="stat-card success">
-
-                    <div class="stat-label">
-                        وضعیت سبز
-                    </div>
-
-                    <div class="stat-value">
-                        ${dashboardNumber(
-                            snapshot.green_alerts
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card warning">
-
-                    <div class="stat-label">
-                        وضعیت زرد
-                    </div>
-
-                    <div class="stat-value">
-                        ${dashboardNumber(
-                            snapshot.yellow_alerts
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div class="stat-card danger">
-
-                    <div class="stat-label">
-                        وضعیت قرمز
-                    </div>
-
-                    <div class="stat-value">
-                        ${dashboardNumber(
-                            snapshot.red_alerts
-                        )}
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <section class="card">
-
-            <div class="card-header">
-
-                <h2 class="card-title">
-                    برنامه‌های تولید
-                </h2>
-
-            </div>
-
-            <div class="table-wrapper">
-
-                <table class="data-table">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                محصول
-                            </th>
-
-                            <th>
-                                برنامه
-                            </th>
-
-                            <th>
-                                تولید
-                            </th>
-
-                            <th>
-                                باقیمانده
-                            </th>
-
-                            <th>
-                                تحقق
-                            </th>
-
-                            <th>
-                                وضعیت
-                            </th>
-
-                            <th>
-                                جزئیات
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        ${
-                            details.length
-
-                            ?
-
-                            details.map(
-                                item => `
-
-                                    <tr>
-
-                                        <td>
+                                        <strong>
                                             ${
                                                 item.product_name
                                                 ||
                                                 "-"
                                             }
-                                        </td>
+                                        </strong>
 
-                                        <td>
+                                        <span>
                                             ${
-                                                dashboardNumber(
-                                                    item.planned_quantity
+                                                item.severity_message
+                                                ||
+                                                dashboardStatusLabel(
+                                                    item.severity
                                                 )
                                             }
-                                        </td>
+                                        </span>
 
-                                        <td>
-                                            ${
-                                                dashboardNumber(
-                                                    item.produced_quantity
-                                                )
-                                            }
-                                        </td>
+                                    </div>
 
-                                        <td>
-                                            ${
-                                                dashboardNumber(
-                                                    item.remaining_quantity
-                                                )
-                                            }
-                                        </td>
+                                    <div class="dashboard-modal-plan-value">
 
-                                        <td>
+                                        <strong>
                                             ${
                                                 dashboardPercent(
                                                     item.achievement_percent
                                                 )
                                             }
-                                        </td>
+                                        </strong>
 
-                                        <td>
+                                        <small>
+                                            تحقق
+                                        </small>
 
-                                            <span
-                                                class="badge ${dashboardSeverityClass(
-                                                    item.severity
-                                                )}"
-                                            >
-                                                ${
-                                                    item.severity_message
-                                                    ||
-                                                    item.status
-                                                    ||
-                                                    "-"
-                                                }
-                                            </span>
+                                    </div>
 
-                                        </td>
+                                    <span>
+                                        ‹
+                                    </span>
 
-                                        <td>
-
-                                            <button
-                                                type="button"
-                                                class="btn btn-small dashboard-detail-button"
-                                                data-planning-id="${
-                                                    item.planning_id
-                                                }"
-                                                data-product-id="${
-                                                    item.product_id
-                                                }"
-                                            >
-                                                مشاهده
-                                            </button>
-
-                                        </td>
-
-                                    </tr>
-
-                                `
-                            ).join("")
-
-                            :
+                                </button>
 
                             `
-                                <tr>
+                        ).join("")
 
-                                    <td
-                                        colspan="7"
-                                    >
-                                        رکوردی برای نمایش وجود ندارد.
-                                    </td>
+                        :
 
-                                </tr>
-                            `
-                        }
+                        `
 
-                    </tbody>
+                            <div class="dashboard-modal-empty">
 
-                </table>
+                                <div>
+                                    ✓
+                                </div>
+
+                                <strong>
+                                    موردی برای نمایش وجود ندارد
+                                </strong>
+
+                                <span>
+                                    وضعیت فعلی در این بخش مناسب است.
+                                </span>
+
+                            </div>
+
+                        `
+
+                    }
+
+                </div>
 
             </div>
 
-        </section>
+        `
+    );
 
 
-        <section class="card">
-
-            <div class="card-header">
-
-                <h2 class="card-title">
-                    مواد اولیه موردنیاز
-                </h2>
-
-            </div>
-
-            <div class="table-wrapper">
-
-                <table class="data-table">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                قطعه
-                            </th>
-
-                            <th>
-                                موردنیاز
-                            </th>
-
-                            <th>
-                                موجودی
-                            </th>
-
-                            <th>
-                                کسری
-                            </th>
-
-                            <th>
-                                وضعیت
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        ${
-                            materials.length
-
-                            ?
-
-                            materials.map(
-                                material => `
-
-                                    <tr>
-
-                                        <td>
-                                            ${
-                                                material.part_name
-                                                ||
-                                                material.part_code
-                                                ||
-                                                "-"
-                                            }
-                                        </td>
-
-                                        <td>
-                                            ${
-                                                dashboardNumber(
-                                                    material.required_quantity
-                                                )
-                                            }
-                                        </td>
-
-                                        <td>
-                                            ${
-                                                dashboardNumber(
-                                                    material.available_quantity
-                                                )
-                                            }
-                                        </td>
-
-                                        <td>
-                                            ${
-                                                dashboardNumber(
-                                                    material.shortage_quantity
-                                                )
-                                            }
-                                        </td>
-
-                                        <td>
-
-                                            <span
-                                                class="badge ${dashboardSeverityClass(
-                                                    material.severity
-                                                )}"
-                                            >
-
-                                                ${
-                                                    material.sufficient
-                                                    ? "کافی"
-                                                    : "کسری"
-                                                }
-
-                                            </span>
-
-                                        </td>
-
-                                    </tr>
-
-                                `
-                            ).join("")
-
-                            :
-
-                            `
-                                <tr>
-
-                                    <td
-                                        colspan="5"
-                                    >
-                                        اطلاعات مواد اولیه موجود نیست.
-                                    </td>
-
-                                </tr>
-                            `
-                        }
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </section>
-
-    `;
-
-
-    const refreshButton =
-        document.querySelector(
-            "#refreshDashboardButton"
-        );
-
-
-    if(
-        refreshButton
-    ){
-
-        refreshButton.addEventListener(
-            "click",
-            loadDashboard
-        );
-
-    }
-
-
-    document
-        .querySelectorAll(
-            ".dashboard-detail-button"
-        )
+    $$(".dashboard-modal-plan")
         .forEach(
             button => {
 
@@ -10734,6 +11375,435 @@ function renderDashboardView(
 
 }
 
+
+function openDashboardPlansModal(
+    details
+){
+
+    openDashboardModal(
+        `
+
+            <div class="dashboard-modal-shell">
+
+                <div class="dashboard-modal-header">
+
+                    <div>
+
+                        <span class="dashboard-modal-badge dashboard-modal-blue">
+                            ◫
+                        </span>
+
+                        <div>
+
+                            <div class="dashboard-modal-kicker">
+                                PRODUCTION
+                            </div>
+
+                            <h2>
+                                همه برنامه‌های تولید
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="dashboard-modal-close"
+                        data-dashboard-close
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="dashboard-modal-body">
+
+                    ${
+                        details.length
+
+                        ?
+
+                        details.map(
+                            item => `
+
+                                <button
+                                    type="button"
+                                    class="dashboard-modal-plan"
+                                    data-planning-id="${
+                                        item.planning_id
+                                    }"
+                                    data-product-id="${
+                                        item.product_id
+                                    }"
+                                >
+
+                                    <div
+                                        class="
+                                            dashboard-modal-plan-icon
+                                            dashboard-modal-plan-${item.severity}
+                                        "
+                                    >
+                                        ${dashboardStatusIcon(
+                                            item.severity
+                                        )}
+                                    </div>
+
+                                    <div class="dashboard-modal-plan-main">
+
+                                        <strong>
+                                            ${
+                                                item.product_name
+                                                ||
+                                                "-"
+                                            }
+                                        </strong>
+
+                                        <span>
+                                            برنامه:
+                                            ${
+                                                dashboardNumber(
+                                                    item.planned_quantity
+                                                )
+                                            }
+
+                                            ·
+
+                                            تولید:
+                                            ${
+                                                dashboardNumber(
+                                                    item.produced_quantity
+                                                )
+                                            }
+                                        </span>
+
+                                    </div>
+
+                                    <div class="dashboard-modal-plan-value">
+
+                                        <strong>
+                                            ${
+                                                dashboardPercent(
+                                                    item.achievement_percent
+                                                )
+                                            }
+                                        </strong>
+
+                                        <small>
+                                            تحقق
+                                        </small>
+
+                                    </div>
+
+                                    <span>
+                                        ‹
+                                    </span>
+
+                                </button>
+
+                            `
+                        ).join("")
+
+                        :
+
+                        `<div class="dashboard-modal-empty">
+                            برنامه‌ای ثبت نشده است.
+                        </div>`
+
+                    }
+
+                </div>
+
+            </div>
+
+        `
+    );
+
+
+    $$(".dashboard-modal-plan")
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    async () => {
+
+                        await loadDashboardDetails(
+                            button.dataset.planningId,
+                            button.dataset.productId
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+function openDashboardRulesModal(){
+
+    openDashboardModal(
+        `
+
+            <div class="dashboard-modal-shell">
+
+                <div class="dashboard-modal-header">
+
+                    <div>
+
+                        <span class="dashboard-modal-badge dashboard-modal-blue">
+                            %
+                        </span>
+
+                        <div>
+
+                            <div class="dashboard-modal-kicker">
+                                ANALYTICS RULES
+                            </div>
+
+                            <h2>
+                                منطق تعیین وضعیت
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="dashboard-modal-close"
+                        data-dashboard-close
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="dashboard-rules-body">
+
+                    <div class="dashboard-formula">
+
+                        <div class="dashboard-formula-label">
+                            فرمول تحقق تولید
+                        </div>
+
+                        <div class="dashboard-formula-value">
+
+                            تحقق =
+                            تولید انجام‌شده
+                            ÷
+                            مقدار برنامه
+                            ×
+                            ۱۰۰
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="dashboard-rule-grid">
+
+                        <div class="dashboard-rule-card dashboard-rule-green">
+
+                            <span>
+                                ✓
+                            </span>
+
+                            <strong>
+                                سبز
+                            </strong>
+
+                            <b>
+                                ۹۰٪ و بیشتر
+                            </b>
+
+                            <small>
+                                برنامه در مسیر مطلوب قرار دارد.
+                            </small>
+
+                        </div>
+
+
+                        <div class="dashboard-rule-card dashboard-rule-yellow">
+
+                            <span>
+                                !
+                            </span>
+
+                            <strong>
+                                زرد
+                            </strong>
+
+                            <b>
+                                ۶۰٪ تا کمتر از ۹۰٪
+                            </b>
+
+                            <small>
+                                وضعیت نیازمند پایش و پیگیری است.
+                            </small>
+
+                        </div>
+
+
+                        <div class="dashboard-rule-card dashboard-rule-red">
+
+                            <span>
+                                ⚠
+                            </span>
+
+                            <strong>
+                                قرمز
+                            </strong>
+
+                            <b>
+                                کمتر از ۶۰٪
+                            </b>
+
+                            <small>
+                                وضعیت بحرانی و نیازمند اقدام است.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `
+    );
+
+}
+
+
+function openDashboardModal(
+    content
+){
+
+    document
+        .querySelector(
+            "#dashboardModalOverlay"
+        )
+        ?.remove();
+
+
+    document.body.insertAdjacentHTML(
+        "beforeend",
+        `
+
+            <div
+                id="dashboardModalOverlay"
+                class="dashboard-modal-overlay"
+            >
+
+                <div
+                    class="dashboard-modal-backdrop"
+                    data-dashboard-close
+                ></div>
+
+                <div
+                    class="dashboard-modal-container"
+                    role="dialog"
+                    aria-modal="true"
+                >
+
+                    ${content}
+
+                </div>
+
+            </div>
+
+        `
+    );
+
+
+    $$("[data-dashboard-close]")
+        .forEach(
+            element => {
+
+                element.addEventListener(
+                    "click",
+                    closeDashboardModal
+                );
+
+            }
+        );
+
+
+    document.addEventListener(
+        "keydown",
+        dashboardModalEscapeHandler
+    );
+
+
+    requestAnimationFrame(
+        () => {
+
+            document
+                .querySelector(
+                    "#dashboardModalOverlay"
+                )
+                ?.classList.add(
+                    "is-open"
+                );
+
+        }
+    );
+
+}
+
+
+function closeDashboardModal(){
+
+    document
+        .querySelector(
+            "#dashboardModalOverlay"
+        )
+        ?.classList.remove(
+            "is-open"
+        );
+
+
+    setTimeout(
+        () => {
+
+            document
+                .querySelector(
+                    "#dashboardModalOverlay"
+                )
+                ?.remove();
+
+        },
+        180
+    );
+
+
+    document.removeEventListener(
+        "keydown",
+        dashboardModalEscapeHandler
+    );
+
+}
+
+
+function dashboardModalEscapeHandler(
+    event
+){
+
+    if(
+        event.key === "Escape"
+    ){
+
+        closeDashboardModal();
+
+    }
+
+} 
 
 async function loadDashboardDetails(
     planningId,
