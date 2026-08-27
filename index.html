@@ -17997,28 +17997,44 @@ function setConnectionStatus(
         );
 
 }
-
-// ============================================================
-// SYSTEM BUSINESS DATE — SINGLE SOURCE OF TRUTH
-// ============================================================
+/* ============================================================
+   SYSTEM BUSINESS DATE
+   CENTRAL CONTROL CENTER
+============================================================ */
 
 function getSystemBusinessDate() {
 
-    const input =
-        document.querySelector(
-            '#businessDate'
-        );
+    const value =
+        STATE.systemBusinessDate;
+
 
     if (
-        input &&
-        input.value
+        !value
     ) {
 
-        return input.value;
+        return null;
 
     }
 
-    return null;
+
+    const normalized =
+        normalizeSystemDate(
+            value
+        );
+
+
+    if (
+        !isValidSystemDate(
+            normalized
+        )
+    ) {
+
+        return null;
+
+    }
+
+
+    return normalized;
 
 }
 /* ============================================================
