@@ -10181,18 +10181,18 @@ if(
     const materialBindings = [];
 
 
-    if(
-        filters.snapshotId
+   if(
+    effectiveSnapshotId
     ){
-
+    
         materialSql += `
             AND snapshot_id = ?
         `;
-
+    
         materialBindings.push(
-            filters.snapshotId
+            effectiveSnapshotId
         );
-
+    
     }
 
 
