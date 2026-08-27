@@ -3164,6 +3164,173 @@ body.dark-mode .dashboard-details-overlay .modal-close:hover{
 }
 
 
+/* ============================================================
+   DASHBOARD MODAL — LIGHT/DARK MODE FIX
+   این بخش را بعد از تمام CSSهای داشبورد قرار بده
+   ============================================================ */
+
+/* ---------- LIGHT MODE ---------- */
+
+:root:not([data-theme="dark"]) .dashboard-page,
+body:not(.dark-mode):not(.dark) .dashboard-page{
+    --dash-bg:#f5f7fb;
+    --dash-surface:#ffffff;
+    --dash-surface-2:#f8fafc;
+    --dash-border:rgba(15,23,42,.10);
+    --dash-text:#111827;
+    --dash-muted:#6b7280;
+    --dash-shadow:0 12px 40px rgba(0,0,0,.08);
+}
+
+
+/* Modal اصلی */
+:root:not([data-theme="dark"]) .dashboard-modal-container,
+body:not(.dark-mode):not(.dark) .dashboard-modal-container,
+
+:root:not([data-theme="dark"]) .dashboard-details-container,
+body:not(.dark-mode):not(.dark) .dashboard-details-container{
+    background:#ffffff;
+    color:#111827;
+    border-color:rgba(15,23,42,.10);
+}
+
+
+/* Header */
+:root:not([data-theme="dark"]) .dashboard-modal-header,
+body:not(.dark-mode):not(.dark) .dashboard-modal-header,
+
+:root:not([data-theme="dark"]) .dashboard-details-overlay .modal-header,
+body:not(.dark-mode):not(.dark) .dashboard-details-overlay .modal-header{
+    background:#ffffff;
+    color:#111827;
+    border-bottom-color:rgba(15,23,42,.10);
+}
+
+
+/* تمام متن‌های Modal */
+:root:not([data-theme="dark"]) .dashboard-modal-container h1,
+:root:not([data-theme="dark"]) .dashboard-modal-container h2,
+:root:not([data-theme="dark"]) .dashboard-modal-container h3,
+:root:not([data-theme="dark"]) .dashboard-modal-container strong,
+:root:not([data-theme="dark"]) .dashboard-modal-container b,
+
+body:not(.dark-mode):not(.dark) .dashboard-modal-container h1,
+body:not(.dark-mode):not(.dark) .dashboard-modal-container h2,
+body:not(.dark-mode):not(.dark) .dashboard-modal-container h3,
+body:not(.dark-mode):not(.dark) .dashboard-modal-container strong,
+body:not(.dark-mode):not(.dark) .dashboard-modal-container b,
+
+:root:not([data-theme="dark"]) .dashboard-details-container h1,
+:root:not([data-theme="dark"]) .dashboard-details-container h2,
+:root:not([data-theme="dark"]) .dashboard-details-container h3,
+:root:not([data-theme="dark"]) .dashboard-details-container strong,
+:root:not([data-theme="dark"]) .dashboard-details-container b,
+
+body:not(.dark-mode):not(.dark) .dashboard-details-container h1,
+body:not(.dark-mode):not(.dark) .dashboard-details-container h2,
+body:not(.dark-mode):not(.dark) .dashboard-details-container h3,
+body:not(.dark-mode):not(.dark) .dashboard-details-container strong,
+body:not(.dark-mode):not(.dark) .dashboard-details-container b{
+    color:#111827;
+}
+
+
+/* متن‌های فرعی */
+:root:not([data-theme="dark"]) .dashboard-modal-container small,
+:root:not([data-theme="dark"]) .dashboard-modal-container span,
+body:not(.dark-mode):not(.dark) .dashboard-modal-container small,
+body:not(.dark-mode):not(.dark) .dashboard-modal-container span,
+
+:root:not([data-theme="dark"]) .dashboard-details-container small,
+:root:not([data-theme="dark"]) .dashboard-details-container span,
+body:not(.dark-mode):not(.dark) .dashboard-details-container small,
+body:not(.dark-mode):not(.dark) .dashboard-details-container span{
+    color:#6b7280;
+}
+
+
+/* KPIهای داخل Modal */
+:root:not([data-theme="dark"]) .dashboard-detail-kpis > div,
+body:not(.dark-mode):not(.dark) .dashboard-detail-kpis > div{
+    background:#f8fafc;
+    border-color:rgba(15,23,42,.10);
+}
+
+
+/* بخش فرمول */
+:root:not([data-theme="dark"]) .dashboard-formula,
+body:not(.dark-mode):not(.dark) .dashboard-formula{
+    background:#f8fafc;
+    border-color:rgba(15,23,42,.10);
+}
+
+
+/* ردیف Material */
+:root:not([data-theme="dark"]) .dashboard-material-row,
+body:not(.dark-mode):not(.dark) .dashboard-material-row{
+    background:#ffffff;
+    border-color:rgba(15,23,42,.10);
+}
+
+
+/* دکمه بستن */
+:root:not([data-theme="dark"]) .dashboard-modal-close,
+body:not(.dark-mode):not(.dark) .dashboard-modal-close,
+
+:root:not([data-theme="dark"]) .dashboard-details-overlay .modal-close,
+body:not(.dark-mode):not(.dark) .dashboard-details-overlay .modal-close{
+    background:#f3f4f6;
+    color:#111827;
+    border-color:rgba(15,23,42,.12);
+}
+
+
+/* ---------- OVERLAY ---------- */
+
+.dashboard-modal-overlay,
+.dashboard-details-overlay{
+    background:rgba(0,0,0,.52);
+}
+
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+
+[data-theme="dark"] .dashboard-page,
+.dark .dashboard-page,
+body.dark-mode .dashboard-page{
+    --dash-bg:#0b1120;
+    --dash-surface:#111827;
+    --dash-surface-2:#172033;
+    --dash-border:rgba(255,255,255,.09);
+    --dash-text:#f3f4f6;
+    --dash-muted:rgba(243,244,246,.58);
+    --dash-shadow:0 15px 45px rgba(0,0,0,.28);
+}
+
+[data-theme="dark"] .dashboard-modal-container,
+.dark .dashboard-modal-container,
+body.dark-mode .dashboard-modal-container,
+
+[data-theme="dark"] .dashboard-details-container,
+.dark .dashboard-details-container,
+body.dark-mode .dashboard-details-container{
+    background:#111827;
+    color:#f3f4f6;
+}
+
+[data-theme="dark"] .dashboard-modal-header,
+.dark .dashboard-modal-header,
+body.dark-mode .dashboard-modal-header,
+
+[data-theme="dark"] .dashboard-details-overlay .modal-header,
+.dark .dashboard-details-overlay .modal-header,
+body.dark-mode .dashboard-details-overlay .modal-header{
+    background:#111827;
+    color:#f3f4f6;
+}
+
     
 </style>
 
