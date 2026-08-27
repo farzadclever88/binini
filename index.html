@@ -11884,105 +11884,103 @@ function renderDashboardView(data){
 
                 </div>
 
+    <div class="dashboard-status-grid">
 
-                <div class="dashboard-status-grid">
+        <button type="button"
+                class="
+            dashboard-status-card
+            status-green
+        "
+                data-dashboard-action="green"
+                aria-label="نمایش موارد سالم">
 
-                    <button
-                        type="button"
-                        class="
-                            dashboard-status-card
-                            status-green
-                        "
-                        data-dashboard-action="green"
-                    >
+            <div class="dashboard-status-card-head">
 
-                        <div class="dashboard-status-card-head">
+                <span class="dashboard-status-sticker">
+                    ✓
+                </span>
 
-                            <span class="dashboard-status-sticker">
-                                ✓
-                            </span>
+                <span>
+                    سالم
+                </span>
 
-                            <span>
-                                سالم
-                            </span>
+            </div>
 
-                        </div>
+            <strong>
+                ${green}
+            </strong>
 
-                        <strong>
-                            ${green}
-                        </strong>
+            <small>
+                در مسیر برنامه · مشاهده جزئیات
+            </small>
 
-                        <small>
-                            در مسیر برنامه
-                        </small>
-
-                    </button>
+        </button>
 
 
-                    <button
-                        type="button"
-                        class="
-                            dashboard-status-card
-                            status-yellow
-                        "
-                        data-dashboard-action="yellow"
-                    >
+        <button type="button"
+                class="
+            dashboard-status-card
+            status-yellow
+        "
+                data-dashboard-action="yellow"
+                aria-label="نمایش موارد نیازمند توجه">
 
-                        <div class="dashboard-status-card-head">
+            <div class="dashboard-status-card-head">
 
-                            <span class="dashboard-status-sticker">
-                                !
-                            </span>
+                <span class="dashboard-status-sticker">
+                    !
+                </span>
 
-                            <span>
-                                نیازمند توجه
-                            </span>
+                <span>
+                    نیازمند توجه
+                </span>
 
-                        </div>
+            </div>
 
-                        <strong>
-                            ${yellow}
-                        </strong>
+            <strong>
+                ${yellow}
+            </strong>
 
-                        <small>
-                            در معرض ریسک
-                        </small>
+            <small>
+                در معرض ریسک · مشاهده جزئیات
+            </small>
 
-                    </button>
+        </button>
 
 
-                    <button
-                        type="button"
-                        class="
-                            dashboard-status-card
-                            status-red
-                        "
-                        data-dashboard-action="red"
-                    >
+        <button type="button"
+                class="
+            dashboard-status-card
+            status-red
+        "
+                data-dashboard-action="red"
+                aria-label="نمایش موارد بحرانی">
 
-                        <div class="dashboard-status-card-head">
+            <div class="dashboard-status-card-head">
 
-                            <span class="dashboard-status-sticker">
-                                ⚠
-                            </span>
+                <span class="dashboard-status-sticker">
+                    ⚠
+                </span>
 
-                            <span>
-                                بحرانی
-                            </span>
+                <span>
+                    بحرانی
+                </span>
 
-                        </div>
+            </div>
 
-                        <strong>
-                            ${red}
-                        </strong>
+            <strong>
+                ${red}
+            </strong>
 
-                        <small>
-                            نیازمند اقدام
-                        </small>
+            <small>
+                نیازمند اقدام · مشاهده جزئیات
+            </small>
 
-                    </button>
+        </button>
 
-                </div>
+    </div>
+                
+                
 
             </section>
 
