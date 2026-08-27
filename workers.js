@@ -6000,64 +6000,64 @@ async function handleGet(
 ) {
 
     // --------------------------------------------------------
-// DASHBOARD SNAPSHOT
-// --------------------------------------------------------
+    // DASHBOARD SNAPSHOT
+    // --------------------------------------------------------
 
-if (
-    path ===
-    "/api/dashboard"
-) {
+    if (
+        path ===
+        "/api/dashboard"
+    ) {
 
-    return await getDashboardSnapshot(
-        env
-    );
+        return await getDashboardSnapshot(
+            env
+        );
 
-}
+    }
 
     // --------------------------------------------------------
-// DASHBOARD DRILL DOWN
-// --------------------------------------------------------
+    // DASHBOARD DRILL DOWN
+    // --------------------------------------------------------
 
-if (
-    path ===
-    "/api/dashboard/details"
-) {
+    if (
+        path ===
+        "/api/dashboard/details"
+    ) {
 
-    const snapshotId =
-        url.searchParams.get(
-            "snapshot_id"
+        const snapshotId =
+            url.searchParams.get(
+                "snapshot_id"
+            );
+
+
+        const planningId =
+            url.searchParams.get(
+                "planning_id"
+            );
+
+
+        const productId =
+            url.searchParams.get(
+                "product_id"
+            );
+
+
+        return await getDashboardDetails(
+
+            env,
+
+            {
+
+                snapshotId,
+
+                planningId,
+
+                productId
+
+            }
+
         );
 
-
-    const planningId =
-        url.searchParams.get(
-            "planning_id"
-        );
-
-
-    const productId =
-        url.searchParams.get(
-            "product_id"
-        );
-
-
-    return await getDashboardDetails(
-
-        env,
-
-        {
-
-            snapshotId,
-
-            planningId,
-
-            productId
-
-        }
-
-    );
-
-}
+    }
     // --------------------------------------------------------
     // CURRENT USER
     // --------------------------------------------------------
@@ -8067,7 +8067,7 @@ async function updateUnit(
 
     };
 
-}      
+}
 // ============================================================
 // DASHBOARD ANALYTICS RULES
 // ============================================================
@@ -8103,7 +8103,7 @@ function getDashboardProductionSeverity(
 
     producedQuantity
 
-){
+) {
 
     const planned =
         Number(
@@ -8116,7 +8116,7 @@ function getDashboardProductionSeverity(
         );
 
 
-    if(planned <= 0){
+    if (planned <= 0) {
 
         return {
 
@@ -8142,12 +8142,12 @@ function getDashboardProductionSeverity(
         100;
 
 
-    if(
+    if (
         achievement >=
         DASHBOARD_RULES
             .achievement
             .green
-    ){
+    ) {
 
         return {
 
@@ -8165,12 +8165,12 @@ function getDashboardProductionSeverity(
     }
 
 
-    if(
+    if (
         achievement >=
         DASHBOARD_RULES
             .achievement
             .yellow
-    ){
+    ) {
 
         return {
 
@@ -8216,7 +8216,7 @@ async function getDashboardInventoryBalance(
 
     itemId
 
-){
+) {
 
     const result =
         await env.DB
@@ -8269,7 +8269,6 @@ async function getDashboardInventoryBalance(
 // ============================================================
 // DASHBOARD INVENTORY SUMMARY
 // ============================================================
-
 async function getDashboardInventorySummary(
     env
 ){
@@ -8298,7 +8297,12 @@ async function getDashboardInventorySummary(
                             THEN 1
                             ELSE 0
                         END
-                    ) AS zero_items
+                    ) AS zero_items,
+
+                    COALESCE(
+                        SUM(quantity),
+                        0
+                    ) AS total_quantity
 
                 FROM inventory_balances
 
@@ -8319,7 +8323,9 @@ async function getDashboardInventorySummary(
 
         positive_items: 0,
 
-        zero_items: 0
+        zero_items: 0,
+
+        total_quantity: 0
 
     };
 
@@ -8330,22 +8336,21 @@ async function getDashboardInventorySummary(
 
         positive_items: 0,
 
-        zero_items: 0
+        zero_items: 0,
+
+        total_quantity: 0
 
     };
 
 
-    for(
+    for (
         const row
         of rows
     ){
 
         const target =
-            row.item_type ===
-            "part"
-
+            row.item_type === "part"
                 ? parts
-
                 : products;
 
 
@@ -8364,6 +8369,12 @@ async function getDashboardInventorySummary(
         target.zero_items =
             Number(
                 row.zero_items || 0
+            );
+
+
+        target.total_quantity =
+            Number(
+                row.total_quantity || 0
             );
 
     }
@@ -8385,12 +8396,15 @@ async function getDashboardInventorySummary(
 
         zero_item_lines:
             parts.zero_items +
-            products.zero_items
+            products.zero_items,
+
+        total_quantity:
+            parts.total_quantity +
+            products.total_quantity
 
     };
 
 }
-
 // ============================================================
 // DASHBOARD MATERIAL REQUIREMENT
 // ============================================================
@@ -8403,43 +8417,74 @@ async function getDashboardMaterialRequirements(
 
     remainingProductQuantity
 
-){
+) {
+
+    // --------------------------------------------------------
+    // NORMALIZE INPUT
+    // --------------------------------------------------------
+
+    const planningId =
+        planningRow?.planning_id ??
+        planningRow?.id ??
+        null;
+
+    const productId =
+        planningRow?.product_id ??
+        null;
 
     const bomId =
         Number(
-            planningRow.bom_id
+            planningRow?.bom_id ?? 0
+        );
+
+    const plannedQuantity =
+        Number(
+            planningRow?.planned_quantity ?? 0
+        );
+
+    const producedQuantity =
+        Number(
+            planningRow?.produced_quantity ?? 0
+        );
+
+    const remainingQuantity =
+        Number(
+            remainingProductQuantity ?? 0
         );
 
 
-    if(
+    // --------------------------------------------------------
+    // VALIDATION
+    // --------------------------------------------------------
+
+    if (
+        !planningId ||
         !bomId ||
-        remainingProductQuantity <= 0
-    ){
+        remainingQuantity <= 0
+    ) {
 
         return [];
 
     }
 
 
+    // --------------------------------------------------------
+    // FIND ACTIVE MATERIAL WAREHOUSE
+    // --------------------------------------------------------
+
     const warehouse =
         await env.DB
             .prepare(`
 
                 SELECT
-
                     id
 
                 FROM warehouses
 
                 WHERE
+                    warehouse_type = 'material'
 
-                    warehouse_type =
-                    'material'
-
-                    AND
-
-                    status =
-                    'active'
+                    AND status = 'active'
 
                 ORDER BY
                     id
@@ -8450,12 +8495,22 @@ async function getDashboardMaterialRequirements(
             .first();
 
 
-    if(!warehouse){
+    if (!warehouse?.id) {
 
         return [];
 
     }
 
+
+    const warehouseId =
+        Number(
+            warehouse.id
+        );
+
+
+    // --------------------------------------------------------
+    // LOAD BOM MATERIALS
+    // --------------------------------------------------------
 
     const materialsResult =
         await env.DB
@@ -8478,28 +8533,18 @@ async function getDashboardMaterialRequirements(
                 FROM bom_details bd
 
                 INNER JOIN parts p
-
-                    ON p.id =
-                       bd.part_id
+                    ON p.id = bd.part_id
 
                 INNER JOIN units u
-
-                    ON u.id =
-                       p.unit_id
+                    ON u.id = p.unit_id
 
                 WHERE
 
                     bd.bom_id = ?
 
-                    AND
+                    AND bd.status = 'active'
 
-                    bd.status =
-                    'active'
-
-                    AND
-
-                    p.status =
-                    'active'
+                    AND p.status = 'active'
 
                 ORDER BY
                     bd.id
@@ -8512,49 +8557,80 @@ async function getDashboardMaterialRequirements(
 
 
     const materials =
-        materialsResult.results || [];
+        materialsResult?.results || [];
 
+
+    if (!materials.length) {
+
+        return [];
+
+    }
+
+
+    // --------------------------------------------------------
+    // BUILD MATERIAL ANALYSIS
+    // --------------------------------------------------------
 
     const rows = [];
 
 
-    for(
+    for (
         const material
         of materials
-    ){
+    ) {
+
+        const partId =
+            Number(
+                material?.part_id ?? 0
+            );
+
+
+        if (!partId) {
+
+            continue;
+
+        }
+
 
         const factor =
             Number(
-                material.consumption_factor || 0
+                material?.consumption_factor ?? 0
             );
 
 
         const scrap =
             Number(
-                material.scrap_percent || 0
+                material?.scrap_percent ?? 0
             );
 
 
-        const requiredQuantity =
+        // ----------------------------------------------------
+        // REQUIRED MATERIAL
+        // ----------------------------------------------------
 
+        const requiredQuantity =
             factor *
-            remainingProductQuantity *
+            remainingQuantity *
             (
                 1 +
                 scrap / 100
             );
 
 
+        // ----------------------------------------------------
+        // CURRENT INVENTORY
+        // ----------------------------------------------------
+
         const availableQuantity =
             await getDashboardInventoryBalance(
 
                 env,
 
-                warehouse.id,
+                warehouseId,
 
                 "part",
 
-                material.part_id
+                partId
 
             );
 
@@ -8574,6 +8650,10 @@ async function getDashboardMaterialRequirements(
             shortageQuantity <= 0;
 
 
+        // ----------------------------------------------------
+        // SEVERITY
+        // ----------------------------------------------------
+
         let severity =
             "green";
 
@@ -8586,7 +8666,7 @@ async function getDashboardMaterialRequirements(
             "موجودی مواد اولیه برای ادامه تولید کافی است.";
 
 
-        if(!sufficient){
+        if (!sufficient) {
 
             severity =
                 "red";
@@ -8597,10 +8677,14 @@ async function getDashboardMaterialRequirements(
 
 
             severityMessage =
-                `برای ${material.part_name} مقدار ${shortageQuantity} کسری وجود دارد.`;
+                `برای ${material?.part_name ?? "این ماده"} مقدار ${shortageQuantity.toFixed(2)} کسری وجود دارد.`;
 
         }
 
+
+        // ----------------------------------------------------
+        // SAFE ROW
+        // ----------------------------------------------------
 
         rows.push({
 
@@ -8608,40 +8692,37 @@ async function getDashboardMaterialRequirements(
                 null,
 
             planning_id:
-                planningRow.planning_id,
+                planningId,
 
             product_id:
-                planningRow.product_id,
+                productId,
 
             bom_id:
                 bomId,
 
             warehouse_id:
-                warehouse.id,
+                warehouseId,
 
             part_id:
-                material.part_id,
+                partId,
 
             part_code:
-                material.part_code,
+                material?.part_code ?? "",
 
             part_name:
-                material.part_name,
+                material?.part_name ?? "",
 
             unit_name:
-                material.unit_name,
+                material?.unit_name ?? "",
 
             planned_quantity:
-                Number(
-                    planningRow.planned_quantity || 0
-                ),
+                plannedQuantity,
 
             produced_quantity:
-                Number(
-                    planningRow.produced_quantity || 0
-                ),
+                producedQuantity,
 
-            remaining_product_quantity,
+            remaining_product_quantity:
+                remainingQuantity,
 
             consumption_factor:
                 factor,
@@ -8653,7 +8734,9 @@ async function getDashboardMaterialRequirements(
                 requiredQuantity,
 
             available_quantity:
-                availableQuantity,
+                Number(
+                    availableQuantity ?? 0
+                ),
 
             shortage_quantity:
                 shortageQuantity,
@@ -8663,7 +8746,8 @@ async function getDashboardMaterialRequirements(
                     ? 1
                     : 0,
 
-            severity,
+            severity:
+                severity,
 
             severity_code:
                 severityCode,
@@ -8687,7 +8771,7 @@ async function getDashboardMaterialRequirements(
 async function buildDashboardSnapshot(
     env,
     businessDate
-){
+) {
 
     const snapshotAt =
         new Date().toISOString();
@@ -8755,10 +8839,10 @@ async function buildDashboardSnapshot(
         [];
 
 
-    for(
+    for (
         const row
         of details
-    ){
+    ) {
 
         const planned =
             Number(
@@ -8816,50 +8900,50 @@ async function buildDashboardSnapshot(
             );
 
 
-        if(
+        if (
             severity.severity ===
             "green"
-        ){
+        ) {
 
             productsOnTrack++;
 
         }
 
-        else if(
+        else if (
             severity.severity ===
             "yellow"
-        ){
+        ) {
 
             productsAtRisk++;
 
         }
 
-        else{
+        else {
 
             productsCritical++;
 
         }
 
 
-        if(
+        if (
             row.plan_status ===
             "completed"
-        ){
+        ) {
 
             completedPlans++;
 
         }
 
-        else if(
+        else if (
             row.plan_status ===
             "in_progress"
-        ){
+        ) {
 
             activePlans++;
 
         }
 
-        else{
+        else {
 
             notStartedPlans++;
 
@@ -8942,19 +9026,19 @@ async function buildDashboardSnapshot(
             false;
 
 
-        for(
+        for (
             const material
             of materials
-        ){
+        ) {
 
             materialRows.push(
                 material
             );
 
 
-            if(
+            if (
                 material.sufficient !== 1
-            ){
+            ) {
 
                 hasMaterialShortage =
                     true;
@@ -8967,9 +9051,9 @@ async function buildDashboardSnapshot(
         }
 
 
-        if(
+        if (
             hasMaterialShortage
-        ){
+        ) {
 
             materialShortagePlans++;
 
@@ -9116,9 +9200,10 @@ async function buildDashboardSnapshot(
                 productsCritical,
 
                 inventorySummary
-                    .positive_item_lines,
+                .positive_item_lines,
 
-                null,
+                inventorySummary
+                .total_quantity,
 
                 greenAlerts,
 
@@ -9140,10 +9225,10 @@ async function buildDashboardSnapshot(
     // PRODUCTION DETAILS
     // --------------------------------------------------------
 
-    for(
+    for (
         const detail
         of detailRows
-    ){
+    ) {
 
         await env.DB
             .prepare(`
@@ -9244,10 +9329,10 @@ async function buildDashboardSnapshot(
     // MATERIAL DETAILS
     // --------------------------------------------------------
 
-    for(
+    for (
         const material
         of materialRows
-    ){
+    ) {
 
         await env.DB
             .prepare(`
@@ -9422,7 +9507,7 @@ async function buildDashboardSnapshot(
 
 async function cleanupDashboardSnapshots(
     env
-){
+) {
 
     await env.DB
         .prepare(`
@@ -9495,16 +9580,16 @@ async function cleanupDashboardSnapshots(
 
 async function refreshDashboardSnapshot(
     env
-){
+) {
 
-    const businessDate =
-        new Date()
-            .toISOString()
-            .slice(
-                0,
-                10
-            );
-
+   // const businessDate =
+   //     new Date()
+    //        .toISOString()
+   //         .slice(
+  //              0,
+   //             10
+   //         );
+const businessDate = "1405/06/05";
 
     await cleanupDashboardSnapshots(
         env
@@ -9527,7 +9612,7 @@ async function refreshDashboardSnapshot(
 
 async function getDashboardSnapshot(
     env
-){
+) {
 
     const snapshot =
         await env.DB
@@ -9546,7 +9631,7 @@ async function getDashboardSnapshot(
             .first();
 
 
-    if(!snapshot){
+    if (!snapshot) {
 
         return {
 
@@ -9662,7 +9747,7 @@ async function getDashboardSnapshot(
 async function getDashboardDetails(
     env,
     filters = {}
-){
+) {
 
     let detailSql = `
 
@@ -9678,7 +9763,7 @@ async function getDashboardDetails(
     const detailBindings = [];
 
 
-    if(filters.snapshotId){
+    if (filters.snapshotId) {
 
         detailSql += `
             AND snapshot_id = ?
@@ -9691,7 +9776,7 @@ async function getDashboardDetails(
     }
 
 
-    if(filters.planningId){
+    if (filters.planningId) {
 
         detailSql += `
             AND planning_id = ?
@@ -9704,7 +9789,7 @@ async function getDashboardDetails(
     }
 
 
-    if(filters.productId){
+    if (filters.productId) {
 
         detailSql += `
             AND product_id = ?
@@ -9752,7 +9837,7 @@ async function getDashboardDetails(
     const materialBindings = [];
 
 
-    if(filters.snapshotId){
+    if (filters.snapshotId) {
 
         materialSql += `
             AND snapshot_id = ?
@@ -9765,7 +9850,7 @@ async function getDashboardDetails(
     }
 
 
-    if(filters.planningId){
+    if (filters.planningId) {
 
         materialSql += `
             AND planning_id = ?
@@ -9778,7 +9863,7 @@ async function getDashboardDetails(
     }
 
 
-    if(filters.productId){
+    if (filters.productId) {
 
         materialSql += `
             AND product_id = ?
@@ -9836,6 +9921,91 @@ async function getDashboardDetails(
             []
 
     };
+
+}
+
+// ============================================================
+// DASHBOARD PRODUCTION DETAILS
+// ============================================================
+
+async function getDashboardProductionDetails(
+    env,
+    persianBusinessDate
+){
+
+    const result =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    pd.id AS planning_id,
+
+                    pd.plan_date,
+
+                    pd.bom_id,
+
+                    pd.planned_quantity,
+
+                    pd.status AS plan_status,
+
+                    bh.product_id,
+
+                    bh.code AS bom_code,
+
+                    p.code AS product_code,
+
+                    p.name AS product_name,
+
+                    COALESCE(
+
+                        (
+                            SELECT
+                                SUM(
+                                    pr.produced_quantity
+                                )
+
+                            FROM production pr
+
+                            WHERE
+                                pr.planning_daily_id =
+                                pd.id
+
+                            AND
+                                pr.status =
+                                'completed'
+
+                        ),
+
+                        0
+
+                    ) AS produced_quantity
+
+                FROM planning_daily pd
+
+                INNER JOIN bom_headers bh
+                    ON bh.id = pd.bom_id
+
+                INNER JOIN products p
+                    ON p.id = bh.product_id
+
+                WHERE
+                    pd.plan_date = ?
+
+                ORDER BY
+                    pd.id ASC
+
+            `)
+            .bind(
+                persianBusinessDate
+            )
+            .all();
+
+
+    return (
+        result.results ||
+        []
+    );
 
 }
 // ============================================================
@@ -10405,20 +10575,183 @@ export default {
         }
 
     },
-     async scheduled(
-        event,
-        env,
-        ctx
-    ){
+    // ============================================================
+// CLOUDFLARE SCHEDULED EVENT
+// ============================================================
 
-        ctx.waitUntil(
+async scheduled(
 
-            refreshDashboardSnapshot(
+    event,
+
+    env,
+
+    ctx
+
+) {
+
+    const startedAt =
+        new Date().toISOString();
+
+
+    try {
+
+        const result =
+            await refreshDashboardSnapshot(
                 env
+            );
+
+
+        await env.DB
+            .prepare(`
+
+                INSERT INTO dashboard_refresh_logs (
+
+                    started_at,
+
+                    finished_at,
+
+                    success,
+
+                    snapshot_id,
+
+                    message
+
+                )
+
+                VALUES (
+
+                    ?,
+
+                    CURRENT_TIMESTAMP,
+
+                    1,
+
+                    ?,
+
+                    ?
+
+                )
+
+            `)
+            .bind(
+
+                startedAt,
+
+                result.snapshot_id,
+
+                JSON.stringify({
+
+                    cron:
+                        event.cron,
+
+                    business_date:
+                        result.business_date,
+
+                    total_planned:
+                        result.total_planned,
+
+                    total_produced:
+                        result.total_produced,
+
+                    achievement_percent:
+                        result.achievement_percent
+
+                })
+
             )
+            .run();
+
+    }
+
+    catch (error) {
+
+        console.error(
+
+            "DASHBOARD CRON ERROR",
+
+            error
 
         );
 
+
+        try {
+
+            await env.DB
+                .prepare(`
+
+                    INSERT INTO dashboard_refresh_logs (
+
+                        started_at,
+
+                        finished_at,
+
+                        success,
+
+                        message,
+
+                        error_name,
+
+                        error_message,
+
+                        error_stack
+
+                    )
+
+                    VALUES (
+
+                        ?,
+
+                        CURRENT_TIMESTAMP,
+
+                        0,
+
+                        ?,
+
+                        ?,
+
+                        ?,
+
+                        ?
+
+                    )
+
+                `)
+                .bind(
+
+                    startedAt,
+
+                    `Cron ${event.cron || ""} failed.`,
+
+                    error?.name ||
+                        "Error",
+
+                    error?.message ||
+                        String(error),
+
+                    error?.stack ||
+                        null
+
+                )
+                .run();
+
+        }
+
+        catch (
+            logError
+        ) {
+
+            console.error(
+
+                "DASHBOARD LOG ERROR",
+
+                logError
+
+            );
+
+        }
+
     }
+
+}
 
 };
