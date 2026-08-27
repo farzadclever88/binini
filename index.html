@@ -1527,13 +1527,20 @@ textarea.form-control{
    ============================================================ */
 
 .dashboard-page{
-    --dash-bg:var(--bg-color,#f5f7fb);
-    --dash-surface:var(--card-bg,#ffffff);
-    --dash-surface-2:color-mix(in srgb,var(--dash-surface) 92%,var(--dash-bg));
-    --dash-border:color-mix(in srgb,var(--text-color,#111827) 10%,transparent);
-    --dash-text:var(--text-color,#111827);
-    --dash-muted:color-mix(in srgb,var(--dash-text) 58%,transparent);
-    --dash-shadow:0 12px 40px color-mix(in srgb,#000 8%,transparent);
+    /* ========================================================
+       DASHBOARD THEME — LIGHT MODE
+       ======================================================== */
+
+    --dash-bg:#f5f7fb;
+    --dash-surface:#ffffff;
+    --dash-surface-2:#f8fafc;
+
+    --dash-border:rgba(15,23,42,.10);
+
+    --dash-text:#111827;
+    --dash-muted:#64748b;
+
+    --dash-shadow:0 12px 40px rgba(15,23,42,.08);
 
     --dash-green:#16a34a;
     --dash-green-bg:rgba(22,163,74,.12);
@@ -1550,8 +1557,11 @@ textarea.form-control{
     margin:0 auto;
     padding:20px;
     box-sizing:border-box;
+
     color:var(--dash-text);
+    background:transparent;
 }
+
 
 
 /* ============================================================
