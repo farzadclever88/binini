@@ -13147,6 +13147,7 @@ function dashboardModalEscapeHandler(
 
 } 
 
+
 async function loadDashboardDetails(
     planningId,
     productId
@@ -13154,8 +13155,16 @@ async function loadDashboardDetails(
 
     try{
 
+        /*
+         * اول مودال لیست داشبورد را می‌بندیم
+         * تا مودال جزئیات روی آن باز نشود.
+         */
+        closeDashboardModal();
+
+
         const params =
             new URLSearchParams();
+
 
         if(
             planningId
@@ -13167,6 +13176,7 @@ async function loadDashboardDetails(
             );
 
         }
+
 
         if(
             productId
@@ -13180,9 +13190,13 @@ async function loadDashboardDetails(
         }
 
 
+        const queryString =
+            params.toString();
+
+
         const result =
             await apiRequest(
-                `/api/dashboard/details?${params.toString()}`,
+                `/api/dashboard/details?${queryString}`,
                 {
                     method: "GET",
                     loadingText:
@@ -13191,24 +13205,26 @@ async function loadDashboardDetails(
             );
 
 
-       const items =
-        result?.items || [];
-        
+        const items =
+            result?.items || [];
+
+
         const materials =
             result?.materials || [];
-        
+
+
         showDashboardDetailsModal(
-        
+
             items,
-        
+
             materials,
-        
+
             result?.material_summary || {},
-        
+
             result?.production || null,
-        
+
             result?.formula || {}
-        
+
         );
 
     }
@@ -13225,6 +13241,7 @@ async function loadDashboardDetails(
 
 
 
+    
 // ============================================================
 // DASHBOARD MANAGEMENT DRILL DOWN MODAL
 // ============================================================
