@@ -2868,6 +2868,119 @@ body.dark-mode .dashboard-modal-container{
 
 }
 
+/* ============================================================
+   DASHBOARD DETAILS MODAL
+============================================================ */
+
+.dashboard-details-overlay{
+    position:fixed;
+    inset:0;
+    z-index:100000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    box-sizing:border-box;
+
+    background:rgba(0,0,0,.52);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+
+    overflow:auto;
+}
+
+
+.dashboard-details-container{
+    position:relative;
+
+    width:min(1180px,100%);
+    max-height:92vh;
+
+    overflow:hidden;
+
+    border:1px solid var(--dash-border);
+    border-radius:24px;
+
+    background:var(--dash-surface);
+    color:var(--dash-text);
+
+    box-shadow:
+        0 35px 100px rgba(0,0,0,.35);
+}
+
+
+.dashboard-details-overlay .modal-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+
+    padding:18px 21px;
+
+    border-bottom:1px solid var(--dash-border);
+
+    background:var(--dash-surface);
+}
+
+
+.dashboard-details-overlay .modal-body{
+    max-height:calc(92vh - 90px);
+    overflow:auto;
+
+    padding:18px 21px 23px;
+}
+
+
+.dashboard-details-overlay .modal-close{
+    width:36px;
+    height:36px;
+
+    border:1px solid var(--dash-border);
+    border-radius:10px;
+
+    background:color-mix(
+        in srgb,
+        var(--dash-text) 6%,
+        transparent
+    );
+
+    color:var(--dash-text);
+
+    font-size:23px;
+    line-height:1;
+
+    cursor:pointer;
+}
+
+
+.dashboard-details-overlay .modal-close:hover{
+    background:color-mix(
+        in srgb,
+        var(--dash-text) 11%,
+        transparent
+    );
+}
+
+
+@media(max-width:760px){
+
+    .dashboard-details-overlay{
+        padding:7px;
+    }
+
+    .dashboard-details-container{
+        width:100%;
+        max-height:94vh;
+        border-radius:19px;
+    }
+
+    .dashboard-details-overlay .modal-body{
+        max-height:calc(94vh - 80px);
+        padding:14px;
+    }
+
+}
+
     
 </style>
 
