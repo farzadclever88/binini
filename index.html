@@ -5212,6 +5212,7 @@ const STATE = {
 
 /* ============================================================
    SYSTEM INPUT CONTROL CENTER
+   SINGLE SOURCE OF TRUTH FOR FORM INPUTS
 ============================================================ */
 
 const INPUT_CONTROL = {
@@ -5234,6 +5235,506 @@ const INPUT_CONTROL = {
 
 };
 
+
+/* ============================================================
+   INPUT CONTROL — DATE HELPERS
+============================================================ */
+
+function normalizeSystemDate(
+    value
+) {
+
+    if (
+        value ===
+        null ||
+        value ===
+        undefined
+    ) {
+
+        return null;
+
+    }
+
+
+    const normalized =
+        String(
+            value
+        )
+        .trim()
+        .replace(
+            /-/g,
+            "/"
+        );
+
+
+    if (
+        !normalized
+    ) {
+
+        return null;
+
+    }
+
+
+    return normalized;
+
+}
+
+
+/* ------------------------------------------------------------
+   Persian date validation
+------------------------------------------------------------ */
+
+function isValidSystemDate(
+    value
+) {
+
+    const date =
+        normalizeSystemDate(
+            value
+        );
+
+
+    if (
+        !date
+    ) {
+
+        return false;
+
+    }
+
+
+    const match =
+        date.match(
+            /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/
+        );
+
+
+    if (
+        !match
+    ) {
+
+        return false;
+
+    }
+
+
+    const year =
+        Number(
+            match[1]
+        );
+
+
+    const month =
+        Number(
+            match[2]
+        );
+
+
+    const day =
+        Number(
+            match[3]
+        );
+
+
+    if (
+        year < 1300 ||
+        year > 1600
+    ) {
+
+        return false;
+
+    }
+
+
+    if (
+        month < 1 ||
+        month > 12
+    ) {
+
+        return false;
+
+    }
+
+
+    const maxDay =
+        month <= 6
+
+            ? 31
+
+            : month <= 11
+
+                ? 30
+
+                : 30;
+
+
+    if (
+        day < 1 ||
+        day > maxDay
+    ) {
+
+        return false;
+
+    }
+
+
+    return true;
+
+}
+
+
+/* ------------------------------------------------------------
+   Convert Persian date to comparable numeric value
+------------------------------------------------------------ */
+
+function systemDateToNumber(
+    value
+) {
+
+    const date =
+        normalizeSystemDate(
+            value
+        );
+
+
+    if (
+        !isValidSystemDate(
+            date
+        )
+    ) {
+
+        return null;
+
+    }
+
+
+    const parts =
+        date.split(
+            "/"
+        );
+
+
+    const year =
+        Number(
+            parts[0]
+        );
+
+
+    const month =
+        Number(
+            parts[1]
+        );
+
+
+    const day =
+        Number(
+            parts[2]
+        );
+
+
+    return (
+        year * 10000 +
+        month * 100 +
+        day
+    );
+
+}
+
+
+/* ============================================================
+   SYSTEM BUSINESS DATE
+============================================================ */
+
+function getSystemBusinessDate() {
+
+    const input =
+        document.querySelector(
+            "#businessDate"
+        );
+
+
+    if (
+        !input
+    ) {
+
+        return null;
+
+    }
+
+
+    const value =
+        normalizeSystemDate(
+            input.value
+        );
+
+
+    if (
+        !value
+    ) {
+
+        return null;
+
+    }
+
+
+    if (
+        !isValidSystemDate(
+            value
+        )
+    ) {
+
+        return null;
+
+    }
+
+
+    return value;
+
+}
+
+
+/* ============================================================
+   SYSTEM DATE COMPARISON
+============================================================ */
+
+function compareSystemDates(
+    firstDate,
+    secondDate
+) {
+
+    const first =
+        systemDateToNumber(
+            firstDate
+        );
+
+
+    const second =
+        systemDateToNumber(
+            secondDate
+        );
+
+
+    if (
+        first ===
+        null ||
+        second ===
+        null
+    ) {
+
+        return null;
+
+    }
+
+
+    if (
+        first <
+        second
+    ) {
+
+        return -1;
+
+    }
+
+
+    if (
+        first >
+        second
+    ) {
+
+        return 1;
+
+    }
+
+
+    return 0;
+
+}
+
+
+/* ============================================================
+   SYSTEM DATE TODAY
+============================================================ */
+
+function getSystemTodayDate() {
+
+    const businessDate =
+        getSystemBusinessDate();
+
+
+    return businessDate;
+
+}
+
+
+/* ============================================================
+   SYSTEM DATE INPUT VALIDATION
+============================================================ */
+
+function validateSystemDateInput(
+    input
+) {
+
+    if (
+        !input
+    ) {
+
+        return {
+
+            valid:
+                false,
+
+            value:
+                null,
+
+            code:
+                "INPUT_NOT_FOUND",
+
+            message:
+                "فیلد تاریخ پیدا نشد."
+
+        };
+
+    }
+
+
+    const value =
+        normalizeSystemDate(
+            input.value
+        );
+
+
+    if (
+        INPUT_CONTROL.date.required &&
+        !value
+    ) {
+
+        return {
+
+            valid:
+                false,
+
+            value:
+                null,
+
+            code:
+                "DATE_REQUIRED",
+
+            message:
+                "وارد کردن تاریخ الزامی است."
+
+        };
+
+    }
+
+
+    if (
+        !value
+    ) {
+
+        return {
+
+            valid:
+                true,
+
+            value:
+                null,
+
+            code:
+                "EMPTY_ALLOWED",
+
+            message:
+                ""
+
+        };
+
+    }
+
+
+    if (
+        !isValidSystemDate(
+            value
+        )
+    ) {
+
+        return {
+
+            valid:
+                false,
+
+            value:
+                value,
+
+            code:
+                "INVALID_DATE",
+
+            message:
+                "تاریخ واردشده معتبر نیست."
+
+        };
+
+    }
+
+
+    const today =
+        getSystemTodayDate();
+
+
+    if (
+        today
+    ) {
+
+        const comparison =
+            compareSystemDates(
+                value,
+                today
+            );
+
+
+        if (
+            comparison ===
+            1 &&
+            !INPUT_CONTROL.date.allowFuture
+        ) {
+
+            return {
+
+                valid:
+                    false,
+
+                value:
+                    value,
+
+                code:
+                    "FUTURE_DATE_NOT_ALLOWED",
+
+                message:
+                    "تاریخ نمی‌تواند بزرگ‌تر از تاریخ امروز باشد."
+
+            };
+
+        }
+
+    }
+
+
+    return {
+
+        valid:
+            true,
+
+        value:
+            value,
+
+        code:
+            "VALID",
+
+        message:
+            ""
+
+    };
+
+}
 /* ============================================================
    DOM
 ============================================================ */
