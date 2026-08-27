@@ -14201,12 +14201,43 @@ function renderDashboardView(data){
     `;
 
 
-    $("#refreshDashboardButton")
-        ?.addEventListener(
-            "click",
-            loadDashboard
-        );
+   $("#refreshDashboardButton")
+    ?.addEventListener(
+        "click",
+        async () => {
 
+            try {
+
+                await apiRequest(
+                    "/api/dashboard/refresh",
+                    {
+                        method: "GET",
+                        loadingText:
+                            "در حال بروزرسانی Snapshot داشبورد..."
+                    }
+                );
+
+
+                showMessage(
+                    "Snapshot داشبورد با موفقیت بروزرسانی شد.",
+                    "success"
+                );
+
+
+                await loadDashboard();
+
+            }
+            catch(error){
+
+                showMessage(
+                    error.message,
+                    "error"
+                );
+
+            }
+
+        }
+    );
 
     $$(".dashboard-plan-row")
         .forEach(
