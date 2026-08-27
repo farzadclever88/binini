@@ -9937,6 +9937,87 @@ async function getDashboardDetails(
     filters = {}
 ){
 
+        let effectiveSnapshotId =
+        filters.snapshotId || null;
+
+
+    if (
+        !effectiveSnapshotId &&
+        filters.planningId
+    ){
+
+        let snapshotSql = `
+
+            SELECT
+                d.snapshot_id
+
+            FROM dashboard_snapshot_details d
+
+            INNER JOIN dashboard_snapshots s
+                ON s.id = d.snapshot_id
+
+            WHERE
+                d.planning_id = ?
+
+        `;
+
+        const snapshotBindings = [
+            filters.planningId
+        ];
+
+
+        if (
+            filters.productId
+        ){
+
+            snapshotSql += `
+
+                AND d.product_id = ?
+
+            `;
+
+            snapshotBindings.push(
+                filters.productId
+            );
+
+        }
+
+
+        snapshotSql += `
+
+            ORDER BY
+                s.snapshot_at DESC,
+                s.id DESC
+
+            LIMIT 1
+
+        `;
+
+
+        const latestSnapshot =
+            await env.DB
+                .prepare(
+                    snapshotSql
+                )
+                .bind(
+                    ...snapshotBindings
+                )
+                .first();
+
+
+        if (
+            latestSnapshot?.snapshot_id
+        ){
+
+            effectiveSnapshotId =
+                Number(
+                    latestSnapshot.snapshot_id
+                );
+
+        }
+
+    }
+    
     let detailSql = `
 
         SELECT *
