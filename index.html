@@ -13102,16 +13102,24 @@ async function loadDashboardDetails(
             );
 
 
-        const items =
-            result?.items || [];
-
+       const items =
+        result?.items || [];
+        
         const materials =
             result?.materials || [];
-
-
+        
         showDashboardDetailsModal(
+        
             items,
-            materials
+        
+            materials,
+        
+            result?.material_summary || {},
+        
+            result?.production || null,
+        
+            result?.formula || {}
+        
         );
 
     }
