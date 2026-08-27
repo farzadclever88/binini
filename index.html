@@ -17524,7 +17524,29 @@ function setConnectionStatus(
 
 }
 
+// ============================================================
+// SYSTEM BUSINESS DATE — SINGLE SOURCE OF TRUTH
+// ============================================================
 
+function getSystemBusinessDate() {
+
+    const input =
+        document.querySelector(
+            '#businessDate'
+        );
+
+    if (
+        input &&
+        input.value
+    ) {
+
+        return input.value;
+
+    }
+
+    return null;
+
+}
 /* ============================================================
    INITIALIZE APPLICATION
 ============================================================ */
