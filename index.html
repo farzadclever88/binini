@@ -11879,188 +11879,390 @@ function showDashboardDetailsModal(
     materials
 ){
 
-    const html = `
+    const item =
+        items?.[0] || {};
 
-        <div class="modal-overlay">
+    const severity =
+        item.severity ||
+        "green";
 
-            <div class="modal">
+    const achievement =
+        dashboardNumber(
+            item.achievement_percent
+        );
 
-                <div class="modal-header">
+    const remaining =
+        dashboardNumber(
+            item.remaining_quantity
+        );
 
-                    <h2>
-                        جزئیات داشبورد
-                    </h2>
+    openDashboardModal(
+        `
+
+            <div class="dashboard-modal-shell">
+
+                <div class="dashboard-modal-header">
+
+                    <div>
+
+                        <span
+                            class="
+                                dashboard-modal-badge
+                                dashboard-modal-${severity}
+                            "
+                        >
+                            ${dashboardStatusIcon(
+                                severity
+                            )}
+                        </span>
+
+                        <div>
+
+                            <div class="dashboard-modal-kicker">
+                                PRODUCTION DETAIL
+                            </div>
+
+                            <h2>
+                                ${
+                                    item.product_name
+                                    ||
+                                    "جزئیات برنامه"
+                                }
+                            </h2>
+
+                            <span class="dashboard-modal-subtitle">
+                                ${
+                                    item.product_code
+                                    ||
+                                    ""
+                                }
+
+                                ${
+                                    item.bom_code
+                                        ? " · " + item.bom_code
+                                        : ""
+                                }
+                            </span>
+
+                        </div>
+
+                    </div>
 
                     <button
                         type="button"
-                        class="modal-close"
-                        id="dashboardDetailsClose"
+                        class="dashboard-modal-close"
+                        data-dashboard-close
                     >
                         ×
                     </button>
 
                 </div>
 
-                <div class="modal-body">
 
-                    <h3>
-                        برنامه تولید
-                    </h3>
+                <div class="dashboard-modal-body">
 
-                    ${
-                        items.length
+                    <div
+                        class="
+                            dashboard-detail-status
+                            dashboard-detail-${severity}
+                        "
+                    >
 
-                        ?
+                        <span>
+                            ${dashboardStatusIcon(
+                                severity
+                            )}
+                        </span>
 
-                        items.map(
-                            item => `
+                        <div>
 
-                                <div class="detail-row">
+                            <strong>
+                                ${dashboardStatusLabel(
+                                    severity
+                                )}
+                            </strong>
 
-                                    <strong>
-                                        ${
-                                            item.product_name
-                                            ||
-                                            "-"
-                                        }
-                                    </strong>
+                            <small>
+                                ${
+                                    item.severity_message
+                                    ||
+                                    "-"
+                                }
+                            </small>
 
-                                    <span>
-                                        برنامه:
-                                        ${
-                                            dashboardNumber(
-                                                item.planned_quantity
-                                            )
-                                        }
-                                    </span>
+                        </div>
 
-                                    <span>
-                                        تولید:
-                                        ${
-                                            dashboardNumber(
-                                                item.produced_quantity
-                                            )
-                                        }
-                                    </span>
+                    </div>
 
-                                    <span>
-                                        تحقق:
-                                        ${
-                                            dashboardPercent(
-                                                item.achievement_percent
-                                            )
-                                        }
-                                    </span>
+
+                    <div class="dashboard-detail-kpis">
+
+                        <div>
+
+                            <span>
+                                برنامه
+                            </span>
+
+                            <strong>
+                                ${
+                                    dashboardNumber(
+                                        item.planned_quantity
+                                    )
+                                }
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                تولید
+                            </span>
+
+                            <strong>
+                                ${
+                                    dashboardNumber(
+                                        item.produced_quantity
+                                    )
+                                }
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                باقیمانده
+                            </span>
+
+                            <strong>
+                                ${remaining}
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                تحقق
+                            </span>
+
+                            <strong>
+                                ${dashboardPercent(
+                                    achievement
+                                )}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="dashboard-detail-progress">
+
+                        <div>
+
+                            <span>
+                                میزان تحقق
+                            </span>
+
+                            <strong>
+                                ${dashboardPercent(
+                                    achievement
+                                )}
+                            </strong>
+
+                        </div>
+
+                        <div class="dashboard-progress-track">
+
+                            <div
+                                class="
+                                    dashboard-progress-fill
+                                    dashboard-progress-${severity}
+                                "
+                                style="
+                                    width:
+                                    ${Math.min(
+                                        100,
+                                        Math.max(
+                                            0,
+                                            achievement
+                                        )
+                                    )}%
+                                "
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="dashboard-material-section">
+
+                        <div class="dashboard-modal-section-title">
+
+                            <div>
+
+                                <span>
+                                    MATERIALS
+                                </span>
+
+                                <h3>
+                                    مواد اولیه موردنیاز
+                                </h3>
+
+                            </div>
+
+                            <strong>
+                                ${materials.length}
+                                قلم
+                            </strong>
+
+                        </div>
+
+
+                        ${
+                            materials.length
+
+                            ?
+
+                            materials.map(
+                                material => {
+
+                                    const materialSeverity =
+                                        material.sufficient
+                                            ? "green"
+                                            : "red";
+
+                                    return `
+
+                                        <div
+                                            class="
+                                                dashboard-material-row
+                                                dashboard-material-${materialSeverity}
+                                            "
+                                        >
+
+                                            <div class="dashboard-material-status">
+
+                                                ${
+                                                    material.sufficient
+                                                        ? "✓"
+                                                        : "⚠"
+                                                }
+
+                                            </div>
+
+                                            <div class="dashboard-material-info">
+
+                                                <strong>
+                                                    ${
+                                                        material.part_name
+                                                        ||
+                                                        material.part_code
+                                                        ||
+                                                        "-"
+                                                    }
+                                                </strong>
+
+                                                <small>
+                                                    ${
+                                                        material.part_code
+                                                        ||
+                                                        ""
+                                                    }
+
+                                                    ${
+                                                        material.unit_name
+                                                            ? " · " +
+                                                              material.unit_name
+                                                            : ""
+                                                    }
+                                                </small>
+
+                                            </div>
+
+                                            <div>
+
+                                                <span>
+                                                    موردنیاز
+                                                </span>
+
+                                                <strong>
+                                                    ${
+                                                        dashboardNumber(
+                                                            material.required_quantity
+                                                        )
+                                                    }
+                                                </strong>
+
+                                            </div>
+
+                                            <div>
+
+                                                <span>
+                                                    موجودی
+                                                </span>
+
+                                                <strong>
+                                                    ${
+                                                        dashboardNumber(
+                                                            material.available_quantity
+                                                        )
+                                                    }
+                                                </strong>
+
+                                            </div>
+
+                                            <div>
+
+                                                <span>
+                                                    کسری
+                                                </span>
+
+                                                <strong>
+                                                    ${
+                                                        dashboardNumber(
+                                                            material.shortage_quantity
+                                                        )
+                                                    }
+                                                </strong>
+
+                                            </div>
+
+                                        </div>
+
+                                    `;
+
+                                }
+                            ).join("")
+
+                            :
+
+                            `
+
+                                <div class="dashboard-modal-empty">
+
+                                    اطلاعات مواد اولیه موجود نیست.
 
                                 </div>
 
                             `
-                        ).join("")
 
-                        :
+                        }
 
-                        `
-                            <p>
-                                اطلاعات برنامه پیدا نشد.
-                            </p>
-                        `
-                    }
-
-
-                    <h3>
-                        مواد اولیه
-                    </h3>
-
-                    ${
-                        materials.length
-
-                        ?
-
-                        materials.map(
-                            material => `
-
-                                <div class="detail-row">
-
-                                    <strong>
-                                        ${
-                                            material.part_name
-                                            ||
-                                            "-"
-                                        }
-                                    </strong>
-
-                                    <span>
-                                        موردنیاز:
-                                        ${
-                                            dashboardNumber(
-                                                material.required_quantity
-                                            )
-                                        }
-                                    </span>
-
-                                    <span>
-                                        موجودی:
-                                        ${
-                                            dashboardNumber(
-                                                material.available_quantity
-                                            )
-                                        }
-                                    </span>
-
-                                    <span>
-                                        کسری:
-                                        ${
-                                            dashboardNumber(
-                                                material.shortage_quantity
-                                            )
-                                        }
-                                    </span>
-
-                                </div>
-
-                            `
-                        ).join("")
-
-                        :
-
-                        `
-                            <p>
-                                ماده اولیه‌ای ثبت نشده است.
-                            </p>
-                        `
-                    }
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
-
-    `;
-
-
-    document.body.insertAdjacentHTML(
-        "beforeend",
-        html
+        `
     );
-
-
-    document
-        .querySelector(
-            "#dashboardDetailsClose"
-        )
-        ?.addEventListener(
-            "click",
-            () => {
-
-                document
-                    .querySelector(
-                        ".modal-overlay"
-                    )
-                    ?.remove();
-
-            }
-        );
 
 }
 
