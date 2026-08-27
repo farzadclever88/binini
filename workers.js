@@ -10030,20 +10030,19 @@ async function getDashboardDetails(
 
     const detailBindings = [];
 
+if(
+    effectiveSnapshotId
+){
 
-    if(
-        filters.snapshotId
-    ){
+    detailSql += `
+        AND snapshot_id = ?
+    `;
 
-        detailSql += `
-            AND snapshot_id = ?
-        `;
+    detailBindings.push(
+        effectiveSnapshotId
+    );
 
-        detailBindings.push(
-            filters.snapshotId
-        );
-
-    }
+}
 
 
     if(
