@@ -12319,10 +12319,9 @@ async function openView(
 
         case "dashboard":
 
-            renderDashboard();
-
+            await loadDashboard();
+        
             break;
-
 
         case "units":
 
