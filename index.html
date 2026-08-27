@@ -5394,57 +5394,6 @@ function systemDateToNumber(
 }
 
 
-/* ============================================================
-   SYSTEM BUSINESS DATE
-============================================================ */
-
-function getSystemBusinessDate() {
-
-    const input =
-        document.querySelector(
-            "#businessDate"
-        );
-
-
-    if (
-        !input
-    ) {
-
-        return null;
-
-    }
-
-
-    const value =
-        normalizeSystemDate(
-            input.value
-        );
-
-
-    if (
-        !value
-    ) {
-
-        return null;
-
-    }
-
-
-    if (
-        !isValidSystemDate(
-            value
-        )
-    ) {
-
-        return null;
-
-    }
-
-
-    return value;
-
-}
-
 
 /* ============================================================
    SYSTEM DATE COMPARISON
