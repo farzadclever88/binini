@@ -1521,364 +1521,661 @@ textarea.form-control{
     }
 
 }
+
+
 /* ============================================================
    BININI — EXECUTIVE DASHBOARD
-   Production UI / Light + Dark Theme
+   PRODUCTION GRADE UI
+   LIGHT / DARK / MULTI-LEVEL DRILLDOWN SAFE
    ============================================================ */
 
-.dashboard-page {
-    /* ========================================================
-       CORE THEME TOKENS
-       ======================================================== */
 
-    --dash-bg: #f4f7fb;
-    --dash-surface: #ffffff;
-    --dash-surface-2: #f8fafc;
-    --dash-surface-3: #f1f5f9;
+/* ============================================================
+   01. DASHBOARD DESIGN TOKENS
+   مهم:
+   Theme variables در ROOT تعریف شده‌اند، نه فقط dashboard-page.
+   بنابراین modal / drilldown که خارج از dashboard-page ساخته شود
+   نیز دقیقاً همان Theme را دریافت می‌کند.
+   ============================================================ */
 
-    --dash-border: rgba(15, 23, 42, .10);
-    --dash-border-strong: rgba(15, 23, 42, .16);
+:root{
 
-    --dash-text: #111827;
-    --dash-text-strong: #0f172a;
-    --dash-muted: #64748b;
-    --dash-muted-2: #94a3b8;
+    /* ---------- Core surfaces ---------- */
 
-    --dash-placeholder: #94a3b8;
+    --dash-bg:
+        #f4f7fb;
 
-    --dash-input-bg: #ffffff;
-    --dash-input-border: rgba(15, 23, 42, .13);
-    --dash-input-focus: rgba(37, 99, 235, .22);
+    --dash-surface:
+        #ffffff;
+
+    --dash-surface-2:
+        #f8fafc;
+
+    --dash-surface-3:
+        #f1f5f9;
+
+    --dash-border:
+        rgba(15,23,42,.10);
+
+    --dash-border-strong:
+        rgba(15,23,42,.16);
+
+    --dash-text:
+        #0f172a;
+
+    --dash-text-soft:
+        #334155;
+
+    --dash-muted:
+        #64748b;
+
+    --dash-placeholder:
+        #94a3b8;
 
     --dash-shadow-sm:
-        0 4px 16px rgba(15, 23, 42, .05);
+        0 4px 16px rgba(15,23,42,.05);
 
     --dash-shadow:
-        0 12px 40px rgba(15, 23, 42, .08);
+        0 12px 40px rgba(15,23,42,.08);
 
     --dash-shadow-lg:
-        0 25px 80px rgba(15, 23, 42, .14);
+        0 30px 90px rgba(15,23,42,.18);
+
+    /* ---------- Brand ---------- */
+
+    --dash-primary:
+        #2563eb;
+
+    --dash-primary-hover:
+        #1d4ed8;
+
+    --dash-primary-bg:
+        rgba(37,99,235,.10);
+
+    --dash-primary-border:
+        rgba(37,99,235,.24);
+
+    /* ---------- Status ---------- */
+
+    --dash-green:
+        #16a34a;
+
+    --dash-green-bg:
+        rgba(22,163,74,.11);
+
+    --dash-green-border:
+        rgba(22,163,74,.25);
+
+    --dash-yellow:
+        #d97706;
+
+    --dash-yellow-bg:
+        rgba(217,119,6,.11);
+
+    --dash-yellow-border:
+        rgba(217,119,6,.25);
+
+    --dash-red:
+        #dc2626;
+
+    --dash-red-bg:
+        rgba(220,38,38,.11);
+
+    --dash-red-border:
+        rgba(220,38,38,.25);
+
+    --dash-blue:
+        #2563eb;
+
+    --dash-blue-bg:
+        rgba(37,99,235,.11);
+
+    /* ---------- Modal ---------- */
 
     --dash-overlay:
-        rgba(15, 23, 42, .56);
+        rgba(2,6,23,.58);
 
-    /* Status */
+    --dash-modal-bg:
+        #ffffff;
 
-    --dash-green: #16a34a;
-    --dash-green-bg: rgba(22, 163, 74, .11);
-    --dash-green-border: rgba(22, 163, 74, .24);
+    --dash-modal-header:
+        #ffffff;
 
-    --dash-yellow: #d97706;
-    --dash-yellow-bg: rgba(217, 119, 6, .12);
-    --dash-yellow-border: rgba(217, 119, 6, .25);
+    --dash-modal-body:
+        #ffffff;
 
-    --dash-red: #dc2626;
-    --dash-red-bg: rgba(220, 38, 38, .11);
-    --dash-red-border: rgba(220, 38, 38, .24);
+    --dash-input-bg:
+        #ffffff;
 
-    --dash-blue: #2563eb;
-    --dash-blue-bg: rgba(37, 99, 235, .11);
-    --dash-blue-border: rgba(37, 99, 235, .24);
+    --dash-input-border:
+        rgba(15,23,42,.14);
 
-    --dash-purple: #7c3aed;
-    --dash-purple-bg: rgba(124, 58, 237, .11);
+    --dash-input-focus:
+        rgba(37,99,235,.18);
 
-    /* Radius */
+    /* ---------- Radius ---------- */
 
-    --dash-radius-sm: 10px;
-    --dash-radius-md: 14px;
-    --dash-radius-lg: 18px;
-    --dash-radius-xl: 24px;
+    --dash-radius-xs:
+        8px;
 
-    /* Animation */
+    --dash-radius-sm:
+        10px;
+
+    --dash-radius:
+        14px;
+
+    --dash-radius-md:
+        17px;
+
+    --dash-radius-lg:
+        21px;
+
+    --dash-radius-xl:
+        26px;
+
+    /* ---------- Motion ---------- */
+
+    --dash-ease:
+        cubic-bezier(.2,.75,.25,1);
 
     --dash-transition:
-        background-color .2s ease,
-        border-color .2s ease,
-        color .2s ease,
-        box-shadow .2s ease,
-        transform .2s ease,
-        opacity .2s ease;
-
-    direction: rtl;
-
-    width: 100%;
-    max-width: 1540px;
-
-    margin: 0 auto;
-    padding: 20px;
-
-    box-sizing: border-box;
-
-    color: var(--dash-text);
+        .2s var(--dash-ease);
 }
 
 
 /* ============================================================
-   GLOBAL DASHBOARD BOX SIZING
+   DARK THEME
+   همه modalها و drilldownها از اینجا Theme می‌گیرند.
    ============================================================ */
 
+html[data-theme="dark"],
+body[data-theme="dark"],
+html.dark,
+body.dark,
+html.dark-mode,
+body.dark-mode{
+
+    --dash-bg:
+        #080d18;
+
+    --dash-surface:
+        #111827;
+
+    --dash-surface-2:
+        #172033;
+
+    --dash-surface-3:
+        #1e293b;
+
+    --dash-border:
+        rgba(255,255,255,.085);
+
+    --dash-border-strong:
+        rgba(255,255,255,.14);
+
+    --dash-text:
+        #f8fafc;
+
+    --dash-text-soft:
+        #cbd5e1;
+
+    --dash-muted:
+        #94a3b8;
+
+    --dash-placeholder:
+        #64748b;
+
+    --dash-shadow-sm:
+        0 5px 20px rgba(0,0,0,.18);
+
+    --dash-shadow:
+        0 15px 45px rgba(0,0,0,.30);
+
+    --dash-shadow-lg:
+        0 35px 110px rgba(0,0,0,.52);
+
+    --dash-primary:
+        #60a5fa;
+
+    --dash-primary-hover:
+        #93c5fd;
+
+    --dash-primary-bg:
+        rgba(96,165,250,.12);
+
+    --dash-primary-border:
+        rgba(96,165,250,.26);
+
+    --dash-green:
+        #4ade80;
+
+    --dash-green-bg:
+        rgba(74,222,128,.11);
+
+    --dash-green-border:
+        rgba(74,222,128,.25);
+
+    --dash-yellow:
+        #fbbf24;
+
+    --dash-yellow-bg:
+        rgba(251,191,36,.11);
+
+    --dash-yellow-border:
+        rgba(251,191,36,.25);
+
+    --dash-red:
+        #f87171;
+
+    --dash-red-bg:
+        rgba(248,113,113,.11);
+
+    --dash-red-border:
+        rgba(248,113,113,.25);
+
+    --dash-blue:
+        #60a5fa;
+
+    --dash-blue-bg:
+        rgba(96,165,250,.12);
+
+    --dash-overlay:
+        rgba(0,0,0,.68);
+
+    --dash-modal-bg:
+        #111827;
+
+    --dash-modal-header:
+        #111827;
+
+    --dash-modal-body:
+        #111827;
+
+    --dash-input-bg:
+        #0f172a;
+
+    --dash-input-border:
+        rgba(255,255,255,.12);
+
+    --dash-input-focus:
+        rgba(96,165,250,.20);
+}
+
+
+/* ============================================================
+   02. GLOBAL DASHBOARD RESET
+   ============================================================ */
+
+.dashboard-page,
 .dashboard-page *,
-.dashboard-page *::before,
-.dashboard-page *::after {
-    box-sizing: border-box;
+.dashboard-modal-overlay,
+.dashboard-modal-overlay *,
+.dashboard-details-overlay,
+.dashboard-details-overlay *{
+
+    box-sizing:border-box;
+}
+
+.dashboard-page button,
+.dashboard-page input,
+.dashboard-page select,
+.dashboard-page textarea,
+.dashboard-modal-overlay button,
+.dashboard-modal-overlay input,
+.dashboard-modal-overlay select,
+.dashboard-modal-overlay textarea,
+.dashboard-details-overlay button,
+.dashboard-details-overlay input,
+.dashboard-details-overlay select,
+.dashboard-details-overlay textarea{
+
+    font:inherit;
 }
 
 
 /* ============================================================
-   TOP BAR
+   03. MAIN DASHBOARD
    ============================================================ */
 
-.dashboard-topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.dashboard-page{
 
-    gap: 20px;
-    margin-bottom: 18px;
+    direction:rtl;
+
+    width:100%;
+    max-width:1540px;
+
+    margin:0 auto;
+    padding:24px;
+
+    color:var(--dash-text);
+    background:transparent;
+
+    isolation:isolate;
 }
 
-.dashboard-eyebrow {
-    color: var(--dash-muted);
 
-    font-size: 10px;
-    font-weight: 900;
+/* ============================================================
+   04. TOP BAR
+   ============================================================ */
 
-    letter-spacing: 1.8px;
+.dashboard-topbar{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:20px;
+
+    margin-bottom:20px;
 }
 
-.dashboard-title {
-    margin: 3px 0;
+.dashboard-eyebrow{
 
-    color: var(--dash-text-strong);
+    margin-bottom:3px;
 
-    font-size: 28px;
-    line-height: 1.2;
-    font-weight: 950;
+    color:var(--dash-muted);
 
-    letter-spacing: -.7px;
+    font-size:10px;
+    font-weight:900;
+
+    letter-spacing:1.8px;
+    text-transform:uppercase;
 }
 
-.dashboard-subtitle {
-    color: var(--dash-muted);
+.dashboard-title{
 
-    font-size: 13px;
+    margin:0;
+
+    color:var(--dash-text);
+
+    font-size:29px;
+    line-height:1.25;
+    font-weight:950;
+
+    letter-spacing:-.7px;
 }
 
-.dashboard-actions {
-    display: flex;
-    align-items: center;
+.dashboard-subtitle{
 
-    gap: 8px;
+    margin-top:5px;
+
+    color:var(--dash-muted);
+
+    font-size:13px;
+    line-height:1.7;
 }
 
-.dashboard-date {
-    padding: 9px 13px;
+.dashboard-actions{
 
-    border: 1px solid var(--dash-border);
-    border-radius: var(--dash-radius-sm);
-
-    background: var(--dash-surface);
-    color: var(--dash-muted);
-
-    font-size: 12px;
-    font-weight: 800;
-
-    box-shadow: var(--dash-shadow-sm);
+    display:flex;
+    align-items:center;
+    gap:9px;
 }
 
-.dashboard-refresh-button {
-    border: 1px solid transparent;
-    border-radius: var(--dash-radius-sm);
+.dashboard-date{
 
-    padding: 10px 15px;
+    display:flex;
+    align-items:center;
 
-    cursor: pointer;
+    min-height:42px;
 
-    background: var(--primary-color, #111827);
-    color: #ffffff;
+    padding:9px 14px;
 
-    font-weight: 900;
+    border:1px solid var(--dash-border);
+    border-radius:var(--dash-radius);
 
-    box-shadow: 0 8px 20px rgba(15, 23, 42, .15);
+    background:var(--dash-surface);
 
-    transition: var(--dash-transition);
+    color:var(--dash-muted);
+
+    font-size:12px;
+    font-weight:800;
+
+    box-shadow:var(--dash-shadow-sm);
 }
 
-.dashboard-refresh-button:hover {
-    transform: translateY(-2px);
+.dashboard-refresh-button{
+
+    min-height:42px;
+
+    padding:10px 17px;
+
+    border:1px solid transparent;
+    border-radius:var(--dash-radius);
+
+    background:var(--dash-primary);
+    color:#ffffff;
+
+    font-size:12px;
+    font-weight:900;
+
+    cursor:pointer;
 
     box-shadow:
-        0 12px 26px rgba(15, 23, 42, .20);
+        0 7px 18px rgba(37,99,235,.20);
+
+    transition:
+        transform var(--dash-transition),
+        box-shadow var(--dash-transition),
+        background var(--dash-transition);
 }
 
-.dashboard-refresh-button:active {
-    transform: translateY(0);
-}
+.dashboard-refresh-button:hover{
 
+    background:var(--dash-primary-hover);
 
-/* ============================================================
-   HERO
-   ============================================================ */
-
-.dashboard-hero {
-    position: relative;
-
-    overflow: hidden;
-
-    border: 1px solid var(--dash-border);
-    border-radius: var(--dash-radius-xl);
-
-    padding: 24px;
-    margin-bottom: 15px;
-
-    background: var(--dash-surface);
-
-    box-shadow: var(--dash-shadow);
-
-    isolation: isolate;
-}
-
-.dashboard-hero::before {
-    content: "";
-
-    position: absolute;
-
-    width: 300px;
-    height: 300px;
-
-    left: -130px;
-    top: -180px;
-
-    border-radius: 50%;
-
-    background: currentColor;
-
-    opacity: .055;
-
-    pointer-events: none;
-
-    z-index: -1;
-}
-
-.dashboard-severity-green {
-    color: var(--dash-green);
-
-    border-right: 5px solid var(--dash-green);
-}
-
-.dashboard-severity-yellow {
-    color: var(--dash-yellow);
-
-    border-right: 5px solid var(--dash-yellow);
-}
-
-.dashboard-severity-red {
-    color: var(--dash-red);
-
-    border-right: 5px solid var(--dash-red);
-}
-
-.dashboard-hero-main {
-    position: relative;
-    z-index: 1;
-
-    display: flex;
-    align-items: center;
-
-    gap: 17px;
-}
-
-.dashboard-status-orb {
-    width: 70px;
-    height: 70px;
-    min-width: 70px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 21px;
-
-    font-size: 30px;
-    font-weight: 950;
-
-    color: #ffffff;
+    transform:translateY(-2px);
 
     box-shadow:
-        0 12px 30px rgba(15, 23, 42, .16);
-
-    transition: var(--dash-transition);
+        0 11px 24px rgba(37,99,235,.26);
 }
 
-.dashboard-severity-green .dashboard-status-orb {
-    background: var(--dash-green);
-}
+.dashboard-refresh-button:active{
 
-.dashboard-severity-yellow .dashboard-status-orb {
-    background: var(--dash-yellow);
-}
-
-.dashboard-severity-red .dashboard-status-orb {
-    background: var(--dash-red);
-}
-
-.dashboard-status-kicker {
-    color: var(--dash-muted);
-
-    font-size: 10px;
-    font-weight: 900;
-
-    letter-spacing: 1.2px;
-}
-
-.dashboard-status-title {
-    margin: 3px 0;
-
-    color: var(--dash-text-strong);
-
-    font-size: 23px;
-    font-weight: 950;
-}
-
-.dashboard-status-message {
-    color: var(--dash-muted);
-
-    font-size: 13px;
+    transform:translateY(0);
 }
 
 
 /* ============================================================
-   PROGRESS
+   05. HERO
    ============================================================ */
 
-.dashboard-progress {
-    position: relative;
-    z-index: 1;
+.dashboard-hero{
 
-    margin-top: 21px;
+    position:relative;
+
+    overflow:hidden;
+
+    padding:25px;
+
+    margin-bottom:16px;
+
+    border:1px solid var(--dash-border);
+    border-radius:var(--dash-radius-xl);
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--dash-surface),
+            var(--dash-surface-2)
+        );
+
+    box-shadow:var(--dash-shadow);
+
+    isolation:isolate;
 }
 
-.dashboard-progress-label {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.dashboard-hero::before{
 
-    margin-bottom: 7px;
+    content:"";
 
-    color: var(--dash-muted);
+    position:absolute;
 
-    font-size: 11px;
-    font-weight: 800;
+    width:330px;
+    height:330px;
+
+    left:-150px;
+    top:-190px;
+
+    border-radius:50%;
+
+    background:currentColor;
+
+    opacity:.055;
+
+    pointer-events:none;
 }
 
-.dashboard-progress-track {
-    width: 100%;
-    height: 9px;
+.dashboard-hero::after{
 
-    overflow: hidden;
+    content:"";
 
-    border-radius: 999px;
+    position:absolute;
+
+    width:180px;
+    height:180px;
+
+    right:-80px;
+    bottom:-110px;
+
+    border-radius:50%;
+
+    background:currentColor;
+
+    opacity:.025;
+
+    pointer-events:none;
+}
+
+.dashboard-severity-green{
+
+    color:var(--dash-green);
+
+    border-right:5px solid var(--dash-green);
+}
+
+.dashboard-severity-yellow{
+
+    color:var(--dash-yellow);
+
+    border-right:5px solid var(--dash-yellow);
+}
+
+.dashboard-severity-red{
+
+    color:var(--dash-red);
+
+    border-right:5px solid var(--dash-red);
+}
+
+.dashboard-hero-main{
+
+    position:relative;
+    z-index:2;
+
+    display:flex;
+    align-items:center;
+
+    gap:18px;
+}
+
+.dashboard-status-orb{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:72px;
+    height:72px;
+    min-width:72px;
+
+    border-radius:22px;
+
+    background:currentColor;
+    color:#ffffff;
+
+    font-size:30px;
+    font-weight:950;
+
+    box-shadow:
+        0 12px 30px color-mix(
+            in srgb,
+            currentColor 24%,
+            transparent
+        );
+}
+
+.dashboard-severity-green .dashboard-status-orb{
+    background:var(--dash-green);
+}
+
+.dashboard-severity-yellow .dashboard-status-orb{
+    background:var(--dash-yellow);
+}
+
+.dashboard-severity-red .dashboard-status-orb{
+    background:var(--dash-red);
+}
+
+.dashboard-status-kicker{
+
+    color:var(--dash-muted);
+
+    font-size:10px;
+    font-weight:900;
+
+    letter-spacing:1.3px;
+}
+
+.dashboard-status-title{
+
+    margin:3px 0 2px;
+
+    color:var(--dash-text);
+
+    font-size:23px;
+    line-height:1.35;
+    font-weight:950;
+}
+
+.dashboard-status-message{
+
+    color:var(--dash-muted);
+
+    font-size:13px;
+    line-height:1.7;
+}
+
+.dashboard-progress{
+
+    position:relative;
+    z-index:2;
+
+    margin-top:22px;
+}
+
+.dashboard-progress-label{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:8px;
+
+    color:var(--dash-muted);
+
+    font-size:11px;
+    font-weight:800;
+}
+
+.dashboard-progress-track{
+
+    width:100%;
+    height:10px;
+
+    overflow:hidden;
+
+    border-radius:999px;
 
     background:
         color-mix(
@@ -1888,86 +2185,129 @@ textarea.form-control{
         );
 }
 
-.dashboard-progress-fill {
-    height: 100%;
+.dashboard-progress-fill{
 
-    border-radius: inherit;
+    height:100%;
 
-    transition: width .6s ease;
+    border-radius:inherit;
+
+    transition:width .7s var(--dash-ease);
+
+    box-shadow:
+        0 0 12px currentColor;
 }
 
-.dashboard-progress-green {
-    background: var(--dash-green);
+.dashboard-progress-green{
+    background:var(--dash-green);
 }
 
-.dashboard-progress-yellow {
-    background: var(--dash-yellow);
+.dashboard-progress-yellow{
+    background:var(--dash-yellow);
 }
 
-.dashboard-progress-red {
-    background: var(--dash-red);
+.dashboard-progress-red{
+    background:var(--dash-red);
 }
 
 
 /* ============================================================
-   KPI GRID
+   06. KPI GRID
    ============================================================ */
 
-.dashboard-kpi-grid {
-    display: grid;
+.dashboard-kpi-grid{
 
-    grid-template-columns: repeat(4, 1fr);
+    display:grid;
 
-    gap: 11px;
+    grid-template-columns:
+        repeat(4,minmax(0,1fr));
 
-    margin-bottom: 17px;
+    gap:12px;
+
+    margin-bottom:19px;
 }
 
-.dashboard-kpi {
-    min-width: 0;
+.dashboard-kpi{
 
-    display: flex;
-    align-items: center;
+    position:relative;
 
-    gap: 12px;
+    min-width:0;
 
-    padding: 15px;
+    display:flex;
+    align-items:center;
 
-    border: 1px solid var(--dash-border);
-    border-radius: 17px;
+    gap:13px;
 
-    background: var(--dash-surface);
-    color: var(--dash-text);
+    padding:16px;
 
-    box-shadow: var(--dash-shadow-sm);
+    overflow:hidden;
 
-    cursor: pointer;
+    border:1px solid var(--dash-border);
+    border-radius:18px;
 
-    transition: var(--dash-transition);
+    background:var(--dash-surface);
+
+    color:var(--dash-text);
+
+    box-shadow:var(--dash-shadow-sm);
+
+    cursor:pointer;
+
+    transition:
+        transform var(--dash-transition),
+        border-color var(--dash-transition),
+        box-shadow var(--dash-transition),
+        background var(--dash-transition);
 }
 
-.dashboard-kpi:hover {
-    transform: translateY(-3px);
+.dashboard-kpi::after{
 
-    border-color: var(--dash-border-strong);
+    content:"";
 
-    box-shadow: var(--dash-shadow);
+    position:absolute;
+
+    width:90px;
+    height:90px;
+
+    left:-38px;
+    bottom:-45px;
+
+    border-radius:50%;
+
+    background:currentColor;
+
+    opacity:.025;
+
+    pointer-events:none;
 }
 
-.dashboard-kpi:active {
-    transform: translateY(-1px);
+.dashboard-kpi:hover{
+
+    transform:translateY(-3px);
+
+    border-color:var(--dash-border-strong);
+
+    box-shadow:var(--dash-shadow);
 }
 
-.dashboard-kpi-icon {
-    width: 43px;
-    height: 43px;
-    min-width: 43px;
+.dashboard-kpi:active{
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transform:translateY(-1px);
+}
 
-    border-radius: 13px;
+.dashboard-kpi-icon{
+
+    position:relative;
+    z-index:1;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:45px;
+    height:45px;
+    min-width:45px;
+
+    border-radius:14px;
 
     background:
         color-mix(
@@ -1976,402 +2316,468 @@ textarea.form-control{
             transparent
         );
 
-    color: var(--dash-text);
+    color:var(--dash-text);
 
-    font-size: 19px;
-    font-weight: 950;
+    font-size:19px;
+    font-weight:950;
 }
 
-.dashboard-kpi-content {
-    min-width: 0;
+.dashboard-kpi-content{
 
-    display: flex;
-    flex-direction: column;
+    position:relative;
+    z-index:1;
+
+    min-width:0;
+
+    display:flex;
+    flex-direction:column;
 }
 
-.dashboard-kpi-label {
-    color: var(--dash-muted);
+.dashboard-kpi-label{
 
-    font-size: 11px;
-    font-weight: 700;
+    color:var(--dash-muted);
+
+    font-size:11px;
+    font-weight:750;
 }
 
-.dashboard-kpi-value {
-    margin-top: 2px;
+.dashboard-kpi-value{
 
-    color: var(--dash-text-strong);
+    margin-top:2px;
 
-    font-size: 23px;
-    line-height: 1.2;
-    font-weight: 950;
+    color:var(--dash-text);
+
+    font-size:24px;
+    line-height:1.25;
+    font-weight:950;
 }
 
-.dashboard-kpi-meta {
-    margin-top: 2px;
+.dashboard-kpi-meta{
 
-    color: var(--dash-muted-2);
+    margin-top:3px;
 
-    font-size: 9px;
+    color:var(--dash-muted);
+
+    font-size:9px;
 }
 
-.dashboard-kpi-danger {
-    border-color: var(--dash-red-border);
+.dashboard-kpi-danger{
+
+    border-color:
+        var(--dash-red-border);
 }
 
-.dashboard-kpi-danger .dashboard-kpi-icon {
-    color: var(--dash-red);
+.dashboard-kpi-danger .dashboard-kpi-icon{
 
-    background: var(--dash-red-bg);
-}
+    color:var(--dash-red);
 
-
-/* ============================================================
-   SECTION
-   ============================================================ */
-
-.dashboard-section {
-    margin-bottom: 17px;
-}
-
-.dashboard-section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 15px;
-
-    margin-bottom: 9px;
-}
-
-.dashboard-section-kicker {
-    color: var(--dash-muted);
-
-    font-size: 9px;
-    font-weight: 900;
-
-    letter-spacing: 1.4px;
-}
-
-.dashboard-section-header h2 {
-    margin: 2px 0 0;
-
-    color: var(--dash-text-strong);
-
-    font-size: 17px;
-    font-weight: 950;
-}
-
-.dashboard-text-button {
-    border: 0;
-
-    padding: 7px 10px;
-
-    border-radius: 9px;
-
-    background: transparent;
-
-    color: var(--dash-muted);
-
-    cursor: pointer;
-
-    font-weight: 850;
-
-    transition: var(--dash-transition);
-}
-
-.dashboard-text-button:hover {
-    background: var(--dash-surface-3);
-
-    color: var(--dash-text);
+    background:var(--dash-red-bg);
 }
 
 
 /* ============================================================
-   STATUS SUMMARY
+   07. SECTIONS
    ============================================================ */
 
-.dashboard-status-grid {
-    display: grid;
+.dashboard-section{
 
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 11px;
+    margin-bottom:20px;
 }
 
-.dashboard-status-card {
-    position: relative;
+.dashboard-section-header{
 
-    overflow: hidden;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
 
-    padding: 17px;
+    gap:15px;
 
-    border: 1px solid var(--dash-border);
-    border-radius: 18px;
-
-    background: var(--dash-surface);
-    color: var(--dash-text);
-
-    cursor: pointer;
-
-    box-shadow: var(--dash-shadow-sm);
-
-    transition: var(--dash-transition);
-
-    isolation: isolate;
+    margin-bottom:10px;
 }
 
-.dashboard-status-card:hover {
-    transform: translateY(-3px);
+.dashboard-section-kicker{
 
-    box-shadow: var(--dash-shadow);
+    color:var(--dash-muted);
+
+    font-size:9px;
+    font-weight:900;
+
+    letter-spacing:1.5px;
 }
 
-.dashboard-status-card::after {
-    content: "";
+.dashboard-section-header h2{
 
-    position: absolute;
+    margin:3px 0 0;
 
-    width: 130px;
-    height: 130px;
+    color:var(--dash-text);
 
-    left: -45px;
-    bottom: -70px;
-
-    border-radius: 50%;
-
-    background: currentColor;
-
-    opacity: .055;
-
-    pointer-events: none;
-
-    z-index: -1;
+    font-size:18px;
+    line-height:1.4;
+    font-weight:950;
 }
 
-.status-green {
-    color: var(--dash-green);
+.dashboard-text-button{
 
-    border-top: 3px solid var(--dash-green);
+    border:0;
+
+    padding:7px 9px;
+
+    border-radius:9px;
+
+    background:transparent;
+
+    color:var(--dash-muted);
+
+    font-size:11px;
+    font-weight:850;
+
+    cursor:pointer;
+
+    transition:
+        background var(--dash-transition),
+        color var(--dash-transition);
 }
 
-.status-yellow {
-    color: var(--dash-yellow);
+.dashboard-text-button:hover{
 
-    border-top: 3px solid var(--dash-yellow);
-}
+    background:
+        color-mix(
+            in srgb,
+            var(--dash-text) 6%,
+            transparent
+        );
 
-.status-red {
-    color: var(--dash-red);
-
-    border-top: 3px solid var(--dash-red);
-}
-
-.dashboard-status-card-head {
-    position: relative;
-    z-index: 1;
-
-    display: flex;
-    align-items: center;
-
-    gap: 8px;
-
-    color: var(--dash-text);
-
-    font-size: 12px;
-    font-weight: 900;
-}
-
-.dashboard-status-sticker {
-    width: 29px;
-    height: 29px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 9px;
-
-    color: #ffffff;
-
-    font-size: 14px;
-    font-weight: 950;
-}
-
-.status-green .dashboard-status-sticker {
-    background: var(--dash-green);
-}
-
-.status-yellow .dashboard-status-sticker {
-    background: var(--dash-yellow);
-}
-
-.status-red .dashboard-status-sticker {
-    background: var(--dash-red);
-}
-
-.dashboard-status-card > strong {
-    position: relative;
-    z-index: 1;
-
-    display: block;
-
-    margin-top: 7px;
-
-    color: var(--dash-text-strong);
-
-    font-size: 30px;
-    font-weight: 950;
-}
-
-.dashboard-status-card > small {
-    position: relative;
-    z-index: 1;
-
-    color: var(--dash-muted);
-
-    font-size: 10px;
+    color:var(--dash-text);
 }
 
 
 /* ============================================================
-   PRODUCTION LIST
+   08. STATUS CARDS
    ============================================================ */
 
-.dashboard-plan-list {
-    display: flex;
-    flex-direction: column;
+.dashboard-status-grid{
 
-    gap: 7px;
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,minmax(0,1fr));
+
+    gap:12px;
 }
 
-.dashboard-plan-row {
-    width: 100%;
+.dashboard-status-card{
 
-    display: grid;
+    position:relative;
+
+    overflow:hidden;
+
+    padding:18px;
+
+    border:1px solid var(--dash-border);
+    border-radius:18px;
+
+    background:var(--dash-surface);
+
+    cursor:pointer;
+
+    box-shadow:var(--dash-shadow-sm);
+
+    transition:
+        transform var(--dash-transition),
+        box-shadow var(--dash-transition),
+        border-color var(--dash-transition);
+}
+
+.dashboard-status-card:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:var(--dash-shadow);
+
+    border-color:var(--dash-border-strong);
+}
+
+.dashboard-status-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:120px;
+    height:120px;
+
+    left:-42px;
+    bottom:-65px;
+
+    border-radius:50%;
+
+    background:currentColor;
+
+    opacity:.045;
+
+    pointer-events:none;
+}
+
+.status-green{
+
+    color:var(--dash-green);
+
+    border-top:3px solid var(--dash-green);
+}
+
+.status-yellow{
+
+    color:var(--dash-yellow);
+
+    border-top:3px solid var(--dash-yellow);
+}
+
+.status-red{
+
+    color:var(--dash-red);
+
+    border-top:3px solid var(--dash-red);
+}
+
+.dashboard-status-card-head{
+
+    position:relative;
+    z-index:1;
+
+    display:flex;
+    align-items:center;
+
+    gap:9px;
+
+    color:var(--dash-text);
+
+    font-size:12px;
+    font-weight:900;
+}
+
+.dashboard-status-sticker{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:31px;
+    height:31px;
+
+    border-radius:10px;
+
+    background:currentColor;
+    color:#ffffff;
+
+    font-size:14px;
+    font-weight:950;
+}
+
+.status-green .dashboard-status-sticker{
+    background:var(--dash-green);
+}
+
+.status-yellow .dashboard-status-sticker{
+    background:var(--dash-yellow);
+}
+
+.status-red .dashboard-status-sticker{
+    background:var(--dash-red);
+}
+
+.dashboard-status-card > strong{
+
+    position:relative;
+    z-index:1;
+
+    display:block;
+
+    margin-top:8px;
+
+    color:var(--dash-text);
+
+    font-size:31px;
+    line-height:1.15;
+    font-weight:950;
+}
+
+.dashboard-status-card > small{
+
+    position:relative;
+    z-index:1;
+
+    display:block;
+
+    margin-top:4px;
+
+    color:var(--dash-muted);
+
+    font-size:10px;
+}
+
+
+/* ============================================================
+   09. PRODUCTION PLAN LIST
+   ============================================================ */
+
+.dashboard-plan-list{
+
+    display:flex;
+    flex-direction:column;
+
+    gap:8px;
+}
+
+.dashboard-plan-row{
+
+    width:100%;
+
+    display:grid;
 
     grid-template-columns:
         42px
-        minmax(180px, 1.7fr)
+        minmax(180px,1.7fr)
         85px
         85px
-        minmax(140px, 1fr)
+        minmax(140px,1fr)
         20px;
 
-    align-items: center;
+    align-items:center;
 
-    gap: 12px;
+    gap:12px;
 
-    padding: 11px 13px;
+    padding:12px 14px;
 
-    border: 1px solid var(--dash-border);
-    border-radius: 14px;
+    border:1px solid var(--dash-border);
+    border-radius:15px;
 
-    background: var(--dash-surface);
-    color: var(--dash-text);
+    background:var(--dash-surface);
+    color:var(--dash-text);
 
-    text-align: right;
+    text-align:right;
 
-    cursor: pointer;
+    cursor:pointer;
 
-    box-shadow: var(--dash-shadow-sm);
+    box-shadow:var(--dash-shadow-sm);
 
-    transition: var(--dash-transition);
+    transition:
+        transform var(--dash-transition),
+        border-color var(--dash-transition),
+        box-shadow var(--dash-transition);
 }
 
-.dashboard-plan-row:hover {
-    transform: translateX(-2px);
+.dashboard-plan-row:hover{
 
-    border-color: var(--dash-border-strong);
+    transform:translateX(-3px);
 
-    box-shadow: var(--dash-shadow);
+    border-color:var(--dash-border-strong);
+
+    box-shadow:var(--dash-shadow);
 }
 
-.dashboard-plan-status span {
-    width: 32px;
-    height: 32px;
+.dashboard-plan-status span{
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-    border-radius: 10px;
+    width:33px;
+    height:33px;
 
-    color: #ffffff;
+    border-radius:10px;
 
-    font-weight: 950;
+    color:#ffffff;
+
+    font-size:13px;
+    font-weight:950;
 }
 
-.dashboard-plan-green .dashboard-plan-status span {
-    background: var(--dash-green);
+.dashboard-plan-green .dashboard-plan-status span{
+    background:var(--dash-green);
 }
 
-.dashboard-plan-yellow .dashboard-plan-status span {
-    background: var(--dash-yellow);
+.dashboard-plan-yellow .dashboard-plan-status span{
+    background:var(--dash-yellow);
 }
 
-.dashboard-plan-red .dashboard-plan-status span {
-    background: var(--dash-red);
+.dashboard-plan-red .dashboard-plan-status span{
+    background:var(--dash-red);
 }
 
-.dashboard-plan-info {
-    min-width: 0;
+.dashboard-plan-info{
 
-    display: flex;
-    flex-direction: column;
+    min-width:0;
+
+    display:flex;
+    flex-direction:column;
 }
 
-.dashboard-plan-info strong {
-    overflow: hidden;
+.dashboard-plan-info strong{
 
-    color: var(--dash-text);
+    overflow:hidden;
 
-    font-size: 12px;
+    color:var(--dash-text);
 
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    font-size:12px;
+
+    text-overflow:ellipsis;
+    white-space:nowrap;
 }
 
-.dashboard-plan-info small {
-    margin-top: 2px;
+.dashboard-plan-info small{
 
-    color: var(--dash-muted);
+    margin-top:2px;
 
-    font-size: 9px;
+    overflow:hidden;
+
+    color:var(--dash-muted);
+
+    font-size:9px;
+
+    text-overflow:ellipsis;
+    white-space:nowrap;
 }
 
-.dashboard-plan-metric {
-    display: flex;
-    flex-direction: column;
+.dashboard-plan-metric{
+
+    display:flex;
+    flex-direction:column;
 }
 
 .dashboard-plan-metric span,
-.dashboard-plan-progress span {
-    color: var(--dash-muted);
+.dashboard-plan-progress span{
 
-    font-size: 9px;
+    color:var(--dash-muted);
+
+    font-size:9px;
 }
 
-.dashboard-plan-metric strong {
-    color: var(--dash-text);
+.dashboard-plan-metric strong{
 
-    font-size: 13px;
+    margin-top:2px;
+
+    color:var(--dash-text);
+
+    font-size:13px;
 }
 
-.dashboard-plan-progress > div:first-child {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.dashboard-plan-progress > div:first-child{
 
-    margin-bottom: 4px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:5px;
 }
 
-.dashboard-mini-track {
-    width: 100%;
-    height: 5px;
+.dashboard-mini-track{
 
-    overflow: hidden;
+    width:100%;
+    height:6px;
 
-    border-radius: 999px;
+    overflow:hidden;
+
+    border-radius:999px;
 
     background:
         color-mix(
@@ -2381,1861 +2787,1679 @@ textarea.form-control{
         );
 }
 
-.dashboard-mini-track span {
-    display: block;
+.dashboard-mini-track span{
 
-    height: 100%;
+    display:block;
 
-    border-radius: inherit;
+    height:100%;
+
+    border-radius:inherit;
+
+    transition:width .6s var(--dash-ease);
 }
 
-.dashboard-plan-green .dashboard-mini-track span {
-    background: var(--dash-green);
+.dashboard-plan-green .dashboard-mini-track span{
+    background:var(--dash-green);
 }
 
-.dashboard-plan-yellow .dashboard-mini-track span {
-    background: var(--dash-yellow);
+.dashboard-plan-yellow .dashboard-mini-track span{
+    background:var(--dash-yellow);
 }
 
-.dashboard-plan-red .dashboard-mini-track span {
-    background: var(--dash-red);
+.dashboard-plan-red .dashboard-mini-track span{
+    background:var(--dash-red);
 }
 
 .dashboard-plan-arrow,
-.dashboard-action-arrow {
-    color: var(--dash-muted);
+.dashboard-action-arrow{
 
-    font-size: 18px;
+    color:var(--dash-muted);
 
-    transition: var(--dash-transition);
+    font-size:18px;
+
+    transition:
+        transform var(--dash-transition),
+        color var(--dash-transition);
 }
 
 .dashboard-plan-row:hover .dashboard-plan-arrow,
-.dashboard-action-card:hover .dashboard-action-arrow {
-    color: var(--dash-text);
-    transform: translateX(-3px);
+.dashboard-action-card:hover .dashboard-action-arrow{
+
+    color:var(--dash-text);
+
+    transform:translateX(-3px);
 }
 
 
 /* ============================================================
-   ACTION CENTER
+   10. ACTION CENTER
    ============================================================ */
 
-.dashboard-action-grid {
-    display: grid;
+.dashboard-action-grid{
 
-    grid-template-columns: repeat(2, 1fr);
+    display:grid;
 
-    gap: 10px;
+    grid-template-columns:
+        repeat(2,minmax(0,1fr));
+
+    gap:11px;
 }
 
-.dashboard-action-card {
-    display: grid;
+.dashboard-action-card{
 
-    grid-template-columns: 43px 1fr 18px;
+    display:grid;
 
-    align-items: center;
+    grid-template-columns:
+        43px
+        minmax(0,1fr)
+        18px;
 
-    gap: 11px;
+    align-items:center;
 
-    padding: 14px;
+    gap:12px;
 
-    border: 1px solid var(--dash-border);
-    border-radius: 16px;
+    min-width:0;
 
-    background: var(--dash-surface);
-    color: var(--dash-text);
+    padding:15px;
 
-    cursor: pointer;
+    border:1px solid var(--dash-border);
+    border-radius:17px;
 
-    box-shadow: var(--dash-shadow-sm);
+    background:var(--dash-surface);
+    color:var(--dash-text);
 
-    transition: var(--dash-transition);
-}
+    cursor:pointer;
 
-.dashboard-action-card:hover {
-    transform: translateY(-3px);
-
-    border-color: var(--dash-border-strong);
-
-    box-shadow: var(--dash-shadow);
-}
-
-.dashboard-action-icon {
-    width: 41px;
-    height: 41px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 12px;
-
-    font-size: 18px;
-    font-weight: 950;
-}
-
-.dashboard-action-red {
-    border-right: 3px solid var(--dash-red);
-}
-
-.dashboard-action-red .dashboard-action-icon {
-    color: var(--dash-red);
-
-    background: var(--dash-red-bg);
-}
-
-.dashboard-action-yellow {
-    border-right: 3px solid var(--dash-yellow);
-}
-
-.dashboard-action-yellow .dashboard-action-icon {
-    color: var(--dash-yellow);
-
-    background: var(--dash-yellow-bg);
-}
-
-.dashboard-action-card div:nth-child(2) {
-    min-width: 0;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 3px;
-}
-
-.dashboard-action-card div:nth-child(2) span {
-    color: var(--dash-muted);
-
-    font-size: 9px;
-}
-
-.dashboard-action-card div:nth-child(2) strong {
-    overflow: hidden;
-
-    color: var(--dash-text);
-
-    font-size: 12px;
-
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-
-/* ============================================================
-   EMPTY + FOOTER
-   ============================================================ */
-
-.dashboard-empty {
-    padding: 28px;
-
-    border: 1px dashed var(--dash-border-strong);
-    border-radius: 16px;
-
-    background: var(--dash-surface-2);
-
-    text-align: center;
-
-    color: var(--dash-muted);
-}
-
-.dashboard-footer {
-    display: flex;
-    justify-content: flex-start;
-
-    flex-wrap: wrap;
-
-    gap: 7px 16px;
-
-    padding: 2px 2px 12px;
-
-    color: var(--dash-muted);
-
-    font-size: 9px;
-}
-
-
-/* ============================================================
-   ============================================================
-   DASHBOARD FORMS
-   این بخش مهم است:
-   تمام فرم‌های داخل داشبورد از Theme Token استفاده می‌کنند.
-   ============================================================
-   ============================================================ */
-
-.dashboard-page form,
-.dashboard-modal-container form,
-.dashboard-details-container form {
-    color: var(--dash-text);
-}
-
-
-/* Form groups */
-
-.dashboard-page .form-group,
-.dashboard-page .form-field,
-.dashboard-page .field,
-.dashboard-modal-container .form-group,
-.dashboard-modal-container .form-field,
-.dashboard-modal-container .field,
-.dashboard-details-container .form-group,
-.dashboard-details-container .form-field,
-.dashboard-details-container .field {
-    margin-bottom: 14px;
-}
-
-
-/* Labels */
-
-.dashboard-page label,
-.dashboard-modal-container label,
-.dashboard-details-container label {
-    display: block;
-
-    margin-bottom: 6px;
-
-    color: var(--dash-text);
-
-    font-size: 11px;
-    font-weight: 800;
-}
-
-.dashboard-page label small,
-.dashboard-modal-container label small,
-.dashboard-details-container label small {
-    color: var(--dash-muted);
-
-    font-weight: 600;
-}
-
-
-/* Inputs */
-
-.dashboard-page input:not([type="checkbox"]):not([type="radio"]),
-.dashboard-page select,
-.dashboard-page textarea,
-
-.dashboard-modal-container input:not([type="checkbox"]):not([type="radio"]),
-.dashboard-modal-container select,
-.dashboard-modal-container textarea,
-
-.dashboard-details-container input:not([type="checkbox"]):not([type="radio"]),
-.dashboard-details-container select,
-.dashboard-details-container textarea {
-    width: 100%;
-
-    min-height: 42px;
-
-    padding: 10px 12px;
-
-    border: 1px solid var(--dash-input-border);
-    border-radius: 11px;
-
-    outline: none;
-
-    background: var(--dash-input-bg);
-    color: var(--dash-text);
-
-    font: inherit;
-    font-size: 12px;
-
-    box-shadow:
-        inset 0 1px 2px rgba(15, 23, 42, .025);
-
-    transition: var(--dash-transition);
-}
-
-
-/* Textarea */
-
-.dashboard-page textarea,
-.dashboard-modal-container textarea,
-.dashboard-details-container textarea {
-    min-height: 100px;
-
-    resize: vertical;
-
-    line-height: 1.7;
-}
-
-
-/* Select */
-
-.dashboard-page select,
-.dashboard-modal-container select,
-.dashboard-details-container select {
-    cursor: pointer;
-}
-
-
-/* Placeholder */
-
-.dashboard-page input::placeholder,
-.dashboard-page textarea::placeholder,
-
-.dashboard-modal-container input::placeholder,
-.dashboard-modal-container textarea::placeholder,
-
-.dashboard-details-container input::placeholder,
-.dashboard-details-container textarea::placeholder {
-    color: var(--dash-placeholder);
-
-    opacity: 1;
-}
-
-
-/* Focus */
-
-.dashboard-page input:focus,
-.dashboard-page select:focus,
-.dashboard-page textarea:focus,
-
-.dashboard-modal-container input:focus,
-.dashboard-modal-container select:focus,
-.dashboard-modal-container textarea:focus,
-
-.dashboard-details-container input:focus,
-.dashboard-details-container select:focus,
-.dashboard-details-container textarea:focus {
-    border-color: var(--dash-blue);
-
-    background: var(--dash-input-bg);
-
-    box-shadow:
-        0 0 0 4px var(--dash-input-focus);
-}
-
-
-/* Disabled */
-
-.dashboard-page input:disabled,
-.dashboard-page select:disabled,
-.dashboard-page textarea:disabled,
-
-.dashboard-modal-container input:disabled,
-.dashboard-modal-container select:disabled,
-.dashboard-modal-container textarea:disabled,
-
-.dashboard-details-container input:disabled,
-.dashboard-details-container select:disabled,
-.dashboard-details-container textarea:disabled {
-    opacity: .6;
-
-    cursor: not-allowed;
-
-    background: var(--dash-surface-3);
-}
-
-
-/* Checkbox / radio */
-
-.dashboard-page input[type="checkbox"],
-.dashboard-page input[type="radio"],
-.dashboard-modal-container input[type="checkbox"],
-.dashboard-modal-container input[type="radio"],
-.dashboard-details-container input[type="checkbox"],
-.dashboard-details-container input[type="radio"] {
-    accent-color: var(--dash-blue);
-
-    cursor: pointer;
-}
-
-
-/* Form helper text */
-
-.dashboard-page .help-text,
-.dashboard-page .form-help,
-.dashboard-page .field-help,
-
-.dashboard-modal-container .help-text,
-.dashboard-modal-container .form-help,
-.dashboard-modal-container .field-help,
-
-.dashboard-details-container .help-text,
-.dashboard-details-container .form-help,
-.dashboard-details-container .field-help {
-    display: block;
-
-    margin-top: 5px;
-
-    color: var(--dash-muted);
-
-    font-size: 9px;
-    line-height: 1.7;
-}
-
-
-/* Form error */
-
-.dashboard-page .error,
-.dashboard-page .field-error,
-.dashboard-page .form-error,
-
-.dashboard-modal-container .error,
-.dashboard-modal-container .field-error,
-.dashboard-modal-container .form-error,
-
-.dashboard-details-container .error,
-.dashboard-details-container .field-error,
-.dashboard-details-container .form-error {
-    color: var(--dash-red);
-
-    font-size: 10px;
-}
-
-
-/* Form success */
-
-.dashboard-page .success,
-.dashboard-page .field-success,
-
-.dashboard-modal-container .success,
-.dashboard-modal-container .field-success,
-
-.dashboard-details-container .success,
-.dashboard-details-container .field-success {
-    color: var(--dash-green);
-
-    font-size: 10px;
-}
-
-
-/* ============================================================
-   DASHBOARD BUTTON SYSTEM
-   ============================================================ */
-
-.dashboard-page button,
-.dashboard-modal-container button,
-.dashboard-details-container button {
-    font: inherit;
-}
-
-.dashboard-page .btn,
-.dashboard-modal-container .btn,
-.dashboard-details-container .btn {
-    min-height: 40px;
-
-    padding: 9px 14px;
-
-    border: 1px solid var(--dash-border);
-    border-radius: 11px;
-
-    background: var(--dash-surface);
-    color: var(--dash-text);
-
-    cursor: pointer;
-
-    font-size: 11px;
-    font-weight: 850;
-
-    transition: var(--dash-transition);
-}
-
-.dashboard-page .btn:hover,
-.dashboard-modal-container .btn:hover,
-.dashboard-details-container .btn:hover {
-    transform: translateY(-1px);
-
-    border-color: var(--dash-border-strong);
-
-    background: var(--dash-surface-2);
-
-    box-shadow: var(--dash-shadow-sm);
-}
-
-.dashboard-page .btn-primary,
-.dashboard-modal-container .btn-primary,
-.dashboard-details-container .btn-primary {
-    border-color: var(--dash-blue);
-
-    background: var(--dash-blue);
-    color: #ffffff;
-}
-
-.dashboard-page .btn-danger,
-.dashboard-modal-container .btn-danger,
-.dashboard-details-container .btn-danger {
-    border-color: var(--dash-red);
-
-    background: var(--dash-red);
-    color: #ffffff;
-}
-
-.dashboard-page .btn-success,
-.dashboard-modal-container .btn-success,
-.dashboard-details-container .btn-success {
-    border-color: var(--dash-green);
-
-    background: var(--dash-green);
-    color: #ffffff;
-}
-
-
-/* ============================================================
-   DASHBOARD MODAL — BASE
-   ============================================================ */
-
-.dashboard-modal-overlay {
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 99999;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 18px;
-
-    background: var(--dash-overlay);
-
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-
-    opacity: 0;
-    visibility: hidden;
+    box-shadow:var(--dash-shadow-sm);
 
     transition:
-        opacity .2s ease,
-        visibility .2s ease;
+        transform var(--dash-transition),
+        box-shadow var(--dash-transition),
+        border-color var(--dash-transition);
 }
 
-.dashboard-modal-overlay.is-open {
-    opacity: 1;
+.dashboard-action-card:hover{
 
-    visibility: visible;
+    transform:translateY(-3px);
+
+    border-color:var(--dash-border-strong);
+
+    box-shadow:var(--dash-shadow);
 }
 
-.dashboard-modal-backdrop {
-    position: absolute;
+.dashboard-action-icon{
 
-    inset: 0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:42px;
+    height:42px;
+
+    border-radius:13px;
+
+    font-size:18px;
+    font-weight:950;
 }
 
-.dashboard-modal-container {
-    position: relative;
-    z-index: 1;
+.dashboard-action-red{
 
-    width: min(980px, 100%);
-
-    max-height: min(88vh, 860px);
-
-    overflow: hidden;
-
-    border: 1px solid var(--dash-border);
-    border-radius: var(--dash-radius-xl);
-
-    background: var(--dash-surface);
-    color: var(--dash-text);
-
-    box-shadow: var(--dash-shadow-lg);
-
-    transform:
-        translateY(15px)
-        scale(.97);
-
-    transition: transform .22s ease;
+    border-right:3px solid var(--dash-red);
 }
 
-.dashboard-modal-overlay.is-open .dashboard-modal-container {
-    transform: none;
+.dashboard-action-red .dashboard-action-icon{
+
+    color:var(--dash-red);
+
+    background:var(--dash-red-bg);
 }
 
-.dashboard-modal-shell {
-    max-height: 88vh;
+.dashboard-action-yellow{
 
-    display: flex;
-    flex-direction: column;
+    border-right:3px solid var(--dash-yellow);
 }
 
+.dashboard-action-yellow .dashboard-action-icon{
 
-/* ============================================================
-   MODAL HEADER
-   ============================================================ */
+    color:var(--dash-yellow);
 
-.dashboard-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 15px;
-
-    padding: 18px 21px;
-
-    border-bottom: 1px solid var(--dash-border);
-
-    background: var(--dash-surface);
-    color: var(--dash-text);
+    background:var(--dash-yellow-bg);
 }
 
-.dashboard-modal-header > div:first-child {
-    min-width: 0;
+.dashboard-action-card > div:nth-child(2){
 
-    display: flex;
-    align-items: center;
+    min-width:0;
 
-    gap: 11px;
+    display:flex;
+    flex-direction:column;
+
+    gap:3px;
 }
 
-.dashboard-modal-header h2 {
-    margin: 2px 0 0;
+.dashboard-action-card > div:nth-child(2) span{
 
-    color: var(--dash-text-strong);
+    color:var(--dash-muted);
 
-    font-size: 18px;
-    font-weight: 950;
+    font-size:9px;
 }
 
-.dashboard-modal-subtitle {
-    display: block;
+.dashboard-action-card > div:nth-child(2) strong{
 
-    margin-top: 2px;
+    overflow:hidden;
 
-    color: var(--dash-muted);
+    color:var(--dash-text);
 
-    font-size: 9px;
-}
+    font-size:12px;
 
-.dashboard-modal-kicker {
-    color: var(--dash-muted);
-
-    font-size: 8px;
-    font-weight: 900;
-
-    letter-spacing: 1.3px;
-}
-
-.dashboard-modal-badge {
-    width: 43px;
-    height: 43px;
-    min-width: 43px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 14px;
-
-    font-size: 19px;
-    font-weight: 950;
-}
-
-.dashboard-modal-green {
-    color: var(--dash-green);
-
-    background: var(--dash-green-bg);
-}
-
-.dashboard-modal-yellow {
-    color: var(--dash-yellow);
-
-    background: var(--dash-yellow-bg);
-}
-
-.dashboard-modal-red {
-    color: var(--dash-red);
-
-    background: var(--dash-red-bg);
-}
-
-.dashboard-modal-blue {
-    color: var(--dash-blue);
-
-    background: var(--dash-blue-bg);
-}
-
-.dashboard-modal-close {
-    width: 36px;
-    height: 36px;
-
-    flex: 0 0 auto;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 0;
-
-    border: 1px solid var(--dash-border);
-    border-radius: 10px;
-
-    background: var(--dash-surface-3);
-    color: var(--dash-text);
-
-    font-size: 23px;
-    line-height: 1;
-
-    cursor: pointer;
-
-    transition: var(--dash-transition);
-}
-
-.dashboard-modal-close:hover {
-    background: var(--dash-surface-2);
-
-    border-color: var(--dash-border-strong);
-
-    transform: rotate(3deg);
+    text-overflow:ellipsis;
+    white-space:nowrap;
 }
 
 
 /* ============================================================
-   MODAL BODY
+   11. FOOTER / EMPTY
    ============================================================ */
 
-.dashboard-modal-body {
-    overflow: auto;
+.dashboard-footer{
 
-    padding: 18px 21px 23px;
+    display:flex;
+    justify-content:flex-start;
 
-    background: var(--dash-surface);
-    color: var(--dash-text);
+    flex-wrap:wrap;
 
-    scrollbar-width: thin;
+    gap:7px 17px;
+
+    padding:4px 2px 14px;
+
+    color:var(--dash-muted);
+
+    font-size:9px;
 }
 
-.dashboard-rules-body {
-    overflow: auto;
+.dashboard-empty{
 
-    padding: 19px 21px 23px;
+    padding:36px 20px;
 
-    background: var(--dash-surface);
-    color: var(--dash-text);
+    border:1px dashed var(--dash-border);
 
-    scrollbar-width: thin;
+    border-radius:16px;
+
+    background:var(--dash-surface);
+
+    color:var(--dash-muted);
+
+    text-align:center;
+
+    font-size:12px;
 }
 
 
 /* ============================================================
-   DETAIL STATUS
+   12. UNIVERSAL MODAL OVERLAY
+   این قانون برای هر دو نوع modal است.
    ============================================================ */
 
-.dashboard-detail-status {
-    display: flex;
-    align-items: center;
+.dashboard-modal-overlay,
+.dashboard-details-overlay{
 
-    gap: 11px;
+    position:fixed;
 
-    padding: 12px;
-    margin-bottom: 13px;
+    inset:0;
 
-    border-radius: 14px;
+    z-index:100000;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:100%;
+    height:100%;
+
+    padding:24px;
+
+    overflow:auto;
+
+    background:var(--dash-overlay);
+
+    backdrop-filter:
+        blur(12px)
+        saturate(115%);
+
+    -webkit-backdrop-filter:
+        blur(12px)
+        saturate(115%);
 }
 
-.dashboard-detail-status > span {
-    width: 35px;
-    height: 35px;
-    min-width: 35px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* modal اصلی حالت closed */
+.dashboard-modal-overlay{
 
-    border-radius: 10px;
+    opacity:0;
+    visibility:hidden;
 
-    font-weight: 950;
+    pointer-events:none;
+
+    transition:
+        opacity .22s var(--dash-ease),
+        visibility .22s var(--dash-ease);
 }
 
-.dashboard-detail-status > div {
-    display: flex;
-    flex-direction: column;
+.dashboard-modal-overlay.is-open{
 
-    gap: 2px;
-}
+    opacity:1;
+    visibility:visible;
 
-.dashboard-detail-status strong {
-    color: inherit;
-
-    font-size: 13px;
-}
-
-.dashboard-detail-status small {
-    color: inherit;
-
-    opacity: .68;
-
-    font-size: 9px;
-}
-
-.dashboard-detail-green {
-    background: var(--dash-green-bg);
-    color: var(--dash-green);
-}
-
-.dashboard-detail-green > span {
-    background: rgba(22, 163, 74, .16);
-}
-
-.dashboard-detail-yellow {
-    background: var(--dash-yellow-bg);
-    color: var(--dash-yellow);
-}
-
-.dashboard-detail-yellow > span {
-    background: rgba(217, 119, 6, .17);
-}
-
-.dashboard-detail-red {
-    background: var(--dash-red-bg);
-    color: var(--dash-red);
-}
-
-.dashboard-detail-red > span {
-    background: rgba(220, 38, 38, .17);
+    pointer-events:auto;
 }
 
 
 /* ============================================================
-   DETAIL KPI
+   13. MODAL BACKDROP
    ============================================================ */
 
-.dashboard-detail-kpis {
-    display: grid;
+.dashboard-modal-backdrop{
 
-    grid-template-columns: repeat(4, 1fr);
+    position:absolute;
 
-    gap: 8px;
+    inset:0;
 
-    margin-bottom: 15px;
-}
+    width:100%;
+    height:100%;
 
-.dashboard-detail-kpis > div {
-    padding: 12px;
-
-    border: 1px solid var(--dash-border);
-    border-radius: 13px;
-
-    background: var(--dash-surface-2);
-}
-
-.dashboard-detail-kpis span {
-    display: block;
-
-    color: var(--dash-muted);
-
-    font-size: 9px;
-}
-
-.dashboard-detail-kpis strong {
-    display: block;
-
-    margin-top: 3px;
-
-    color: var(--dash-text-strong);
-
-    font-size: 19px;
-    font-weight: 950;
-}
-
-.dashboard-detail-progress {
-    margin-bottom: 19px;
-}
-
-.dashboard-detail-progress > div:first-child {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    margin-bottom: 6px;
-
-    color: var(--dash-muted);
-
-    font-size: 10px;
-    font-weight: 800;
+    cursor:default;
 }
 
 
 /* ============================================================
-   MATERIAL SECTION
+   14. MODAL CONTAINER
    ============================================================ */
 
-.dashboard-material-section {
-    padding-top: 17px;
+.dashboard-modal-container,
+.dashboard-details-container{
 
-    border-top: 1px solid var(--dash-border);
+    position:relative;
+    z-index:1;
+
+    display:flex;
+    flex-direction:column;
+
+    width:min(980px,100%);
+
+    max-height:
+        min(88vh,860px);
+
+    min-height:0;
+
+    overflow:hidden;
+
+    border:1px solid var(--dash-border);
+
+    border-radius:var(--dash-radius-xl);
+
+    background:var(--dash-modal-bg);
+
+    color:var(--dash-text);
+
+    box-shadow:var(--dash-shadow-lg);
+
+    isolation:isolate;
+
+    animation:
+        dashboardModalIn
+        .24s var(--dash-ease)
+        both;
 }
 
-.dashboard-modal-section-title {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
+.dashboard-details-container{
 
-    gap: 10px;
+    width:min(1180px,100%);
 
-    margin-bottom: 9px;
+    max-height:92vh;
 }
 
-.dashboard-modal-section-title > div {
-    display: flex;
-    flex-direction: column;
+@keyframes dashboardModalIn{
+
+    from{
+
+        opacity:0;
+
+        transform:
+            translateY(18px)
+            scale(.975);
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
 }
 
-.dashboard-modal-section-title span {
-    color: var(--dash-muted);
 
-    font-size: 8px;
-    font-weight: 900;
+/* ============================================================
+   15. MODAL HEADER
+   ============================================================ */
 
-    letter-spacing: 1.3px;
+.dashboard-modal-header,
+.dashboard-details-overlay .modal-header{
+
+    position:relative;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:16px;
+
+    flex:0 0 auto;
+
+    min-height:82px;
+
+    padding:18px 22px;
+
+    border-bottom:
+        1px solid
+        var(--dash-border);
+
+    background:
+        linear-gradient(
+            180deg,
+            var(--dash-modal-header),
+            var(--dash-modal-bg)
+        );
+
+    color:var(--dash-text);
 }
 
-.dashboard-modal-section-title h3 {
-    margin: 2px 0 0;
+.dashboard-modal-header > div:first-child{
 
-    color: var(--dash-text-strong);
+    min-width:0;
 
-    font-size: 15px;
-    font-weight: 950;
+    display:flex;
+    align-items:center;
+
+    gap:12px;
 }
 
-.dashboard-modal-section-title > strong {
-    color: var(--dash-muted);
+.dashboard-modal-header h2{
 
-    font-size: 9px;
+    margin:2px 0 0;
+
+    overflow:hidden;
+
+    color:var(--dash-text);
+
+    font-size:19px;
+    line-height:1.4;
+    font-weight:950;
+
+    text-overflow:ellipsis;
 }
 
-.dashboard-material-row {
-    display: grid;
+.dashboard-modal-subtitle{
+
+    display:block;
+
+    margin-top:3px;
+
+    color:var(--dash-muted);
+
+    font-size:10px;
+    line-height:1.6;
+}
+
+.dashboard-modal-kicker{
+
+    display:block;
+
+    color:var(--dash-muted);
+
+    font-size:8px;
+    font-weight:900;
+
+    letter-spacing:1.4px;
+}
+
+.dashboard-modal-badge{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:45px;
+    height:45px;
+    min-width:45px;
+
+    border-radius:14px;
+
+    font-size:20px;
+    font-weight:950;
+}
+
+.dashboard-modal-green{
+
+    color:var(--dash-green);
+
+    background:var(--dash-green-bg);
+}
+
+.dashboard-modal-yellow{
+
+    color:var(--dash-yellow);
+
+    background:var(--dash-yellow-bg);
+}
+
+.dashboard-modal-red{
+
+    color:var(--dash-red);
+
+    background:var(--dash-red-bg);
+}
+
+.dashboard-modal-blue{
+
+    color:var(--dash-blue);
+
+    background:var(--dash-blue-bg);
+}
+
+
+/* ============================================================
+   16. CLOSE BUTTON
+   ============================================================ */
+
+.dashboard-modal-close,
+.dashboard-details-overlay .modal-close{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:38px;
+    height:38px;
+    min-width:38px;
+
+    padding:0;
+
+    border:1px solid var(--dash-border);
+
+    border-radius:11px;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--dash-text) 6%,
+            transparent
+        );
+
+    color:var(--dash-text);
+
+    font-size:23px;
+    line-height:1;
+
+    cursor:pointer;
+
+    transition:
+        background var(--dash-transition),
+        color var(--dash-transition),
+        border-color var(--dash-transition),
+        transform var(--dash-transition);
+}
+
+.dashboard-modal-close:hover,
+.dashboard-details-overlay .modal-close:hover{
+
+    background:
+        color-mix(
+            in srgb,
+            var(--dash-text) 11%,
+            transparent
+        );
+
+    border-color:var(--dash-border-strong);
+
+    transform:rotate(2deg);
+}
+
+
+/* ============================================================
+   17. MODAL BODY
+   ============================================================ */
+
+.dashboard-modal-body,
+.dashboard-rules-body,
+.dashboard-details-overlay .modal-body{
+
+    flex:1 1 auto;
+
+    min-height:0;
+
+    overflow:auto;
+
+    padding:22px 24px 26px;
+
+    background:var(--dash-modal-body);
+
+    color:var(--dash-text);
+
+    scrollbar-width:thin;
+
+    scrollbar-color:
+        var(--dash-border-strong)
+        transparent;
+}
+
+
+/* Webkit scrollbar */
+
+.dashboard-modal-body::-webkit-scrollbar,
+.dashboard-rules-body::-webkit-scrollbar,
+.dashboard-details-overlay .modal-body::-webkit-scrollbar{
+
+    width:8px;
+}
+
+.dashboard-modal-body::-webkit-scrollbar-track,
+.dashboard-rules-body::-webkit-scrollbar-track,
+.dashboard-details-overlay .modal-body::-webkit-scrollbar-track{
+
+    background:transparent;
+}
+
+.dashboard-modal-body::-webkit-scrollbar-thumb,
+.dashboard-rules-body::-webkit-scrollbar-thumb,
+.dashboard-details-overlay .modal-body::-webkit-scrollbar-thumb{
+
+    border-radius:999px;
+
+    background:
+        var(--dash-border-strong);
+}
+
+
+/* ============================================================
+   18. MODAL TYPOGRAPHY
+   مهم:
+   هیچ color ثابت مثل #111827 در modal استفاده نمی‌کنیم.
+   ============================================================ */
+
+.dashboard-modal-container h1,
+.dashboard-modal-container h2,
+.dashboard-modal-container h3,
+.dashboard-modal-container h4,
+.dashboard-details-container h1,
+.dashboard-details-container h2,
+.dashboard-details-container h3,
+.dashboard-details-container h4{
+
+    color:var(--dash-text);
+}
+
+.dashboard-modal-container strong,
+.dashboard-modal-container b,
+.dashboard-details-container strong,
+.dashboard-details-container b{
+
+    color:var(--dash-text);
+}
+
+.dashboard-modal-container p,
+.dashboard-details-container p{
+
+    color:var(--dash-text-soft);
+}
+
+.dashboard-modal-container small,
+.dashboard-modal-container .muted,
+.dashboard-details-container small,
+.dashboard-details-container .muted{
+
+    color:var(--dash-muted);
+}
+
+
+/* ============================================================
+   19. DETAIL STATUS
+   ============================================================ */
+
+.dashboard-detail-status{
+
+    display:flex;
+    align-items:center;
+
+    gap:12px;
+
+    padding:14px 15px;
+
+    margin-bottom:15px;
+
+    border:1px solid transparent;
+
+    border-radius:15px;
+}
+
+.dashboard-detail-status > span{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:37px;
+    height:37px;
+    min-width:37px;
+
+    border-radius:11px;
+
+    font-weight:950;
+}
+
+.dashboard-detail-status > div{
+
+    min-width:0;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:2px;
+}
+
+.dashboard-detail-status strong{
+
+    color:inherit;
+
+    font-size:13px;
+    font-weight:900;
+}
+
+.dashboard-detail-status small{
+
+    color:inherit;
+
+    opacity:.72;
+
+    font-size:9px;
+}
+
+.dashboard-detail-green{
+
+    background:var(--dash-green-bg);
+
+    color:var(--dash-green);
+
+    border-color:var(--dash-green-border);
+}
+
+.dashboard-detail-green > span{
+
+    background:
+        color-mix(
+            in srgb,
+            var(--dash-green) 17%,
+            transparent
+        );
+}
+
+.dashboard-detail-yellow{
+
+    background:var(--dash-yellow-bg);
+
+    color:var(--dash-yellow);
+
+    border-color:var(--dash-yellow-border);
+}
+
+.dashboard-detail-yellow > span{
+
+    background:
+        color-mix(
+            in srgb,
+            var(--dash-yellow) 17%,
+            transparent
+        );
+}
+
+.dashboard-detail-red{
+
+    background:var(--dash-red-bg);
+
+    color:var(--dash-red);
+
+    border-color:var(--dash-red-border);
+}
+
+.dashboard-detail-red > span{
+
+    background:
+        color-mix(
+            in srgb,
+            var(--dash-red) 17%,
+            transparent
+        );
+}
+
+
+/* ============================================================
+   20. DETAIL KPI
+   ============================================================ */
+
+.dashboard-detail-kpis{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,minmax(0,1fr));
+
+    gap:9px;
+
+    margin-bottom:18px;
+}
+
+.dashboard-detail-kpis > div{
+
+    min-width:0;
+
+    padding:14px;
+
+    border:1px solid var(--dash-border);
+
+    border-radius:14px;
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--dash-surface-2),
+            var(--dash-surface)
+        );
+
+    box-shadow:var(--dash-shadow-sm);
+}
+
+.dashboard-detail-kpis span{
+
+    display:block;
+
+    color:var(--dash-muted);
+
+    font-size:9px;
+}
+
+.dashboard-detail-kpis strong{
+
+    display:block;
+
+    margin-top:4px;
+
+    color:var(--dash-text);
+
+    font-size:20px;
+    line-height:1.25;
+    font-weight:950;
+}
+
+.dashboard-detail-progress{
+
+    margin-bottom:21px;
+}
+
+.dashboard-detail-progress > div:first-child{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:7px;
+
+    color:var(--dash-muted);
+
+    font-size:10px;
+    font-weight:800;
+}
+
+
+/* ============================================================
+   21. MATERIAL SECTION
+   ============================================================ */
+
+.dashboard-material-section{
+
+    padding-top:19px;
+
+    border-top:
+        1px solid
+        var(--dash-border);
+}
+
+.dashboard-modal-section-title{
+
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+
+    gap:12px;
+
+    margin-bottom:11px;
+}
+
+.dashboard-modal-section-title > div{
+
+    display:flex;
+    flex-direction:column;
+}
+
+.dashboard-modal-section-title span{
+
+    color:var(--dash-muted);
+
+    font-size:8px;
+    font-weight:900;
+
+    letter-spacing:1.3px;
+}
+
+.dashboard-modal-section-title h3{
+
+    margin:3px 0 0;
+
+    color:var(--dash-text);
+
+    font-size:16px;
+    font-weight:950;
+}
+
+.dashboard-modal-section-title > strong{
+
+    color:var(--dash-muted);
+
+    font-size:9px;
+}
+
+.dashboard-material-row{
+
+    display:grid;
 
     grid-template-columns:
         36px
-        minmax(180px, 1fr)
+        minmax(180px,1fr)
         85px
         85px
         85px;
 
-    align-items: center;
+    align-items:center;
 
-    gap: 9px;
+    gap:10px;
 
-    padding: 10px;
-    margin-bottom: 6px;
+    padding:11px;
 
-    border: 1px solid var(--dash-border);
-    border-radius: 12px;
+    margin-bottom:7px;
 
-    background: var(--dash-surface);
-    color: var(--dash-text);
+    border:1px solid var(--dash-border);
+
+    border-radius:13px;
+
+    background:var(--dash-surface);
+
+    color:var(--dash-text);
+
+    transition:
+        border-color var(--dash-transition),
+        background var(--dash-transition);
 }
 
-.dashboard-material-status {
-    width: 31px;
-    height: 31px;
+.dashboard-material-row:hover{
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-color:var(--dash-border-strong);
 
-    border-radius: 9px;
-
-    font-weight: 950;
+    background:var(--dash-surface-2);
 }
 
-.dashboard-material-green .dashboard-material-status {
-    color: var(--dash-green);
+.dashboard-material-status{
 
-    background: var(--dash-green-bg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:32px;
+    height:32px;
+
+    border-radius:10px;
+
+    font-weight:950;
 }
 
-.dashboard-material-red .dashboard-material-status {
-    color: var(--dash-red);
+.dashboard-material-green .dashboard-material-status{
 
-    background: var(--dash-red-bg);
+    color:var(--dash-green);
+
+    background:var(--dash-green-bg);
 }
 
-.dashboard-material-info {
-    min-width: 0;
+.dashboard-material-red .dashboard-material-status{
 
-    display: flex;
-    flex-direction: column;
+    color:var(--dash-red);
+
+    background:var(--dash-red-bg);
 }
 
-.dashboard-material-info strong {
-    overflow: hidden;
+.dashboard-material-info{
 
-    color: var(--dash-text);
+    min-width:0;
 
-    font-size: 11px;
-
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display:flex;
+    flex-direction:column;
 }
 
-.dashboard-material-info small {
-    color: var(--dash-muted);
+.dashboard-material-info strong{
 
-    font-size: 8px;
+    overflow:hidden;
+
+    color:var(--dash-text);
+
+    font-size:11px;
+
+    text-overflow:ellipsis;
+    white-space:nowrap;
 }
 
-.dashboard-material-row > div:not(.dashboard-material-status):not(.dashboard-material-info) {
-    display: flex;
-    flex-direction: column;
+.dashboard-material-info small{
 
-    text-align: center;
+    margin-top:2px;
+
+    color:var(--dash-muted);
+
+    font-size:8px;
 }
 
-.dashboard-material-row > div span {
-    color: var(--dash-muted);
+.dashboard-material-row > div:not(.dashboard-material-status):not(.dashboard-material-info){
 
-    font-size: 8px;
+    display:flex;
+    flex-direction:column;
+
+    text-align:center;
 }
 
-.dashboard-material-row > div strong {
-    color: var(--dash-text);
+.dashboard-material-row > div span{
 
-    font-size: 11px;
+    color:var(--dash-muted);
+
+    font-size:8px;
 }
 
+.dashboard-material-row > div strong{
 
-/* ============================================================
-   RULES / FORMULA
-   ============================================================ */
+    color:var(--dash-text);
 
-.dashboard-formula {
-    padding: 18px;
-
-    margin-bottom: 15px;
-
-    border: 1px solid var(--dash-border);
-    border-radius: 16px;
-
-    background: var(--dash-surface-2);
-
-    text-align: center;
-}
-
-.dashboard-formula-label {
-    margin-bottom: 7px;
-
-    color: var(--dash-muted);
-
-    font-size: 9px;
-    font-weight: 800;
-}
-
-.dashboard-formula-value {
-    color: var(--dash-text-strong);
-
-    font-size: 17px;
-    font-weight: 950;
-}
-
-.dashboard-rule-grid {
-    display: grid;
-
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 9px;
-}
-
-.dashboard-rule-card {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-
-    padding: 15px;
-
-    border: 1px solid var(--dash-border);
-    border-radius: 15px;
-
-    background: var(--dash-surface);
-}
-
-.dashboard-rule-card > span {
-    width: 31px;
-    height: 31px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    margin-bottom: 9px;
-
-    border-radius: 9px;
-
-    color: #ffffff;
-
-    font-weight: 950;
-}
-
-.dashboard-rule-card strong {
-    color: var(--dash-text-strong);
-
-    font-size: 16px;
-    font-weight: 950;
-}
-
-.dashboard-rule-card b {
-    margin-top: 4px;
-
-    color: var(--dash-text);
-
-    font-size: 11px;
-}
-
-.dashboard-rule-card small {
-    margin-top: 6px;
-
-    color: var(--dash-muted);
-
-    font-size: 9px;
-    line-height: 1.7;
-}
-
-.dashboard-rule-green {
-    border-top: 3px solid var(--dash-green);
-}
-
-.dashboard-rule-green > span {
-    background: var(--dash-green);
-}
-
-.dashboard-rule-yellow {
-    border-top: 3px solid var(--dash-yellow);
-}
-
-.dashboard-rule-yellow > span {
-    background: var(--dash-yellow);
-}
-
-.dashboard-rule-red {
-    border-top: 3px solid var(--dash-red);
-}
-
-.dashboard-rule-red > span {
-    background: var(--dash-red);
+    font-size:11px;
 }
 
 
 /* ============================================================
-   ============================================================
-   DETAILS MODAL
-   ============================================================
+   22. RULES / FORMULA
    ============================================================ */
 
-.dashboard-details-overlay {
-    position: fixed;
+.dashboard-formula{
 
-    inset: 0;
+    padding:20px;
 
-    z-index: 100000;
+    margin-bottom:17px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border:1px solid var(--dash-border);
 
-    padding: 18px;
+    border-radius:17px;
 
-    box-sizing: border-box;
+    background:
+        linear-gradient(
+            145deg,
+            var(--dash-surface-2),
+            var(--dash-surface)
+        );
 
-    background: var(--dash-overlay);
+    text-align:center;
 
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    box-shadow:var(--dash-shadow-sm);
+}
 
-    overflow: auto;
+.dashboard-formula-label{
+
+    margin-bottom:8px;
+
+    color:var(--dash-muted);
+
+    font-size:9px;
+    font-weight:800;
+}
+
+.dashboard-formula-value{
+
+    color:var(--dash-text);
+
+    font-size:18px;
+    font-weight:950;
+}
+
+.dashboard-rule-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,minmax(0,1fr));
+
+    gap:10px;
+}
+
+.dashboard-rule-card{
+
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+
+    min-width:0;
+
+    padding:16px;
+
+    border:1px solid var(--dash-border);
+
+    border-radius:16px;
+
+    background:var(--dash-surface);
+
+    box-shadow:var(--dash-shadow-sm);
+}
+
+.dashboard-rule-card > span{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:32px;
+    height:32px;
+
+    margin-bottom:10px;
+
+    border-radius:10px;
+
+    color:#ffffff;
+
+    font-weight:950;
+}
+
+.dashboard-rule-card strong{
+
+    color:var(--dash-text);
+
+    font-size:16px;
+    font-weight:950;
+}
+
+.dashboard-rule-card b{
+
+    margin-top:4px;
+
+    color:var(--dash-text-soft);
+
+    font-size:11px;
+}
+
+.dashboard-rule-card small{
+
+    margin-top:7px;
+
+    color:var(--dash-muted);
+
+    font-size:9px;
+
+    line-height:1.75;
+}
+
+.dashboard-rule-green{
+
+    border-top:3px solid var(--dash-green);
+}
+
+.dashboard-rule-green > span{
+
+    background:var(--dash-green);
+}
+
+.dashboard-rule-yellow{
+
+    border-top:3px solid var(--dash-yellow);
+}
+
+.dashboard-rule-yellow > span{
+
+    background:var(--dash-yellow);
+}
+
+.dashboard-rule-red{
+
+    border-top:3px solid var(--dash-red);
+}
+
+.dashboard-rule-red > span{
+
+    background:var(--dash-red);
 }
 
 
 /* ============================================================
-   DETAILS CONTAINER
+   23. UNIVERSAL MODAL FORMS
+   این قسمت برای جلوگیری از خراب شدن formهای Drilldown است.
    ============================================================ */
 
-.dashboard-details-container {
-    position: relative;
+.dashboard-modal-container label,
+.dashboard-details-container label{
 
-    width: min(1180px, 100%);
+    display:block;
 
-    max-height: 92vh;
+    margin-bottom:6px;
 
-    overflow: hidden;
+    color:var(--dash-text-soft);
 
-    border: 1px solid var(--dash-border);
-    border-radius: var(--dash-radius-xl);
+    font-size:11px;
+    font-weight:800;
+}
 
-    background: var(--dash-surface);
-    color: var(--dash-text);
+.dashboard-modal-container input,
+.dashboard-modal-container select,
+.dashboard-modal-container textarea,
+.dashboard-details-container input,
+.dashboard-details-container select,
+.dashboard-details-container textarea{
 
-    box-shadow: var(--dash-shadow-lg);
+    width:100%;
+
+    min-height:42px;
+
+    padding:10px 12px;
+
+    border:1px solid var(--dash-input-border);
+
+    border-radius:11px;
+
+    outline:none;
+
+    background:var(--dash-input-bg);
+
+    color:var(--dash-text);
+
+    caret-color:var(--dash-primary);
+
+    transition:
+        border-color var(--dash-transition),
+        box-shadow var(--dash-transition),
+        background var(--dash-transition);
+}
+
+.dashboard-modal-container textarea,
+.dashboard-details-container textarea{
+
+    min-height:100px;
+
+    resize:vertical;
+
+    line-height:1.7;
+}
+
+.dashboard-modal-container input::placeholder,
+.dashboard-modal-container textarea::placeholder,
+.dashboard-details-container input::placeholder,
+.dashboard-details-container textarea::placeholder{
+
+    color:var(--dash-placeholder);
+
+    opacity:1;
+}
+
+.dashboard-modal-container input:focus,
+.dashboard-modal-container select:focus,
+.dashboard-modal-container textarea:focus,
+.dashboard-details-container input:focus,
+.dashboard-details-container select:focus,
+.dashboard-details-container textarea:focus{
+
+    border-color:var(--dash-primary);
+
+    box-shadow:
+        0 0 0 4px
+        var(--dash-input-focus);
+
+    background:var(--dash-input-bg);
+}
+
+.dashboard-modal-container input:disabled,
+.dashboard-modal-container select:disabled,
+.dashboard-modal-container textarea:disabled,
+.dashboard-details-container input:disabled,
+.dashboard-details-container select:disabled,
+.dashboard-details-container textarea:disabled{
+
+    opacity:.58;
+
+    cursor:not-allowed;
+}
+
+.dashboard-modal-container option,
+.dashboard-details-container option{
+
+    background:var(--dash-input-bg);
+
+    color:var(--dash-text);
 }
 
 
 /* ============================================================
-   DETAILS HEADER
+   24. UNIVERSAL BUTTONS INSIDE MODALS
    ============================================================ */
 
-.dashboard-details-overlay .modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.dashboard-modal-container button:not(.dashboard-modal-close),
+.dashboard-details-container button:not(.modal-close){
 
-    gap: 15px;
-
-    padding: 18px 21px;
-
-    border-bottom: 1px solid var(--dash-border);
-
-    background: var(--dash-surface);
-    color: var(--dash-text);
+    color:var(--dash-text);
 }
 
-.dashboard-details-overlay .modal-header h1,
-.dashboard-details-overlay .modal-header h2,
-.dashboard-details-overlay .modal-header h3,
-.dashboard-details-overlay .modal-header strong,
-.dashboard-details-overlay .modal-header b {
-    color: var(--dash-text-strong);
+.dashboard-modal-container button,
+.dashboard-details-container button{
+
+    transition:
+        transform var(--dash-transition),
+        background var(--dash-transition),
+        border-color var(--dash-transition),
+        color var(--dash-transition),
+        box-shadow var(--dash-transition);
 }
 
-.dashboard-details-overlay .modal-header .dashboard-modal-subtitle,
-.dashboard-details-overlay .modal-header .dashboard-modal-kicker {
-    color: var(--dash-muted);
+.dashboard-modal-container button:focus-visible,
+.dashboard-details-container button:focus-visible,
+.dashboard-page button:focus-visible{
+
+    outline:none;
+
+    box-shadow:
+        0 0 0 4px
+        var(--dash-input-focus);
 }
 
 
 /* ============================================================
-   DETAILS BODY
+   25. DRILLDOWN DEPTH SAFETY
+   مهم برای لایه‌های دوم، سوم و بیشتر.
+   هیچ فرضی درباره parent dashboard-page نداریم.
    ============================================================ */
 
-.dashboard-details-overlay .modal-body {
-    max-height: calc(92vh - 90px);
+.dashboard-details-overlay,
+.dashboard-details-overlay .dashboard-modal-container,
+.dashboard-details-overlay .dashboard-details-container,
+.dashboard-details-overlay .modal-header,
+.dashboard-details-overlay .modal-body{
 
-    overflow: auto;
-
-    padding: 18px 21px 23px;
-
-    background: var(--dash-surface);
-    color: var(--dash-text);
-
-    scrollbar-width: thin;
+    color:var(--dash-text);
 }
 
+.dashboard-details-overlay .modal-header{
+
+    background:var(--dash-modal-header);
+}
+
+.dashboard-details-overlay .modal-body{
+
+    background:var(--dash-modal-body);
+}
+
+
+/* هر عنصر داخل drilldown که رنگ inherit گرفته باشد */
+.dashboard-details-overlay .modal-header *,
+.dashboard-details-overlay .modal-body *{
+
+    border-color:inherit;
+}
+
+
+/* عناصر متنی اصلی */
 .dashboard-details-overlay .modal-body h1,
 .dashboard-details-overlay .modal-body h2,
 .dashboard-details-overlay .modal-body h3,
-.dashboard-details-overlay .modal-body h4 {
-    color: var(--dash-text-strong);
-}
-
+.dashboard-details-overlay .modal-body h4,
 .dashboard-details-overlay .modal-body strong,
-.dashboard-details-overlay .modal-body b {
-    color: var(--dash-text);
-}
+.dashboard-details-overlay .modal-body b{
 
-.dashboard-details-overlay .modal-body small {
-    color: var(--dash-muted);
+    color:var(--dash-text);
 }
 
 
-/* ============================================================
-   DETAILS CLOSE
-   ============================================================ */
+/* عناصر متنی فرعی */
+.dashboard-details-overlay .modal-body small{
 
-.dashboard-details-overlay .modal-close {
-    width: 36px;
-    height: 36px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 0;
-
-    border: 1px solid var(--dash-border);
-    border-radius: 10px;
-
-    background: var(--dash-surface-3);
-    color: var(--dash-text);
-
-    font-size: 23px;
-    line-height: 1;
-
-    cursor: pointer;
-
-    transition: var(--dash-transition);
-}
-
-.dashboard-details-overlay .modal-close:hover {
-    background: var(--dash-surface-2);
-
-    border-color: var(--dash-border-strong);
-
-    transform: rotate(3deg);
+    color:var(--dash-muted);
 }
 
 
 /* ============================================================
-   SCROLLBARS
+   26. LINKS
    ============================================================ */
 
-.dashboard-page *,
-.dashboard-modal-body,
-.dashboard-rules-body,
-.dashboard-details-overlay .modal-body {
-    scrollbar-width: thin;
-    scrollbar-color:
-        var(--dash-muted-2)
-        transparent;
+.dashboard-page a,
+.dashboard-modal-container a,
+.dashboard-details-container a{
+
+    color:var(--dash-primary);
+
+    text-decoration:none;
+
+    transition:color var(--dash-transition);
 }
 
-.dashboard-page ::-webkit-scrollbar,
-.dashboard-modal-body::-webkit-scrollbar,
-.dashboard-rules-body::-webkit-scrollbar,
-.dashboard-details-overlay .modal-body::-webkit-scrollbar {
-    width: 7px;
-    height: 7px;
-}
+.dashboard-page a:hover,
+.dashboard-modal-container a:hover,
+.dashboard-details-container a:hover{
 
-.dashboard-page ::-webkit-scrollbar-track,
-.dashboard-modal-body::-webkit-scrollbar-track,
-.dashboard-rules-body::-webkit-scrollbar-track,
-.dashboard-details-overlay .modal-body::-webkit-scrollbar-track {
-    background: transparent;
-}
+    color:var(--dash-primary-hover);
 
-.dashboard-page ::-webkit-scrollbar-thumb,
-.dashboard-modal-body::-webkit-scrollbar-thumb,
-.dashboard-rules-body::-webkit-scrollbar-thumb,
-.dashboard-details-overlay .modal-body::-webkit-scrollbar-thumb {
-    border-radius: 999px;
-
-    background: var(--dash-muted-2);
+    text-decoration:underline;
 }
 
 
 /* ============================================================
-   DARK MODE
-   فقط یک منبع حقیقت برای Dashboard
+   27. SELECTION
    ============================================================ */
 
-[data-theme="dark"] .dashboard-page,
-body.dark-mode .dashboard-page,
-body.dark .dashboard-page,
-.dark .dashboard-page {
+.dashboard-page ::selection,
+.dashboard-modal-container ::selection,
+.dashboard-details-container ::selection{
 
-    --dash-bg: #080d18;
+    background:
+        color-mix(
+            in srgb,
+            var(--dash-primary) 25%,
+            transparent
+        );
 
-    --dash-surface: #111827;
-    --dash-surface-2: #172033;
-    --dash-surface-3: #1e293b;
-
-    --dash-border: rgba(255, 255, 255, .085);
-    --dash-border-strong: rgba(255, 255, 255, .15);
-
-    --dash-text: #e5e7eb;
-    --dash-text-strong: #f8fafc;
-
-    --dash-muted: rgba(226, 232, 240, .62);
-    --dash-muted-2: rgba(226, 232, 240, .40);
-
-    --dash-placeholder: rgba(226, 232, 240, .38);
-
-    --dash-input-bg: #0f172a;
-    --dash-input-border: rgba(255, 255, 255, .12);
-    --dash-input-focus: rgba(96, 165, 250, .22);
-
-    --dash-shadow-sm:
-        0 6px 22px rgba(0, 0, 0, .18);
-
-    --dash-shadow:
-        0 15px 45px rgba(0, 0, 0, .28);
-
-    --dash-shadow-lg:
-        0 35px 100px rgba(0, 0, 0, .48);
-
-    --dash-overlay:
-        rgba(0, 0, 0, .68);
+    color:var(--dash-text);
 }
 
 
 /* ============================================================
-   DARK MODAL SAFETY
-   این بخش جلوی همان مشکل صفحه سیاه + متن سیاه را می‌گیرد.
+   28. RESPONSIVE — 1100
    ============================================================ */
 
-[data-theme="dark"] .dashboard-modal-container,
-body.dark-mode .dashboard-modal-container,
-body.dark .dashboard-modal-container,
-.dark .dashboard-modal-container,
+@media(max-width:1100px){
 
-[data-theme="dark"] .dashboard-details-container,
-body.dark-mode .dashboard-details-container,
-body.dark .dashboard-details-container,
-.dark .dashboard-details-container {
+    .dashboard-page{
 
-    background: var(--dash-surface);
-    color: var(--dash-text);
-
-    border-color: var(--dash-border);
-}
-
-
-/* Header */
-
-[data-theme="dark"] .dashboard-modal-header,
-body.dark-mode .dashboard-modal-header,
-body.dark .dashboard-modal-header,
-.dark .dashboard-modal-header,
-
-[data-theme="dark"] .dashboard-details-overlay .modal-header,
-body.dark-mode .dashboard-details-overlay .modal-header,
-body.dark .dashboard-details-overlay .modal-header,
-.dark .dashboard-details-overlay .modal-header {
-
-    background: var(--dash-surface);
-    color: var(--dash-text);
-
-    border-color: var(--dash-border);
-}
-
-
-/* Header titles */
-
-[data-theme="dark"] .dashboard-modal-header h1,
-[data-theme="dark"] .dashboard-modal-header h2,
-[data-theme="dark"] .dashboard-modal-header h3,
-[data-theme="dark"] .dashboard-modal-header strong,
-[data-theme="dark"] .dashboard-modal-header b,
-
-body.dark-mode .dashboard-modal-header h1,
-body.dark-mode .dashboard-modal-header h2,
-body.dark-mode .dashboard-modal-header h3,
-body.dark-mode .dashboard-modal-header strong,
-body.dark-mode .dashboard-modal-header b,
-
-body.dark .dashboard-modal-header h1,
-body.dark .dashboard-modal-header h2,
-body.dark .dashboard-modal-header h3,
-body.dark .dashboard-modal-header strong,
-body.dark .dashboard-modal-header b,
-
-.dark .dashboard-modal-header h1,
-.dark .dashboard-modal-header h2,
-.dark .dashboard-modal-header h3,
-.dark .dashboard-modal-header strong,
-.dark .dashboard-modal-header b,
-
-[data-theme="dark"] .dashboard-details-overlay .modal-header h1,
-[data-theme="dark"] .dashboard-details-overlay .modal-header h2,
-[data-theme="dark"] .dashboard-details-overlay .modal-header h3,
-[data-theme="dark"] .dashboard-details-overlay .modal-header strong,
-[data-theme="dark"] .dashboard-details-overlay .modal-header b,
-
-body.dark-mode .dashboard-details-overlay .modal-header h1,
-body.dark-mode .dashboard-details-overlay .modal-header h2,
-body.dark-mode .dashboard-details-overlay .modal-header h3,
-body.dark-mode .dashboard-details-overlay .modal-header strong,
-body.dark-mode .dashboard-details-overlay .modal-header b,
-
-body.dark .dashboard-details-overlay .modal-header h1,
-body.dark .dashboard-details-overlay .modal-header h2,
-body.dark .dashboard-details-overlay .modal-header h3,
-body.dark .dashboard-details-overlay .modal-header strong,
-body.dark .dashboard-details-overlay .modal-header b,
-
-.dark .dashboard-details-overlay .modal-header h1,
-.dark .dashboard-details-overlay .modal-header h2,
-.dark .dashboard-details-overlay .modal-header h3,
-.dark .dashboard-details-overlay .modal-header strong,
-.dark .dashboard-details-overlay .modal-header b {
-
-    color: var(--dash-text-strong);
-}
-
-
-/* Body */
-
-[data-theme="dark"] .dashboard-modal-body,
-body.dark-mode .dashboard-modal-body,
-body.dark .dashboard-modal-body,
-.dark .dashboard-modal-body,
-
-[data-theme="dark"] .dashboard-rules-body,
-body.dark-mode .dashboard-rules-body,
-body.dark .dashboard-rules-body,
-.dark .dashboard-rules-body,
-
-[data-theme="dark"] .dashboard-details-overlay .modal-body,
-body.dark-mode .dashboard-details-overlay .modal-body,
-body.dark .dashboard-details-overlay .modal-body,
-.dark .dashboard-details-overlay .modal-body {
-
-    background: var(--dash-surface);
-    color: var(--dash-text);
-}
-
-
-/* Body headings */
-
-[data-theme="dark"] .dashboard-modal-body h1,
-[data-theme="dark"] .dashboard-modal-body h2,
-[data-theme="dark"] .dashboard-modal-body h3,
-[data-theme="dark"] .dashboard-modal-body h4,
-[data-theme="dark"] .dashboard-modal-body strong,
-[data-theme="dark"] .dashboard-modal-body b,
-
-body.dark-mode .dashboard-modal-body h1,
-body.dark-mode .dashboard-modal-body h2,
-body.dark-mode .dashboard-modal-body h3,
-body.dark-mode .dashboard-modal-body h4,
-body.dark-mode .dashboard-modal-body strong,
-body.dark-mode .dashboard-modal-body b,
-
-body.dark .dashboard-modal-body h1,
-body.dark .dashboard-modal-body h2,
-body.dark .dashboard-modal-body h3,
-body.dark .dashboard-modal-body h4,
-body.dark .dashboard-modal-body strong,
-body.dark .dashboard-modal-body b,
-
-.dark .dashboard-modal-body h1,
-.dark .dashboard-modal-body h2,
-.dark .dashboard-modal-body h3,
-.dark .dashboard-modal-body h4,
-.dark .dashboard-modal-body strong,
-.dark .dashboard-modal-body b,
-
-[data-theme="dark"] .dashboard-details-overlay .modal-body h1,
-[data-theme="dark"] .dashboard-details-overlay .modal-body h2,
-[data-theme="dark"] .dashboard-details-overlay .modal-body h3,
-[data-theme="dark"] .dashboard-details-overlay .modal-body h4,
-[data-theme="dark"] .dashboard-details-overlay .modal-body strong,
-[data-theme="dark"] .dashboard-details-overlay .modal-body b,
-
-body.dark-mode .dashboard-details-overlay .modal-body h1,
-body.dark-mode .dashboard-details-overlay .modal-body h2,
-body.dark-mode .dashboard-details-overlay .modal-body h3,
-body.dark-mode .dashboard-details-overlay .modal-body h4,
-body.dark-mode .dashboard-details-overlay .modal-body strong,
-body.dark-mode .dashboard-details-overlay .modal-body b,
-
-body.dark .dashboard-details-overlay .modal-body h1,
-body.dark .dashboard-details-overlay .modal-body h2,
-body.dark .dashboard-details-overlay .modal-body h3,
-body.dark .dashboard-details-overlay .modal-body h4,
-body.dark .dashboard-details-overlay .modal-body strong,
-body.dark .dashboard-details-overlay .modal-body b,
-
-.dark .dashboard-details-overlay .modal-body h1,
-.dark .dashboard-details-overlay .modal-body h2,
-.dark .dashboard-details-overlay .modal-body h3,
-.dark .dashboard-details-overlay .modal-body h4,
-.dark .dashboard-details-overlay .modal-body strong,
-.dark .dashboard-details-overlay .modal-body b {
-
-    color: var(--dash-text-strong);
-}
-
-
-/* ============================================================
-   DARK FORM CONTROLS
-   ============================================================ */
-
-[data-theme="dark"] .dashboard-page input,
-[data-theme="dark"] .dashboard-page select,
-[data-theme="dark"] .dashboard-page textarea,
-
-body.dark-mode .dashboard-page input,
-body.dark-mode .dashboard-page select,
-body.dark-mode .dashboard-page textarea,
-
-body.dark .dashboard-page input,
-body.dark .dashboard-page select,
-body.dark .dashboard-page textarea,
-
-.dark .dashboard-page input,
-.dark .dashboard-page select,
-.dark .dashboard-page textarea,
-
-[data-theme="dark"] .dashboard-modal-container input,
-[data-theme="dark"] .dashboard-modal-container select,
-[data-theme="dark"] .dashboard-modal-container textarea,
-
-body.dark-mode .dashboard-modal-container input,
-body.dark-mode .dashboard-modal-container select,
-body.dark-mode .dashboard-modal-container textarea,
-
-body.dark .dashboard-modal-container input,
-body.dark .dashboard-modal-container select,
-body.dark .dashboard-modal-container textarea,
-
-.dark .dashboard-modal-container input,
-.dark .dashboard-modal-container select,
-.dark .dashboard-modal-container textarea,
-
-[data-theme="dark"] .dashboard-details-container input,
-[data-theme="dark"] .dashboard-details-container select,
-[data-theme="dark"] .dashboard-details-container textarea,
-
-body.dark-mode .dashboard-details-container input,
-body.dark-mode .dashboard-details-container select,
-body.dark-mode .dashboard-details-container textarea,
-
-body.dark .dashboard-details-container input,
-body.dark .dashboard-details-container select,
-body.dark .dashboard-details-container textarea,
-
-.dark .dashboard-details-container input,
-.dark .dashboard-details-container select,
-.dark .dashboard-details-container textarea {
-
-    background: var(--dash-input-bg);
-    color: var(--dash-text);
-
-    border-color: var(--dash-input-border);
-}
-
-
-/* ============================================================
-   DARK CLOSE BUTTON
-   ============================================================ */
-
-[data-theme="dark"] .dashboard-modal-close,
-body.dark-mode .dashboard-modal-close,
-body.dark .dashboard-modal-close,
-.dark .dashboard-modal-close,
-
-[data-theme="dark"] .dashboard-details-overlay .modal-close,
-body.dark-mode .dashboard-details-overlay .modal-close,
-body.dark .dashboard-details-overlay .modal-close,
-.dark .dashboard-details-overlay .modal-close {
-
-    background: var(--dash-surface-3);
-
-    color: var(--dash-text);
-
-    border-color: var(--dash-border);
-}
-
-
-/* ============================================================
-   RESPONSIVE — 1100
-   ============================================================ */
-
-@media (max-width: 1100px) {
-
-    .dashboard-kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
+        padding:19px;
     }
 
-    .dashboard-plan-row {
+    .dashboard-kpi-grid{
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+    }
+
+    .dashboard-plan-row{
+
         grid-template-columns:
             38px
-            1fr
+            minmax(0,1fr)
             75px
             75px;
     }
 
-    .dashboard-plan-progress {
-        grid-column: 2 / -1;
+    .dashboard-plan-progress{
+
+        grid-column:2 / -1;
     }
 
-    .dashboard-plan-arrow {
-        display: none;
+    .dashboard-plan-arrow{
+
+        display:none;
+    }
+
+    .dashboard-rule-grid{
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
     }
 }
 
 
 /* ============================================================
-   RESPONSIVE — 760
+   29. RESPONSIVE — 760
    ============================================================ */
 
-@media (max-width: 760px) {
+@media(max-width:760px){
 
-    .dashboard-page {
-        padding: 12px;
+    .dashboard-page{
+
+        padding:12px;
     }
 
-    .dashboard-topbar {
-        align-items: flex-start;
+    .dashboard-topbar{
 
-        flex-direction: column;
+        align-items:flex-start;
+
+        flex-direction:column;
+
+        gap:13px;
     }
 
-    .dashboard-actions {
-        width: 100%;
+    .dashboard-actions{
+
+        width:100%;
     }
 
-    .dashboard-date {
-        flex: 1;
+    .dashboard-date{
+
+        flex:1;
     }
 
-    .dashboard-title {
-        font-size: 23px;
+    .dashboard-title{
+
+        font-size:23px;
     }
 
-    .dashboard-hero {
-        padding: 18px;
+    .dashboard-hero{
 
-        border-radius: 19px;
+        padding:19px;
+
+        border-radius:20px;
     }
 
-    .dashboard-status-orb {
-        width: 56px;
-        height: 56px;
+    .dashboard-hero-main{
 
-        min-width: 56px;
-
-        border-radius: 17px;
-
-        font-size: 24px;
+        gap:13px;
     }
 
-    .dashboard-status-title {
-        font-size: 19px;
+    .dashboard-status-orb{
+
+        width:57px;
+        height:57px;
+        min-width:57px;
+
+        border-radius:17px;
+
+        font-size:24px;
+    }
+
+    .dashboard-status-title{
+
+        font-size:19px;
     }
 
     .dashboard-kpi-grid,
     .dashboard-status-grid,
-    .dashboard-action-grid {
-        grid-template-columns: 1fr;
+    .dashboard-action-grid{
+
+        grid-template-columns:1fr;
     }
 
-    .dashboard-plan-row {
+    .dashboard-plan-row{
+
         grid-template-columns:
             36px
-            1fr
+            minmax(0,1fr)
             65px;
 
-        gap: 9px;
+        gap:9px;
 
-        padding: 10px;
+        padding:11px;
     }
 
-    .dashboard-plan-metric:nth-of-type(4) {
-        display: none;
+    .dashboard-plan-metric:nth-of-type(4){
+
+        display:none;
     }
 
-    .dashboard-detail-kpis {
-        grid-template-columns: repeat(2, 1fr);
+    .dashboard-detail-kpis{
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
     }
 
-    .dashboard-material-row {
+    .dashboard-material-row{
+
         grid-template-columns:
             33px
-            1fr
+            minmax(0,1fr)
             70px;
     }
 
-    .dashboard-material-row > div:nth-last-child(-n + 2) {
-        display: none;
+    .dashboard-material-row > div:nth-last-child(-n+2){
+
+        display:none;
     }
 
-    .dashboard-rule-grid {
-        grid-template-columns: 1fr;
+    .dashboard-rule-grid{
+
+        grid-template-columns:1fr;
     }
 
     .dashboard-modal-overlay,
-    .dashboard-details-overlay {
-        padding: 7px;
+    .dashboard-details-overlay{
+
+        align-items:flex-start;
+
+        padding:8px;
     }
 
     .dashboard-modal-container,
-    .dashboard-details-container {
-        max-height: 94vh;
+    .dashboard-details-container{
 
-        border-radius: 19px;
+        width:100%;
+
+        max-height:94vh;
+
+        margin:auto 0;
+
+        border-radius:20px;
     }
 
-    .dashboard-modal-shell {
-        max-height: 94vh;
-    }
+    .dashboard-modal-header,
+    .dashboard-details-overlay .modal-header{
 
-    .dashboard-modal-header {
-        padding: 15px;
+        min-height:74px;
+
+        padding:15px;
     }
 
     .dashboard-modal-body,
     .dashboard-rules-body,
-    .dashboard-details-overlay .modal-body {
-        padding: 14px;
-    }
+    .dashboard-details-overlay .modal-body{
 
-    .dashboard-details-overlay .modal-body {
-        max-height: calc(94vh - 80px);
+        padding:15px;
     }
 }
 
 
 /* ============================================================
-   RESPONSIVE — 430
+   30. RESPONSIVE — 430
    ============================================================ */
 
-@media (max-width: 430px) {
+@media(max-width:430px){
 
-    .dashboard-kpi-grid {
-        gap: 8px;
+    .dashboard-page{
+
+        padding:9px;
     }
 
-    .dashboard-kpi {
-        padding: 12px;
+    .dashboard-kpi-grid{
+
+        gap:8px;
     }
 
-    .dashboard-kpi-icon {
-        width: 38px;
-        height: 38px;
+    .dashboard-kpi{
 
-        min-width: 38px;
+        padding:12px;
+
+        border-radius:15px;
     }
 
-    .dashboard-kpi-value {
-        font-size: 20px;
+    .dashboard-kpi-icon{
+
+        width:38px;
+        height:38px;
+        min-width:38px;
+
+        border-radius:11px;
     }
 
-    .dashboard-detail-kpis > div {
-        padding: 10px;
+    .dashboard-kpi-value{
+
+        font-size:20px;
     }
 
-    .dashboard-detail-kpis strong {
-        font-size: 17px;
+    .dashboard-detail-kpis > div{
+
+        padding:11px;
     }
 
-    .dashboard-hero-main {
-        gap: 12px;
+    .dashboard-detail-kpis strong{
+
+        font-size:17px;
+    }
+
+    .dashboard-modal-container,
+    .dashboard-details-container{
+
+        border-radius:18px;
+    }
+
+    .dashboard-modal-header h2{
+
+        font-size:16px;
+    }
+
+    .dashboard-modal-badge{
+
+        width:40px;
+        height:40px;
+        min-width:40px;
     }
 }
 
 
 /* ============================================================
-   ACCESSIBILITY
+   31. REDUCED MOTION
    ============================================================ */
 
-.dashboard-page button:focus-visible,
-.dashboard-page input:focus-visible,
-.dashboard-page select:focus-visible,
-.dashboard-page textarea:focus-visible,
-
-.dashboard-modal-container button:focus-visible,
-.dashboard-modal-container input:focus-visible,
-.dashboard-modal-container select:focus-visible,
-.dashboard-modal-container textarea:focus-visible,
-
-.dashboard-details-container button:focus-visible,
-.dashboard-details-container input:focus-visible,
-.dashboard-details-container select:focus-visible,
-.dashboard-details-container textarea:focus-visible {
-    outline: 2px solid var(--dash-blue);
-
-    outline-offset: 2px;
-}
-
-
-/* ============================================================
-   REDUCED MOTION
-   ============================================================ */
-
-@media (prefers-reduced-motion: reduce) {
+@media(prefers-reduced-motion:reduce){
 
     .dashboard-page *,
-    .dashboard-modal-container *,
-    .dashboard-details-container * {
-        animation-duration: .01ms !important;
-        animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
-        transition-duration: .01ms !important;
+    .dashboard-modal-overlay *,
+    .dashboard-details-overlay *{
+
+        animation-duration:.01ms !important;
+
+        animation-iteration-count:1 !important;
+
+        transition-duration:.01ms !important;
     }
-}    
+}
+
+
 </style>
 
 </head>
