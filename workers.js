@@ -6145,20 +6145,36 @@ async function handleGet(
     url
 ) {
 
-    // --------------------------------------------------------
-    // DASHBOARD SNAPSHOT
-    // --------------------------------------------------------
+   // --------------------------------------------------------
+// DASHBOARD SNAPSHOT
+// --------------------------------------------------------
+//
+// بدون date:
+// رفتار قبلی حفظ می‌شود و آخرین Snapshot برمی‌گردد.
+//
+// با date:
+// داشبورد همان تاریخ درخواست‌شده را برمی‌گرداند.
+// --------------------------------------------------------
 
-    if (
-        path ===
-        "/api/dashboard"
-    ) {
+if (
+    path ===
+    "/api/dashboard"
+) {
 
-        return await getDashboardSnapshot(
-            env
+    const requestedDate =
+        url.searchParams.get(
+            "date"
         );
 
-    }
+    return await getDashboardSnapshot(
+
+        env,
+
+        requestedDate
+
+    );
+
+}
     // --------------------------------------------------------
     // MANUAL DASHBOARD SNAPSHOT REFRESH
     // --------------------------------------------------------
@@ -9915,14 +9931,14 @@ async function refreshDashboardSnapshot(
     env
 ) {
 
-    // const businessDate =
-    //     new Date()
-    //        .toISOString()
-    //         .slice(
-    //              0,
-    //             10
-    //         );
-    const businessDate = "1405/06/05";
+     const businessDate =
+         new Date()
+            .toISOString()
+             .slice(
+                  0,
+                 10
+             );
+     //const businessDate = "1405/06/05";
 
     await cleanupDashboardSnapshots(
         env
@@ -9942,138 +9958,717 @@ async function refreshDashboardSnapshot(
 // ============================================================
 // GET DASHBOARD SNAPSHOT
 // ============================================================
+//
+// requestedDate = null
+//     رفتار قبلی:
+//     آخرین Snapshot موجود.
+//
+// requestedDate = تاریخ مشخص
+//     Snapshot همان تاریخ.
+//
+// اگر برای تاریخ موردنظر Snapshot وجود نداشته باشد:
+//     از planning_daily همان تاریخ یک Dashboard موقت ساخته می‌شود.
+//
+// IMPORTANT:
+// Dashboard آینده در این حالت در dashboard_snapshots ذخیره نمی‌شود.
+// ============================================================
 
 async function getDashboardSnapshot(
-    env
+    env,
+    requestedDate = null
 ) {
 
-    const snapshot =
-        await env.DB
-            .prepare(`
+    // --------------------------------------------------------
+    // NORMALIZE REQUESTED DATE
+    // --------------------------------------------------------
 
-                SELECT *
-
-                FROM dashboard_snapshots
-
-                ORDER BY
-                    snapshot_at DESC
-
-                LIMIT 1
-
-            `)
-            .first();
+    const date =
+        requestedDate
+            ? String(
+                requestedDate
+            ).trim()
+            : null;
 
 
-    if (!snapshot) {
+    // --------------------------------------------------------
+    // CASE 1
+    // NO DATE
+    //
+    // رفتار قبلی سیستم حفظ می‌شود.
+    // --------------------------------------------------------
+
+    let snapshot;
+
+
+    if (!date) {
+
+        snapshot =
+            await env.DB
+                .prepare(`
+
+                    SELECT *
+
+                    FROM dashboard_snapshots
+
+                    ORDER BY
+                        snapshot_at DESC
+
+                    LIMIT 1
+
+                `)
+                .first();
+
+    }
+
+    // --------------------------------------------------------
+    // CASE 2
+    // SPECIFIC DATE
+    // --------------------------------------------------------
+
+    else {
+
+        snapshot =
+            await env.DB
+                .prepare(`
+
+                    SELECT *
+
+                    FROM dashboard_snapshots
+
+                    WHERE
+                        business_date = ?
+
+                    ORDER BY
+                        snapshot_at DESC
+
+                    LIMIT 1
+
+                `)
+                .bind(
+                    date
+                )
+                .first();
+
+    }
+
+
+    // --------------------------------------------------------
+    // SNAPSHOT EXISTS
+    // --------------------------------------------------------
+
+    if (snapshot) {
+
+        const detailsResult =
+            await env.DB
+                .prepare(`
+
+                    SELECT *
+
+                    FROM dashboard_snapshot_details
+
+                    WHERE
+                        snapshot_id = ?
+
+                    ORDER BY
+
+                        CASE severity
+
+                            WHEN 'red'
+                            THEN 1
+
+                            WHEN 'yellow'
+                            THEN 2
+
+                            ELSE 3
+
+                        END,
+
+                        product_name,
+
+                        planning_id
+
+                `)
+                .bind(
+                    snapshot.id
+                )
+                .all();
+
+
+        const materialsResult =
+            await env.DB
+                .prepare(`
+
+                    SELECT *
+
+                    FROM dashboard_snapshot_materials
+
+                    WHERE
+                        snapshot_id = ?
+
+                    ORDER BY
+
+                        CASE severity
+
+                            WHEN 'red'
+                            THEN 1
+
+                            WHEN 'yellow'
+                            THEN 2
+
+                            ELSE 3
+
+                        END,
+
+                        planning_id,
+
+                        part_name
+
+                `)
+                .bind(
+                    snapshot.id
+                )
+                .all();
+
 
         return {
 
-            snapshot:
-                null,
+            snapshot,
 
             details:
+                detailsResult.results ||
                 [],
 
             materials:
-                [],
-
-            message:
-                "هنوز Snapshot داشبورد ساخته نشده است."
+                materialsResult.results ||
+                []
 
         };
 
     }
 
 
-    const detailsResult =
-        await env.DB
-            .prepare(`
+    // --------------------------------------------------------
+    // SPECIFIC DATE WITHOUT SNAPSHOT
+    //
+    // برای آینده یا تاریخی که Snapshot ندارد.
+    //
+    // ابتدا بررسی می‌کنیم آیا اصلاً برنامه‌ای
+    // برای آن تاریخ وجود دارد یا خیر.
+    // --------------------------------------------------------
 
-                SELECT *
+    if (date) {
 
-                FROM dashboard_snapshot_details
+        const plans =
+            await getDashboardProductionDetails(
 
-                WHERE
-                    snapshot_id = ?
+                env,
 
-                ORDER BY
+                date
 
-                    CASE severity
-
-                        WHEN 'red'
-                        THEN 1
-
-                        WHEN 'yellow'
-                        THEN 2
-
-                        ELSE 3
-
-                    END,
-
-                    product_name,
-
-                    planning_id
-
-            `)
-            .bind(
-                snapshot.id
-            )
-            .all();
+            );
 
 
-    const materialsResult =
-        await env.DB
-            .prepare(`
+        // ----------------------------------------------------
+        // NO PLAN FOR REQUESTED DATE
+        // ----------------------------------------------------
 
-                SELECT *
+        if (
+            plans.length === 0
+        ) {
 
-                FROM dashboard_snapshot_materials
+            return {
 
-                WHERE
-                    snapshot_id = ?
+                snapshot: {
 
-                ORDER BY
+                    business_date:
+                        date,
 
-                    CASE severity
+                    total_planned:
+                        0,
 
-                        WHEN 'red'
-                        THEN 1
+                    total_produced:
+                        0,
 
-                        WHEN 'yellow'
-                        THEN 2
+                    total_remaining:
+                        0,
 
-                        ELSE 3
+                    achievement_percent:
+                        0,
 
-                    END,
+                    total_plans:
+                        0,
 
-                    planning_id,
+                    active_plans:
+                        0,
 
-                    part_name
+                    completed_plans:
+                        0,
 
-            `)
-            .bind(
-                snapshot.id
-            )
-            .all();
+                    not_started_plans:
+                        0,
 
+                    total_products:
+                        0,
+
+                    products_on_track:
+                        0,
+
+                    products_at_risk:
+                        0,
+
+                    products_critical:
+                        0,
+
+                    green_alerts:
+                        0,
+
+                    yellow_alerts:
+                        0,
+
+                    red_alerts:
+                        0,
+
+                    snapshot_at:
+                        null,
+
+                    is_virtual:
+                        true
+
+                },
+
+                details: [],
+
+                materials: [],
+
+                message:
+                    "برای این تاریخ برنامه تولیدی ثبت نشده است."
+
+            };
+
+        }
+
+
+        // ----------------------------------------------------
+        // BUILD VIRTUAL DASHBOARD
+        //
+        // IMPORTANT:
+        // هیچ INSERT انجام نمی‌شود.
+        // ----------------------------------------------------
+
+        let totalPlanned =
+            0;
+
+        let totalProduced =
+            0;
+
+        let totalRemaining =
+            0;
+
+        let activePlans =
+            0;
+
+        let completedPlans =
+            0;
+
+        let notStartedPlans =
+            0;
+
+        let productsOnTrack =
+            0;
+
+        let productsAtRisk =
+            0;
+
+        let productsCritical =
+            0;
+
+        let materialShortagePlans =
+            0;
+
+        let materialShortageItems =
+            0;
+
+
+        const detailRows =
+            [];
+
+        const materialRows =
+            [];
+
+
+        for (
+            const row
+            of plans
+        ) {
+
+            const planned =
+                Number(
+                    row.planned_quantity ||
+                    0
+                );
+
+
+            const produced =
+                Number(
+                    row.produced_quantity ||
+                    0
+                );
+
+
+            const remaining =
+                Math.max(
+
+                    0,
+
+                    planned -
+                    produced
+
+                );
+
+
+            const achievement =
+                planned > 0
+
+                    ? (
+                        produced /
+                        planned
+                    ) * 100
+
+                    : 0;
+
+
+            totalPlanned +=
+                planned;
+
+
+            totalProduced +=
+                produced;
+
+
+            totalRemaining +=
+                remaining;
+
+
+            const severity =
+                getDashboardProductionSeverity(
+
+                    planned,
+
+                    produced
+
+                );
+
+
+            if (
+                severity.severity ===
+                "green"
+            ) {
+
+                productsOnTrack++;
+
+            }
+
+            else if (
+                severity.severity ===
+                "yellow"
+            ) {
+
+                productsAtRisk++;
+
+            }
+
+            else {
+
+                productsCritical++;
+
+            }
+
+
+            if (
+                row.plan_status ===
+                "completed"
+            ) {
+
+                completedPlans++;
+
+            }
+
+            else if (
+                row.plan_status ===
+                "in_progress"
+            ) {
+
+                activePlans++;
+
+            }
+
+            else {
+
+                notStartedPlans++;
+
+            }
+
+
+            detailRows.push({
+
+                detail_type:
+                    "production_plan",
+
+                entity_id:
+                    row.planning_id,
+
+                planning_id:
+                    row.planning_id,
+
+                product_id:
+                    row.product_id,
+
+                bom_id:
+                    row.bom_id,
+
+                plan_date:
+                    row.plan_date,
+
+                product_code:
+                    row.product_code,
+
+                product_name:
+                    row.product_name,
+
+                bom_code:
+                    row.bom_code,
+
+                planned_quantity:
+                    planned,
+
+                produced_quantity:
+                    produced,
+
+                remaining_quantity:
+                    remaining,
+
+                achievement_percent:
+                    achievement,
+
+                status:
+                    row.plan_status,
+
+                severity:
+                    severity.severity,
+
+                severity_code:
+                    severity.code,
+
+                severity_message:
+                    severity.message
+
+            });
+
+
+            // ------------------------------------------------
+            // MATERIAL ANALYSIS
+            // ------------------------------------------------
+
+            const materials =
+                await getDashboardMaterialRequirements(
+
+                    env,
+
+                    row,
+
+                    remaining
+
+                );
+
+
+            let hasMaterialShortage =
+                false;
+
+
+            for (
+                const material
+                of materials
+            ) {
+
+                materialRows.push(
+                    material
+                );
+
+
+                if (
+                    material.sufficient !== 1
+                ) {
+
+                    hasMaterialShortage =
+                        true;
+
+                    materialShortageItems++;
+
+                }
+
+            }
+
+
+            if (
+                hasMaterialShortage
+            ) {
+
+                materialShortagePlans++;
+
+            }
+
+        }
+
+
+        const totalPlans =
+            plans.length;
+
+
+        const totalProducts =
+            new Set(
+
+                plans.map(
+                    item =>
+                        item.product_id
+                )
+
+            ).size;
+
+
+        const achievementPercent =
+            totalPlanned > 0
+
+                ? (
+                    totalProduced /
+                    totalPlanned
+                ) * 100
+
+                : 0;
+
+
+        const inventorySummary =
+            await getDashboardInventorySummary(
+                env
+            );
+
+
+        const greenAlerts =
+            productsOnTrack;
+
+
+        const yellowAlerts =
+            productsAtRisk +
+            materialShortagePlans;
+
+
+        const redAlerts =
+            productsCritical +
+            materialShortageItems;
+
+
+        return {
+
+            snapshot: {
+
+                business_date:
+                    date,
+
+                total_planned:
+                    totalPlanned,
+
+                total_produced:
+                    totalProduced,
+
+                total_remaining:
+                    totalRemaining,
+
+                achievement_percent:
+                    achievementPercent,
+
+                total_plans:
+                    totalPlans,
+
+                active_plans:
+                    activePlans,
+
+                completed_plans:
+                    completedPlans,
+
+                not_started_plans:
+                    notStartedPlans,
+
+                total_products:
+                    totalProducts,
+
+                products_on_track:
+                    productsOnTrack,
+
+                products_at_risk:
+                    productsAtRisk,
+
+                products_critical:
+                    productsCritical,
+
+                inventory_item_count:
+                    inventorySummary
+                        .positive_item_lines,
+
+                inventory_total:
+                    inventorySummary
+                        .total_quantity,
+
+                green_alerts:
+                    greenAlerts,
+
+                yellow_alerts:
+                    yellowAlerts,
+
+                red_alerts:
+                    redAlerts,
+
+                snapshot_at:
+                    null,
+
+                is_virtual:
+                    true
+
+            },
+
+            details:
+                detailRows,
+
+            materials:
+                materialRows,
+
+            message:
+                "نمایش برنامه تولید این تاریخ بر اساس اطلاعات ثبت‌شده در سیستم انجام شد."
+
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // NO SNAPSHOT + NO DATE
+    // --------------------------------------------------------
 
     return {
 
-        snapshot,
+        snapshot:
+            null,
 
         details:
-            detailsResult.results ||
             [],
 
         materials:
-            materialsResult.results ||
-            []
+            [],
+
+        message:
+            "هنوز Snapshot داشبورد ساخته نشده است."
 
     };
 
 }
-
-
 // ============================================================
 // DASHBOARD DETAILS — MANAGEMENT DRILL DOWN
 // ============================================================
