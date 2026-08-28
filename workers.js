@@ -4360,6 +4360,7 @@ async function getProductionPlans(
 // UPDATE PRODUCTION PLAN
 // ============================================================
 
+
 async function updateProductionPlan(
     request,
     env,
@@ -4460,32 +4461,6 @@ async function updateProductionPlan(
 
 
     // --------------------------------------------------------
-    // CHECK PLAN STATUS
-    // --------------------------------------------------------
-
-    if (
-        ![
-            "planned",
-            "in_progress"
-        ].includes(
-            existingPlan.status
-        )
-    ) {
-
-        throw new AppError(
-
-            "PLAN-106",
-
-            "این برنامه تولید در وضعیت قابل ویرایش نیست.",
-
-            409
-
-        );
-
-    }
-
-
-    // --------------------------------------------------------
     // LOAD ACTIVE BOM
     // --------------------------------------------------------
 
@@ -4536,7 +4511,7 @@ async function updateProductionPlan(
     // --------------------------------------------------------
     // CHECK DUPLICATE DATE + BOM
     //
-    // خود برنامه فعلی باید از این بررسی مستثنی باشد.
+    // خود برنامه فعلی از بررسی مستثنی است.
     // --------------------------------------------------------
 
     const duplicatePlan =
@@ -4642,6 +4617,96 @@ async function updateProductionPlan(
 
 
     // --------------------------------------------------------
+    // OLD / NEW QUANTITY
+    // --------------------------------------------------------
+
+    const oldPlannedQuantity =
+        Number(
+            existingPlan.planned_quantity
+        );
+
+
+    const quantityIncrease =
+        plannedQuantity -
+        oldPlannedQuantity;
+
+
+    // --------------------------------------------------------
+    // COMPLETED PLAN RULE
+    //
+    // برنامه Completed:
+    //
+    // 1. تاریخ گذشته:
+    //    قابل ویرایش نیست.
+    //
+    // 2. امروز یا آینده:
+    //    فقط افزایش مقدار مجاز است.
+    //
+    // کاهش برنامه Completed همچنان از مسیر DELETE
+    // و منطق قبلی سیستم انجام می‌شود.
+    // --------------------------------------------------------
+
+    let resultingStatus =
+        existingPlan.status;
+
+
+    if (
+        existingPlan.status ===
+        "completed"
+    ) {
+
+         // ----------------------------------------------------
+        // COMPLETED + TODAY/FUTURE
+        //
+        // فقط افزایش مجاز است.
+        // ----------------------------------------------------
+
+        if (
+            quantityIncrease <=
+            0
+        ) {
+
+            throw new AppError(
+
+                "PLAN-115",
+
+                "برنامه تولید تکمیل‌شده فقط برای افزایش مقدار برنامه قابل ویرایش است.",
+
+                409,
+
+                {
+
+                    planning_id:
+                        planningId,
+
+                    planned_quantity:
+                        oldPlannedQuantity,
+
+                    requested_quantity:
+                        plannedQuantity,
+
+                    already_produced:
+                        alreadyProduced
+
+                }
+
+            );
+
+        }
+
+
+        // ----------------------------------------------------
+        // بعد از افزایش، چون تولیدشده کمتر از برنامه جدید
+        // است، وضعیت باید in_progress شود.
+        // ----------------------------------------------------
+
+        resultingStatus =
+            "in_progress";
+
+    }
+
+
+    // --------------------------------------------------------
     // NEW PLAN CANNOT BE LESS THAN ALREADY PRODUCED
     // --------------------------------------------------------
 
@@ -4674,16 +4739,67 @@ async function updateProductionPlan(
 
 
     // --------------------------------------------------------
+    // EXISTING NON-COMPLETED PLAN
+    //
+    // وضعیت فعلی منطق قبلی حفظ می‌شود.
+    // --------------------------------------------------------
+
+    if (
+        existingPlan.status !==
+        "completed"
+    ) {
+
+           // --------------------------------------------------------
+    // CHECK PLAN STATUS
+    // --------------------------------------------------------
+
+    if (
+        existingPlan.status !== "planned" &&
+        existingPlan.status !== "in_progress" &&
+        existingPlan.status !== "completed"
+    ) {
+
+        throw new AppError(
+
+            "PLAN-106",
+
+            "این برنامه تولید در وضعیت قابل ویرایش نیست.",
+
+            409
+
+        );
+
+    }
+
+
+        resultingStatus =
+            plannedQuantity >
+                alreadyProduced
+
+                ? (
+                    alreadyProduced >
+                        0
+                        ? "in_progress"
+                        : existingPlan.status
+                )
+
+                : (
+                    plannedQuantity ===
+                        alreadyProduced &&
+                        alreadyProduced >
+                        0
+                        ? "completed"
+                        : existingPlan.status
+                );
+
+    }
+
+
+    // --------------------------------------------------------
     // DETERMINE QUANTITY CHANGE
     // --------------------------------------------------------
 
-    const oldPlannedQuantity =
-        Number(
-            existingPlan.planned_quantity
-        );
-
-
-    const quantityIncrease =
+    const effectiveQuantityIncrease =
         Math.max(
 
             0,
@@ -4695,23 +4811,18 @@ async function updateProductionPlan(
 
 
     // --------------------------------------------------------
-    // NO INCREASE
+    // STOCK CHECK
     //
-    // اگر مقدار افزایش نداشته باشد،
-    // بررسی موجودی اضافه لازم نیست.
+    // فقط افزایش برنامه بررسی می‌شود.
+    // هیچ موجودی در این تابع کسر نمی‌شود.
     // --------------------------------------------------------
 
     let stockCheck = [];
 
 
-    // --------------------------------------------------------
-    // CHECK ADDITIONAL MATERIAL STOCK
-    //
-    // فقط مقدار اضافه‌شده بررسی می‌شود.
-    // --------------------------------------------------------
-
     if (
-        quantityIncrease > 0
+        effectiveQuantityIncrease >
+        0
     ) {
 
         // ----------------------------------------------------
@@ -4858,13 +4969,14 @@ async function updateProductionPlan(
 
             const scrapPercent =
                 Number(
-                    material.scrap_percent || 0
+                    material.scrap_percent ||
+                    0
                 );
 
 
             const baseRequired =
                 consumptionFactor *
-                quantityIncrease;
+                effectiveQuantityIncrease;
 
 
             const requiredQuantity =
@@ -4919,7 +5031,7 @@ async function updateProductionPlan(
                     scrapPercent,
 
                 additional_planned_quantity:
-                    quantityIncrease,
+                    effectiveQuantityIncrease,
 
                 required_quantity:
                     requiredQuantity,
@@ -4937,7 +5049,9 @@ async function updateProductionPlan(
             );
 
 
-            if (!sufficient) {
+            if (
+                !sufficient
+            ) {
 
                 shortages.push(
                     check
@@ -4953,7 +5067,8 @@ async function updateProductionPlan(
         // ----------------------------------------------------
 
         if (
-            shortages.length > 0
+            shortages.length >
+            0
         ) {
 
             const shortageText =
@@ -4977,7 +5092,9 @@ async function updateProductionPlan(
 
                         }
                     )
-                    .join(" | ");
+                    .join(
+                        " | "
+                    );
 
 
             throw new AppError(
@@ -5003,7 +5120,7 @@ async function updateProductionPlan(
                         plannedQuantity,
 
                     quantity_increase:
-                        quantityIncrease,
+                        effectiveQuantityIncrease,
 
                     warehouse_id:
                         rawWarehouseId,
@@ -5025,7 +5142,10 @@ async function updateProductionPlan(
     // --------------------------------------------------------
     // UPDATE PLAN
     //
-    // هیچ موجودی در این مرحله تغییر نمی‌کند.
+    // اگر Completed بوده و افزایش داده شده:
+    // completed -> in_progress
+    //
+    // سایر حالت‌ها طبق منطق قبلی حفظ می‌شوند.
     // --------------------------------------------------------
 
     await env.DB
@@ -5039,7 +5159,9 @@ async function updateProductionPlan(
 
                 bom_id = ?,
 
-                planned_quantity = ?
+                planned_quantity = ?,
+
+                status = ?
 
             WHERE
 
@@ -5054,6 +5176,8 @@ async function updateProductionPlan(
 
             plannedQuantity,
 
+            resultingStatus,
+
             planningId
 
         )
@@ -5064,58 +5188,78 @@ async function updateProductionPlan(
     // AUDIT
     // --------------------------------------------------------
 
-    await writeAudit(
+    try {
 
-        env,
+        await writeAudit(
 
-        user.id,
+            env,
 
-        "UPDATE",
+            user.id,
 
-        "planning_daily",
+            "UPDATE",
 
-        planningId,
+            "planning_daily",
 
-        {
+            planningId,
 
-            before: {
+            {
 
-                plan_date:
-                    existingPlan.plan_date,
+                before: {
 
-                bom_id:
-                    existingPlan.bom_id,
+                    plan_date:
+                        existingPlan.plan_date,
 
-                planned_quantity:
-                    oldPlannedQuantity
+                    bom_id:
+                        existingPlan.bom_id,
 
-            },
+                    planned_quantity:
+                        oldPlannedQuantity,
 
-            after: {
+                    status:
+                        existingPlan.status
 
-                plan_date:
-                    planDate,
+                },
 
-                bom_id:
-                    bomId,
+                after: {
 
-                planned_quantity:
-                    plannedQuantity
+                    plan_date:
+                        planDate,
 
-            },
+                    bom_id:
+                        bomId,
 
-            already_produced:
-                alreadyProduced,
+                    planned_quantity:
+                        plannedQuantity,
 
-            quantity_increase:
-                quantityIncrease,
+                    status:
+                        resultingStatus
 
-            material_check:
-                stockCheck
+                },
 
-        }
+                already_produced:
+                    alreadyProduced,
 
-    );
+                quantity_increase:
+                    effectiveQuantityIncrease,
+
+                material_check:
+                    stockCheck
+
+            }
+
+        );
+
+    }
+    catch (
+    auditError
+    ) {
+
+        console.error(
+            "PLANNING UPDATE AUDIT ERROR:",
+            auditError
+        );
+
+    }
 
 
     // --------------------------------------------------------
@@ -5148,10 +5292,10 @@ async function updateProductionPlan(
                 alreadyProduced,
 
             quantity_increase:
-                quantityIncrease,
+                effectiveQuantityIncrease,
 
             status:
-                existingPlan.status
+                resultingStatus
 
         },
 
@@ -5161,6 +5305,8 @@ async function updateProductionPlan(
     };
 
 }
+
+
 // ============================================================
 // REGISTER PRODUCTION
 // ============================================================
@@ -10574,6 +10720,10 @@ async function getDashboardProductionDetails(
 // DELETE SESSION / FUTURE DELETE ROUTES
 // ============================================================
 
+// ============================================================
+// DELETE / REDUCE PRODUCTION PLAN
+// ============================================================
+
 async function handleDelete(
     request,
     env,
@@ -10581,21 +10731,355 @@ async function handleDelete(
     path
 ) {
 
-    throw new AppError(
+    const planningId =
+        positiveId(
+            path.split("/").pop(),
+            "شناسه برنامه تولید",
+            "PLANNING-DELETE-001"
+        );
 
-        "API-405",
 
-        "عملیات حذف در این نسخه برای این مسیر فعال نشده است.",
+    const planning =
+        await env.DB
+            .prepare(`
 
-        405,
+                SELECT
 
-        {
+                    id,
 
-            path
+                    plan_date,
+
+                    bom_id,
+
+                    planned_quantity,
+
+                    status
+
+                FROM planning_daily
+
+                WHERE id = ?
+
+                LIMIT 1
+
+            `)
+            .bind(
+                planningId
+            )
+            .first();
+
+
+    if (!planning) {
+
+        throw new AppError(
+
+            "PLANNING-DELETE-002",
+
+            "برنامه تولید پیدا نشد.",
+
+            404
+
+        );
+
+    }
+
+
+    const production =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    COALESCE(
+                        SUM(
+                            produced_quantity
+                        ),
+                        0
+                    ) AS produced_quantity
+
+                FROM production
+
+                WHERE
+
+                    planning_daily_id = ?
+
+                    AND
+
+                    status = 'completed'
+
+            `)
+            .bind(
+                planningId
+            )
+            .first();
+
+
+    const producedQuantity =
+        Number(
+            production?.produced_quantity ||
+            0
+        );
+
+
+    const plannedQuantity =
+        Number(
+            planning.planned_quantity ||
+            0
+        );
+
+
+    // ========================================================
+    // NO PRODUCTION
+    // حذف کامل برنامه
+    // ========================================================
+
+    if (
+        producedQuantity <= 0
+    ) {
+
+        try {
+
+            await env.DB
+                .prepare(`
+
+                    DELETE FROM planning_daily
+
+                    WHERE id = ?
+
+                `)
+                .bind(
+                    planningId
+                )
+                .run();
+
+
+            await writeAudit(
+
+                env,
+
+                user?.id,
+
+                "DELETE",
+
+                "planning_daily",
+
+                planningId,
+
+                {
+
+                    mode:
+                        "FULL_DELETE",
+
+                    plan_date:
+                        planning.plan_date,
+
+                    bom_id:
+                        planning.bom_id,
+
+                    old_planned_quantity:
+                        plannedQuantity,
+
+                    produced_quantity:
+                        0
+
+                }
+
+            );
+
+
+            return {
+
+                success:
+                    true,
+
+                action:
+                    "deleted",
+
+                planning_id:
+                    planningId,
+
+                message:
+                    "برنامه تولید با موفقیت حذف شد."
+
+            };
 
         }
 
-    );
+        catch (
+        error
+        ) {
+
+            throw databaseError(
+
+                error,
+
+                "PLANNING-DELETE-003",
+
+                "حذف برنامه تولید انجام نشد."
+
+            );
+
+        }
+
+    }
+
+
+    // ========================================================
+    // PRODUCTION >= PLAN
+    // کاهش یا حذف دیگر مجاز نیست
+    // ========================================================
+
+    if (
+        producedQuantity >=
+        plannedQuantity
+    ) {
+
+        throw new AppError(
+
+            "PLANNING-DELETE-004",
+
+            "این برنامه تولید به طور کامل تولید شده است و دیگر قابل حذف یا کاهش نیست.",
+
+            409,
+
+            {
+
+                planning_id:
+                    planningId,
+
+                planned_quantity:
+                    plannedQuantity,
+
+                produced_quantity:
+                    producedQuantity
+
+            }
+
+        );
+
+    }
+
+
+    // ========================================================
+    // PARTIAL PRODUCTION
+    // برنامه تا مقدار تولیدشده کاهش پیدا می‌کند
+    // ========================================================
+
+    const newPlannedQuantity =
+        producedQuantity;
+
+
+    try {
+
+        await env.DB
+            .prepare(`
+
+        UPDATE planning_daily
+
+        SET
+
+            planned_quantity = ?,
+
+            status = ?
+
+        WHERE id = ?
+
+    `)
+            .bind(
+
+                newPlannedQuantity,
+
+                newPlannedQuantity <= producedQuantity
+                    ? "completed"
+                    : "in_progress",
+
+                planningId
+
+            )
+            .run();
+
+
+        await writeAudit(
+
+            env,
+
+            user?.id,
+
+            "UPDATE",
+
+            "planning_daily",
+
+            planningId,
+
+            {
+
+                mode:
+                    "REDUCE_TO_PRODUCED",
+
+                plan_date:
+                    planning.plan_date,
+
+                bom_id:
+                    planning.bom_id,
+
+                old_planned_quantity:
+                    plannedQuantity,
+
+                produced_quantity:
+                    producedQuantity,
+
+                new_planned_quantity:
+                    newPlannedQuantity
+
+            }
+
+        );
+
+
+        return {
+
+            success:
+                true,
+
+            action:
+                "reduced",
+
+            planning_id:
+                planningId,
+
+            old_planned_quantity:
+                plannedQuantity,
+
+            planned_quantity:
+                newPlannedQuantity,
+
+            produced_quantity:
+                producedQuantity,
+
+            status:
+                "completed",
+
+            message:
+                "مقدار برنامه تولید تا مقدار تولیدشده کاهش یافت و برنامه تکمیل شد."
+
+        };
+
+    }
+
+    catch (
+    error
+    ) {
+
+        throw databaseError(
+
+            error,
+
+            "PLANNING-DELETE-005",
+
+            "کاهش مقدار برنامه تولید انجام نشد."
+
+        );
+
+    }
 
 }
 
