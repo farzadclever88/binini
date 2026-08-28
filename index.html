@@ -13316,60 +13316,78 @@ $("#dashboardDateButton")
         };
 
 
-    const parsePersianDate =
-        value => {
+const parsePersianDate =
+    value => {
 
-            const text =
-                normalizeDigits(
-                    value
-                )
-                    .trim()
-                    .replace(
-                        /-/g,
-                        "/"
-                    );
-
-
-            const parts =
-                text
-                    .split("/")
-                    .map(
-                        item =>
-                            Number(
-                                item.trim()
-                            )
-                    );
+        const text =
+            normalizeDigits(
+                value
+            )
+                .trim()
+                .replace(
+                    /-/g,
+                    "/"
+                );
 
 
-            if (
-                parts.length !== 3 ||
-                parts.some(
+        const parts =
+            text
+                .split("/")
+                .map(
                     item =>
-                        !Number.isFinite(
-                            item
+                        Number(
+                            item.trim()
                         )
-                )
-            ) {
-
-                return null;
-
-            }
+                );
 
 
-            return {
+        if (
+            parts.length !== 3 ||
+            parts.some(
+                item =>
+                    !Number.isFinite(
+                        item
+                    )
+            )
+        ) {
 
-                year:
-                    parts[0],
+            return null;
 
-                month:
-                    parts[1],
+        }
 
-                day:
-                    parts[2]
 
-            };
+        const [
+            year,
+            month,
+            day
+        ] =
+            parts;
+
+
+        if (
+            year < 1 ||
+            month < 1 ||
+            month > 12 ||
+            day < 1 ||
+            day > 31
+        ) {
+
+            return null;
+
+        }
+
+
+        return {
+
+            year,
+
+            month,
+
+            day
 
         };
+
+    };
 
 
     const formatPersianDate =
@@ -13422,89 +13440,205 @@ $("#dashboardDateButton")
         };
 
 
-    const getTodayPersian =
-        () => {
+  const getTodayPersian =
+    () => {
 
-            return formatPersianDate(
-                parsePersianDate(
-                    persianFormatter.format(
-                        new Date()
-                    )
-                )
-            );
+        const parts =
+            new Intl.DateTimeFormat(
+                "en-US-u-ca-persian-nu-latn",
+                {
+                    timeZone:
+                        "Asia/Tehran",
 
-        };
+                    year:
+                        "numeric",
 
+                    month:
+                        "numeric",
 
-    const getPersianParts =
-        date => {
-
-            return parsePersianDate(
-                persianDayFormatter.format(
-                    date
-                )
-            );
-
-        };
-
-
-    const createDateFromPersian =
-        (
-            year,
-            month,
-            day
-        ) => {
-
-            /*
-             * We only need an approximate Gregorian anchor.
-             * The correction loop below finds the exact Persian date.
-             */
-
-            let date =
-                new Date(
-                    Date.UTC(
-                        year - 621,
-                        month - 1,
-                        day
-                    )
+                    day:
+                        "numeric"
+                }
+            )
+                .formatToParts(
+                    new Date()
                 );
 
 
-            for (
-                let i = 0;
-                i < 370;
-                i++
+        const values =
+            {};
+
+
+        for (
+            const part
+            of parts
+        ) {
+
+            if (
+                part.type === "year" ||
+                part.type === "month" ||
+                part.type === "day"
             ) {
 
-                const current =
-                    getPersianParts(
-                        date
+                values[part.type] =
+                    Number(
+                        part.value
                     );
 
+            }
 
-                if (
-                    current &&
-                    current.year === year &&
-                    current.month === month &&
-                    current.day === day
-                ) {
+        }
 
-                    return date;
 
+        return formatPersianDate({
+
+            year:
+                values.year,
+
+            month:
+                values.month,
+
+            day:
+                values.day
+
+        });
+
+    };
+
+ const getPersianParts =
+    date => {
+
+        const parts =
+            new Intl.DateTimeFormat(
+                "en-US-u-ca-persian-nu-latn",
+                {
+                    timeZone:
+                        "Asia/Tehran",
+
+                    year:
+                        "numeric",
+
+                    month:
+                        "numeric",
+
+                    day:
+                        "numeric"
                 }
-
-
-                date.setUTCDate(
-                    date.getUTCDate() + 1
+            )
+                .formatToParts(
+                    date
                 );
+
+
+        const values =
+            {};
+
+
+        for (
+            const part
+            of parts
+        ) {
+
+            if (
+                part.type === "year" ||
+                part.type === "month" ||
+                part.type === "day"
+            ) {
+
+                values[part.type] =
+                    Number(
+                        part.value
+                    );
+
+            }
+
+        }
+
+
+        if (
+            !values.year ||
+            !values.month ||
+            !values.day
+        ) {
+
+            return null;
+
+        }
+
+
+        return {
+
+            year:
+                values.year,
+
+            month:
+                values.month,
+
+            day:
+                values.day
+
+        };
+
+    };
+
+
+const createDateFromPersian =
+    (
+        year,
+        month,
+        day
+    ) => {
+
+        /*
+         * Persian year 1405 is approximately Gregorian 2026.
+         * Start close to the expected Gregorian year and search
+         * forward until Intl confirms the exact Persian date.
+         */
+
+        let date =
+            new Date(
+                Date.UTC(
+                    year + 621,
+                    month - 1,
+                    day
+                )
+            );
+
+
+        for (
+            let i = 0;
+            i < 370;
+            i++
+        ) {
+
+            const current =
+                getPersianParts(
+                    date
+                );
+
+
+            if (
+                current &&
+                current.year === year &&
+                current.month === month &&
+                current.day === day
+            ) {
+
+                return date;
 
             }
 
 
-            return null;
+            date.setUTCDate(
+                date.getUTCDate() + 1
+            );
 
-        };
+        }
 
+
+        return null;
+
+    };
 
     const getMonthDays =
         (
@@ -13523,11 +13657,17 @@ $("#dashboardDateButton")
                 );
 
 
-            if (!firstDate) {
+          if (!firstDate) {
 
-                return days;
+    return {
 
-            }
+        days: [],
+
+        firstWeekday: 0
+
+    };
+
+}
 
 
             /*
@@ -14069,17 +14209,36 @@ $("#dashboardDateButton")
             );
 
 
-        const calendar =
-            getMonthDays(
-                year,
-                month
-            );
+       const calendar =
+    getMonthDays(
+        year,
+        month
+    ) || {
+
+        days: [],
+
+        firstWeekday: 0
+
+    };
 
 
         daysElement.innerHTML =
             "";
 
+if (
+    !Array.isArray(
+        calendar.days
+    )
+) {
 
+    console.error(
+        "Invalid Persian calendar:",
+        calendar
+    );
+
+    return;
+
+}
         for (
             let i = 0;
             i < calendar.firstWeekday;
