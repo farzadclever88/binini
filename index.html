@@ -11793,40 +11793,59 @@
 
         }
 
-        /* ============================================================
-           DASHBOARD VIEW
-        ============================================================ */
+      /* ============================================================
+   DASHBOARD VIEW
+============================================================ */
 
-        async function loadDashboard() {
+async function loadDashboard(
+    selectedDate = null
+) {
 
-            try {
+    try {
 
-                const result =
-                    await apiRequest(
-                        "/api/dashboard",
-                        {
-                            method: "GET",
-                            loadingText:
-                                "در حال دریافت وضعیت داشبورد..."
-                        }
-                    );
+        let endpoint =
+            "/api/dashboard";
 
-                renderDashboardView(
-                    result
+
+        if (
+            selectedDate
+        ) {
+
+            endpoint +=
+                "?date=" +
+                encodeURIComponent(
+                    selectedDate
                 );
-
-            }
-            catch (error) {
-
-                showMessage(
-                    error.message,
-                    "error"
-                );
-
-            }
 
         }
 
+
+        const result =
+            await apiRequest(
+                endpoint,
+                {
+                    method: "GET",
+                    loadingText:
+                        "در حال دریافت وضعیت داشبورد..."
+                }
+            );
+
+
+        renderDashboardView(
+            result
+        );
+
+    }
+    catch (error) {
+
+        showMessage(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
 
         function dashboardNumber(
             value
