@@ -10591,19 +10591,242 @@
 
                         }
 
-                        if (
-                            action ===
-                            "delete"
-                        ) {
+                       if (
+    action ===
+    "delete"
+) {
 
-                            showMessage(
-                                "حذف برنامه تولید فعلاً غیرفعال است.",
-                                "error"
-                            );
+    const producedQuantity =
+        toNumber(
+            row.produced_quantity
+        );
 
-                            return;
+    const plannedQuantity =
+        toNumber(
+            row.planned_quantity
+        );
 
-                        }
+
+    /* ========================================================
+       حالت ۱ — هنوز هیچ تولیدی انجام نشده
+       ======================================================== */
+
+    if (
+        producedQuantity <= 0
+    ) {
+
+        const confirmed =
+            window.confirm(
+                "آیا مطمئن هستید؟\n\n" +
+                "این برنامه تولید هنوز هیچ تولیدی ندارد و به طور کامل حذف خواهد شد."
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        try {
+
+            await apiRequest(
+                `/api/planning/${id}`,
+                {
+                    method:
+                        "DELETE"
+                }
+            );
+
+
+            showMessage(
+                "برنامه تولید با موفقیت حذف شد.",
+                "success"
+            );
+
+
+            await loadCollection(
+                "planning",
+                "/api/planning",
+                "برنامه تولید"
+            );
+
+
+            refreshAllDropdowns();
+
+
+            renderPlanningView();
+
+
+        }
+
+        catch (
+            error
+        ) {
+
+            console.error(
+                "DELETE PLANNING ERROR:",
+                error
+            );
+
+
+            showMessage(
+                error?.message ||
+                "حذف برنامه تولید انجام نشد.",
+                "error"
+            );
+
+        }
+
+
+        return;
+
+    }
+
+
+    /* ========================================================
+       حالت ۲ — تولید انجام شده
+       ======================================================== */
+
+    if (
+        producedQuantity >
+        plannedQuantity
+    ) {
+
+        showMessage(
+            "مقدار تولیدشده از مقدار برنامه بیشتر است و این برنامه قابل اصلاح نیست.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        producedQuantity ===
+        plannedQuantity
+    ) {
+
+        showMessage(
+            "این برنامه به طور کامل تولید شده است و دیگر قابل حذف یا کاهش نیست.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    /* ========================================================
+       حالت ۳ — بخشی از برنامه تولید شده
+       ======================================================== */
+
+    const confirmed =
+        window.confirm(
+
+            "آیا مطمئن هستید؟\n\n" +
+
+            `مقدار برنامه فعلی: ${formatNumber(plannedQuantity)}\n` +
+
+            `مقدار تولیدشده: ${formatNumber(producedQuantity)}\n\n` +
+
+            "با این عملیات، مقدار برنامه تولید " +
+            "به مقدار تولیدشده کاهش پیدا می‌کند.\n\n" +
+
+            `مقدار نهایی برنامه: ${formatNumber(producedQuantity)}`
+
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        await apiRequest(
+            `/api/planning/${id}`,
+            {
+
+                method:
+                    "PUT",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body:
+                    JSON.stringify({
+
+                        id:
+                            id,
+
+                        plan_date:
+                            row.plan_date,
+
+                        bom_id:
+                            row.bom_id,
+
+                        planned_quantity:
+                            producedQuantity
+
+                    })
+
+            }
+        );
+
+
+        showMessage(
+            "مقدار برنامه تولید به مقدار تولیدشده کاهش یافت.",
+            "success"
+        );
+
+
+        await loadCollection(
+            "planning",
+            "/api/planning",
+            "برنامه تولید"
+        );
+
+
+        refreshAllDropdowns();
+
+
+        renderPlanningView();
+
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.error(
+            "REDUCE PLANNING ERROR:",
+            error
+        );
+
+
+        showMessage(
+            error?.message ||
+            "کاهش مقدار برنامه تولید انجام نشد.",
+            "error"
+        );
+
+    }
+
+
+    return;
+
+}
 
                     }
                 );
