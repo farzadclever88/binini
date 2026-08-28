@@ -12180,24 +12180,80 @@ async function loadDashboard(
             "/api/dashboard";
 
 
+        /*
+         * اگر کاربر تاریخ مشخصی انتخاب کرده باشد،
+         * همان تاریخ را به API می‌فرستیم.
+         *
+         * اگر تاریخ مشخص نشده باشد،
+         * داشبورد باید روی «امروز» باز شود،
+         * نه روی آخرین Snapshot.
+         */
+
         if (
-            selectedDate
+            !selectedDate
         ) {
 
-            endpoint +=
-                "?date=" +
-                encodeURIComponent(
-                    selectedDate
+            const today =
+                new Intl.DateTimeFormat(
+                    "fa-IR-u-ca-persian",
+                    {
+                        timeZone:
+                            "Asia/Tehran",
+
+                        year:
+                            "numeric",
+
+                        month:
+                            "2-digit",
+
+                        day:
+                            "2-digit"
+                    }
+                )
+                .format(
+                    new Date()
+                )
+                .replace(
+                    /[\u06F0-\u06F9]/g,
+                    char =>
+                        String(
+                            char.charCodeAt(0) -
+                            0x06F0
+                        )
+                )
+                .replace(
+                    /[\u0660-\u0669]/g,
+                    char =>
+                        String(
+                            char.charCodeAt(0) -
+                            0x0660
+                        )
+                )
+                .replace(
+                    /-/g,
+                    "/"
                 );
 
+
+            selectedDate =
+                today;
+
         }
+
+
+        endpoint +=
+            "?date=" +
+            encodeURIComponent(
+                selectedDate
+            );
 
 
         const result =
             await apiRequest(
                 endpoint,
                 {
-                    method: "GET",
+                    method:
+                        "GET",
 
                     loadingText:
                         "در حال دریافت وضعیت داشبورد..."
