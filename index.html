@@ -16247,7 +16247,378 @@ async function loadDashboard(
 
         /* ============================================================
            END OF JAVASCRIPT
-        ========================================d==================== */</script>
+        ========================================d==================== */
+    
+    // ============================================================
+// TEMPORARY DASHBOARD API TEST PANEL
+// !!! TEMPORARY — DELETE THIS ENTIRE BLOCK AFTER TESTING !!!
+// ============================================================
+
+(function initTemporaryDashboardApiTests() {
+
+    // --------------------------------------------------------
+    // جلوگیری از اجرای چندباره
+    // --------------------------------------------------------
+
+    if (
+        document.getElementById(
+            "temporaryDashboardApiTests"
+        )
+    ) {
+        return;
+    }
+
+
+    // --------------------------------------------------------
+    // TEST PANEL
+    // --------------------------------------------------------
+
+    const panel =
+        document.createElement(
+            "div"
+        );
+
+    panel.id =
+        "temporaryDashboardApiTests";
+
+
+    panel.style.cssText = `
+        position: fixed;
+        left: 20px;
+        bottom: 20px;
+        z-index: 999999;
+        width: 430px;
+        max-width: calc(100vw - 40px);
+        background: #ffffff;
+        color: #172033;
+        border: 2px solid #dc2626;
+        border-radius: 14px;
+        box-shadow: 0 15px 45px rgba(0,0,0,.25);
+        padding: 16px;
+        direction: rtl;
+        font-family: Vazirmatn, Tahoma, Arial, sans-serif;
+    `;
+
+
+    panel.innerHTML = `
+
+        <div
+            style="
+                font-weight:900;
+                font-size:15px;
+                color:#dc2626;
+                margin-bottom:8px;
+            "
+        >
+            ⚠ تست موقت API داشبورد
+        </div>
+
+
+        <div
+            style="
+                font-size:11px;
+                color:#64748b;
+                margin-bottom:12px;
+                line-height:1.8;
+            "
+        >
+            این بخش فقط برای تست انتخاب Snapshot و
+            داشبورد تاریخ آینده اضافه شده است.
+            <br>
+            بعد از پایان تست، کل بلوک
+            <strong>
+                TEMPORARY DASHBOARD API TEST PANEL
+            </strong>
+            را حذف کنید.
+        </div>
+
+
+        <div
+            style="
+                display:grid;
+                gap:7px;
+            "
+        >
+
+            <button
+                type="button"
+                id="temporaryDashboardTest1"
+                style="
+                    padding:9px;
+                    border:1px solid #e2e8f0;
+                    border-radius:8px;
+                    background:#f8fafc;
+                    cursor:pointer;
+                    text-align:right;
+                    font-family:inherit;
+                "
+            >
+                تست ۱ — داشبورد عادی
+                <small
+                    style="
+                        display:block;
+                        color:#64748b;
+                        margin-top:3px;
+                    "
+                >
+                    GET /api/dashboard
+                </small>
+            </button>
+
+
+            <button
+                type="button"
+                id="temporaryDashboardTest2"
+                style="
+                    padding:9px;
+                    border:1px solid #e2e8f0;
+                    border-radius:8px;
+                    background:#f8fafc;
+                    cursor:pointer;
+                    text-align:right;
+                    font-family:inherit;
+                "
+            >
+                تست ۲ — Snapshot تاریخ ۱۴۰۵/۰۶/۰۵
+                <small
+                    style="
+                        display:block;
+                        color:#64748b;
+                        margin-top:3px;
+                    "
+                >
+                    GET /api/dashboard?date=1405/06/05
+                </small>
+            </button>
+
+
+            <button
+                type="button"
+                id="temporaryDashboardTest3"
+                style="
+                    padding:9px;
+                    border:1px solid #e2e8f0;
+                    border-radius:8px;
+                    background:#f8fafc;
+                    cursor:pointer;
+                    text-align:right;
+                    font-family:inherit;
+                "
+            >
+                تست ۳ — تاریخ آینده ۱۴۰۵/۰۶/۰۸
+                <small
+                    style="
+                        display:block;
+                        color:#64748b;
+                        margin-top:3px;
+                    "
+                >
+                    GET /api/dashboard?date=1405/06/08
+                </small>
+            </button>
+
+        </div>
+
+
+        <div
+            id="temporaryDashboardTestStatus"
+            style="
+                margin-top:12px;
+                padding:10px;
+                background:#f8fafc;
+                border-radius:8px;
+                font-size:11px;
+                line-height:1.8;
+                white-space:pre-wrap;
+                word-break:break-word;
+                max-height:260px;
+                overflow:auto;
+            "
+        >
+            آماده تست...
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        panel
+    );
+
+
+    // --------------------------------------------------------
+    // RESULT AREA
+    // --------------------------------------------------------
+
+    const statusBox =
+        document.getElementById(
+            "temporaryDashboardTestStatus"
+        );
+
+
+    // --------------------------------------------------------
+    // TEST RUNNER
+    // --------------------------------------------------------
+
+    async function runTemporaryDashboardTest(
+        label,
+        endpoint
+    ) {
+
+        statusBox.textContent =
+            `${label}\n\n` +
+            `در حال ارسال درخواست:\n` +
+            `${endpoint}\n\n` +
+            `لطفاً صبر کنید...`;
+
+
+        console.log(
+            "[TEMP DASHBOARD TEST]",
+            label,
+            endpoint
+        );
+
+
+        try {
+
+            const result =
+                await apiRequest(
+                    endpoint,
+                    {
+                        method:
+                            "GET",
+
+                        loadingText:
+                            `در حال اجرای ${label}...`
+                    }
+                );
+
+
+            console.log(
+                "[TEMP DASHBOARD TEST RESULT]",
+                label,
+                result
+            );
+
+
+            statusBox.textContent =
+                `${label}\n\n` +
+                `Endpoint:\n` +
+                `${endpoint}\n\n` +
+                `نتیجه:\n` +
+                JSON.stringify(
+                    result,
+                    null,
+                    2
+                );
+
+
+        }
+        catch (error) {
+
+            console.error(
+                "[TEMP DASHBOARD TEST ERROR]",
+                label,
+                error
+            );
+
+
+            statusBox.textContent =
+                `${label}\n\n` +
+                `Endpoint:\n` +
+                `${endpoint}\n\n` +
+                `خطا:\n` +
+                `${error?.message || error}\n\n` +
+                `جزئیات:\n` +
+                JSON.stringify(
+                    error,
+                    null,
+                    2
+                );
+
+        }
+
+    }
+
+
+    // --------------------------------------------------------
+    // TEST 1
+    // --------------------------------------------------------
+
+    document
+        .getElementById(
+            "temporaryDashboardTest1"
+        )
+        ?.addEventListener(
+            "click",
+            () => {
+
+                runTemporaryDashboardTest(
+
+                    "تست ۱ — داشبورد عادی",
+
+                    "/api/dashboard"
+
+                );
+
+            }
+        );
+
+
+    // --------------------------------------------------------
+    // TEST 2
+    // --------------------------------------------------------
+
+    document
+        .getElementById(
+            "temporaryDashboardTest2"
+        )
+        ?.addEventListener(
+            "click",
+            () => {
+
+                runTemporaryDashboardTest(
+
+                    "تست ۲ — Snapshot تاریخ ۱۴۰۵/۰۶/۰۵",
+
+                    "/api/dashboard?date=1405%2F06%2F05"
+
+                );
+
+            }
+        );
+
+
+    // --------------------------------------------------------
+    // TEST 3
+    // --------------------------------------------------------
+
+    document
+        .getElementById(
+            "temporaryDashboardTest3"
+        )
+        ?.addEventListener(
+            "click",
+            () => {
+
+                runTemporaryDashboardTest(
+
+                    "تست ۳ — تاریخ آینده ۱۴۰۵/۰۶/۰۸",
+
+                    "/api/dashboard?date=1405%2F06%2F08"
+
+                );
+
+            }
+        );
+
+
+})();
+
+// ============================================================
+// !!! END TEMPORARY DASHBOARD API TEST PANEL !!!
+// ============================================================
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
