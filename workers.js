@@ -6014,28 +6014,28 @@ async function handleGet(
 
     }
     // --------------------------------------------------------
-// MANUAL DASHBOARD SNAPSHOT REFRESH
-// --------------------------------------------------------
+    // MANUAL DASHBOARD SNAPSHOT REFRESH
+    // --------------------------------------------------------
 
-if (
-    path ===
-    "/api/dashboard/refresh"
-) {
+    if (
+        path ===
+        "/api/dashboard/refresh"
+    ) {
 
-    const startedAt =
-        new Date().toISOString();
-
-
-    try {
-
-        const result =
-            await refreshDashboardSnapshot(
-                env
-            );
+        const startedAt =
+            new Date().toISOString();
 
 
-        await env.DB
-            .prepare(`
+        try {
+
+            const result =
+                await refreshDashboardSnapshot(
+                    env
+                );
+
+
+            await env.DB
+                .prepare(`
 
                 INSERT INTO dashboard_refresh_logs (
 
@@ -6066,63 +6066,63 @@ if (
                 )
 
             `)
-            .bind(
+                .bind(
 
-                startedAt,
+                    startedAt,
 
-                result.snapshot_id,
+                    result.snapshot_id,
 
-                JSON.stringify({
+                    JSON.stringify({
 
-                    manual: true,
+                        manual: true,
 
-                    business_date:
-                        result.business_date,
+                        business_date:
+                            result.business_date,
 
-                    total_planned:
-                        result.total_planned,
+                        total_planned:
+                            result.total_planned,
 
-                    total_produced:
-                        result.total_produced,
+                        total_produced:
+                            result.total_produced,
 
-                    achievement_percent:
-                        result.achievement_percent
+                        achievement_percent:
+                            result.achievement_percent
 
-                })
+                    })
 
-            )
-            .run();
-
-
-        return {
-
-            success: true,
-
-            message:
-                "Snapshot داشبورد با موفقیت بروزرسانی شد.",
-
-            snapshot:
-                result
-
-        };
-
-    }
-
-    catch (error) {
-
-        console.error(
-
-            "MANUAL DASHBOARD REFRESH ERROR",
-
-            error
-
-        );
+                )
+                .run();
 
 
-        try {
+            return {
 
-            await env.DB
-                .prepare(`
+                success: true,
+
+                message:
+                    "Snapshot داشبورد با موفقیت بروزرسانی شد.",
+
+                snapshot:
+                    result
+
+            };
+
+        }
+
+        catch (error) {
+
+            console.error(
+
+                "MANUAL DASHBOARD REFRESH ERROR",
+
+                error
+
+            );
+
+
+            try {
+
+                await env.DB
+                    .prepare(`
 
                     INSERT INTO dashboard_refresh_logs (
 
@@ -6161,46 +6161,46 @@ if (
                     )
 
                 `)
-                .bind(
+                    .bind(
 
-                    startedAt,
+                        startedAt,
 
-                    "Manual dashboard refresh failed.",
+                        "Manual dashboard refresh failed.",
 
-                    error?.name ||
+                        error?.name ||
                         "Error",
 
-                    error?.message ||
+                        error?.message ||
                         String(error),
 
-                    error?.stack ||
+                        error?.stack ||
                         null
 
-                )
-                .run();
+                    )
+                    .run();
 
-        }
+            }
 
-        catch (
+            catch (
             logError
-        ) {
+            ) {
 
-            console.error(
+                console.error(
 
-                "MANUAL DASHBOARD LOG ERROR",
+                    "MANUAL DASHBOARD LOG ERROR",
 
-                logError
+                    logError
 
-            );
+                );
+
+            }
+
+
+            throw error;
 
         }
-
-
-        throw error;
 
     }
-
-}
     // --------------------------------------------------------
     // DASHBOARD DRILL DOWN
     // --------------------------------------------------------
@@ -8458,7 +8458,7 @@ async function getDashboardInventoryBalance(
 // ============================================================
 async function getDashboardInventorySummary(
     env
-){
+) {
 
     const result =
         await env.DB
@@ -8533,7 +8533,7 @@ async function getDashboardInventorySummary(
     for (
         const row
         of rows
-    ){
+    ) {
 
         const target =
             row.item_type === "part"
@@ -9387,10 +9387,10 @@ async function buildDashboardSnapshot(
                 productsCritical,
 
                 inventorySummary
-                .positive_item_lines,
+                    .positive_item_lines,
 
                 inventorySummary
-                .total_quantity,
+                    .total_quantity,
 
                 greenAlerts,
 
@@ -9769,14 +9769,14 @@ async function refreshDashboardSnapshot(
     env
 ) {
 
-   // const businessDate =
-   //     new Date()
+    // const businessDate =
+    //     new Date()
     //        .toISOString()
-   //         .slice(
-  //              0,
-   //             10
-   //         );
-const businessDate = "1405/06/05";
+    //         .slice(
+    //              0,
+    //             10
+    //         );
+    const businessDate = "1405/06/05";
 
     await cleanupDashboardSnapshots(
         env
@@ -9935,16 +9935,16 @@ async function getDashboardSnapshot(
 async function getDashboardDetails(
     env,
     filters = {}
-){
+) {
 
-        let effectiveSnapshotId =
+    let effectiveSnapshotId =
         filters.snapshotId || null;
 
 
     if (
         !effectiveSnapshotId &&
         filters.planningId
-    ){
+    ) {
 
         let snapshotSql = `
 
@@ -9968,7 +9968,7 @@ async function getDashboardDetails(
 
         if (
             filters.productId
-        ){
+        ) {
 
             snapshotSql += `
 
@@ -10007,7 +10007,7 @@ async function getDashboardDetails(
 
         if (
             latestSnapshot?.snapshot_id
-        ){
+        ) {
 
             effectiveSnapshotId =
                 Number(
@@ -10017,7 +10017,7 @@ async function getDashboardDetails(
         }
 
     }
-    
+
     let detailSql = `
 
         SELECT *
@@ -10030,24 +10030,24 @@ async function getDashboardDetails(
 
     const detailBindings = [];
 
-if(
-    effectiveSnapshotId
-){
+    if (
+        effectiveSnapshotId
+    ) {
 
-    detailSql += `
+        detailSql += `
         AND snapshot_id = ?
     `;
 
-    detailBindings.push(
-        effectiveSnapshotId
-    );
+        detailBindings.push(
+            effectiveSnapshotId
+        );
 
-}
+    }
 
 
-    if(
+    if (
         filters.planningId
-    ){
+    ) {
 
         detailSql += `
             AND planning_id = ?
@@ -10060,9 +10060,9 @@ if(
     }
 
 
-    if(
+    if (
         filters.productId
-    ){
+    ) {
 
         detailSql += `
             AND product_id = ?
@@ -10181,24 +10181,24 @@ if(
     const materialBindings = [];
 
 
-   if(
-    effectiveSnapshotId
-    ){
-    
+    if (
+        effectiveSnapshotId
+    ) {
+
         materialSql += `
             AND snapshot_id = ?
         `;
-    
+
         materialBindings.push(
             effectiveSnapshotId
         );
-    
+
     }
 
 
-    if(
+    if (
         filters.planningId
-    ){
+    ) {
 
         materialSql += `
             AND planning_id = ?
@@ -10211,9 +10211,9 @@ if(
     }
 
 
-    if(
+    if (
         filters.productId
-    ){
+    ) {
 
         materialSql += `
             AND product_id = ?
@@ -10493,7 +10493,7 @@ if(
 async function getDashboardProductionDetails(
     env,
     persianBusinessDate
-){
+) {
 
     const result =
         await env.DB
@@ -11138,33 +11138,33 @@ export default {
 
     },
     // ============================================================
-// CLOUDFLARE SCHEDULED EVENT
-// ============================================================
+    // CLOUDFLARE SCHEDULED EVENT
+    // ============================================================
 
-async scheduled(
+    async scheduled(
 
-    event,
+        event,
 
-    env,
+        env,
 
-    ctx
+        ctx
 
-) {
+    ) {
 
-    const startedAt =
-        new Date().toISOString();
-
-
-    try {
-
-        const result =
-            await refreshDashboardSnapshot(
-                env
-            );
+        const startedAt =
+            new Date().toISOString();
 
 
-        await env.DB
-            .prepare(`
+        try {
+
+            const result =
+                await refreshDashboardSnapshot(
+                    env
+                );
+
+
+            await env.DB
+                .prepare(`
 
                 INSERT INTO dashboard_refresh_logs (
 
@@ -11195,51 +11195,51 @@ async scheduled(
                 )
 
             `)
-            .bind(
+                .bind(
 
-                startedAt,
+                    startedAt,
 
-                result.snapshot_id,
+                    result.snapshot_id,
 
-                JSON.stringify({
+                    JSON.stringify({
 
-                    cron:
-                        event.cron,
+                        cron:
+                            event.cron,
 
-                    business_date:
-                        result.business_date,
+                        business_date:
+                            result.business_date,
 
-                    total_planned:
-                        result.total_planned,
+                        total_planned:
+                            result.total_planned,
 
-                    total_produced:
-                        result.total_produced,
+                        total_produced:
+                            result.total_produced,
 
-                    achievement_percent:
-                        result.achievement_percent
+                        achievement_percent:
+                            result.achievement_percent
 
-                })
+                    })
 
-            )
-            .run();
+                )
+                .run();
 
-    }
+        }
 
-    catch (error) {
+        catch (error) {
 
-        console.error(
+            console.error(
 
-            "DASHBOARD CRON ERROR",
+                "DASHBOARD CRON ERROR",
 
-            error
+                error
 
-        );
+            );
 
 
-        try {
+            try {
 
-            await env.DB
-                .prepare(`
+                await env.DB
+                    .prepare(`
 
                     INSERT INTO dashboard_refresh_logs (
 
@@ -11278,42 +11278,42 @@ async scheduled(
                     )
 
                 `)
-                .bind(
+                    .bind(
 
-                    startedAt,
+                        startedAt,
 
-                    `Cron ${event.cron || ""} failed.`,
+                        `Cron ${event.cron || ""} failed.`,
 
-                    error?.name ||
+                        error?.name ||
                         "Error",
 
-                    error?.message ||
+                        error?.message ||
                         String(error),
 
-                    error?.stack ||
+                        error?.stack ||
                         null
 
-                )
-                .run();
+                    )
+                    .run();
 
-        }
+            }
 
-        catch (
+            catch (
             logError
-        ) {
+            ) {
 
-            console.error(
+                console.error(
 
-                "DASHBOARD LOG ERROR",
+                    "DASHBOARD LOG ERROR",
 
-                logError
+                    logError
 
-            );
+                );
+
+            }
 
         }
 
     }
-
-}
 
 };
