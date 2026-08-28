@@ -10678,18 +10678,55 @@ async function getDashboardDetails(
     filters = {}
 ) {
 
+    const planningId =
+        filters.planningId
+            ? Number(
+                filters.planningId
+            )
+            : null;
+
+
+    const productId =
+        filters.productId
+            ? Number(
+                filters.productId
+            )
+            : null;
+
+
+    const snapshotId =
+        filters.snapshotId
+            ? Number(
+                filters.snapshotId
+            )
+            : null;
+
+
+    // ========================================================
+    // 1. TRY SNAPSHOT DATA FIRST
+    // ========================================================
+    //
+    // اگر Snapshot مربوط به برنامه وجود داشته باشد،
+    // همان داده Snapshot استفاده می‌شود.
+    //
+    // این رفتار برای تاریخ‌هایی که Snapshot دارند
+    // حفظ می‌شود.
+    //
+    // ========================================================
+
     let effectiveSnapshotId =
-        filters.snapshotId || null;
+        snapshotId;
 
 
     if (
         !effectiveSnapshotId &&
-        filters.planningId
+        planningId
     ) {
 
         let snapshotSql = `
 
             SELECT
+
                 d.snapshot_id
 
             FROM dashboard_snapshot_details d
@@ -10702,13 +10739,16 @@ async function getDashboardDetails(
 
         `;
 
+
         const snapshotBindings = [
-            filters.planningId
+
+            planningId
+
         ];
 
 
         if (
-            filters.productId
+            productId
         ) {
 
             snapshotSql += `
@@ -10717,8 +10757,11 @@ async function getDashboardDetails(
 
             `;
 
+
             snapshotBindings.push(
-                filters.productId
+
+                productId
+
             );
 
         }
@@ -10727,7 +10770,9 @@ async function getDashboardDetails(
         snapshotSql += `
 
             ORDER BY
+
                 s.snapshot_at DESC,
+
                 s.id DESC
 
             LIMIT 1
@@ -10759,309 +10804,635 @@ async function getDashboardDetails(
 
     }
 
-    let detailSql = `
 
-        SELECT *
+    // ========================================================
+    // 2. LOAD SNAPSHOT PRODUCTION DETAILS
+    // ========================================================
 
-        FROM dashboard_snapshot_details
-
-        WHERE 1 = 1
-
-    `;
-
-    const detailBindings = [];
-
-    if (
-        effectiveSnapshotId
-    ) {
-
-        detailSql += `
-        AND snapshot_id = ?
-    `;
-
-        detailBindings.push(
-            effectiveSnapshotId
-        );
-
-    }
-
-
-    if (
-        filters.planningId
-    ) {
-
-        detailSql += `
-            AND planning_id = ?
-        `;
-
-        detailBindings.push(
-            filters.planningId
-        );
-
-    }
-
-
-    if (
-        filters.productId
-    ) {
-
-        detailSql += `
-            AND product_id = ?
-        `;
-
-        detailBindings.push(
-            filters.productId
-        );
-
-    }
-
-
-    detailSql += `
-
-        ORDER BY
-            plan_date DESC,
-            product_name,
-            planning_id
-
-    `;
-
-
-    const detailResult =
-        await env.DB
-            .prepare(
-                detailSql
-            )
-            .bind(
-                ...detailBindings
-            )
-            .all();
-
-
-    const items =
-        detailResult.results || [];
-
-
-    // --------------------------------------------------------
-    // MATERIAL ANALYSIS
-    // --------------------------------------------------------
-    //
-    // مهم:
-    // اینجا ردیف‌های تکراری را به یک ماده یکتا تبدیل می‌کنیم.
-    //
-    // required_quantity:
-    // SUM
-    //
-    // available_quantity:
-    // MAX
-    //
-    // چون موجودی انبار برای هر رکورد ماده تکرار شده
-    // و نباید چند بار با هم جمع شود.
-    // --------------------------------------------------------
-
-    let materialSql = `
-
-        SELECT
-
-            part_id,
-
-            part_code,
-
-            part_name,
-
-            unit_name,
-
-            MAX(
-                consumption_factor
-            ) AS consumption_factor,
-
-            MAX(
-                scrap_percent
-            ) AS scrap_percent,
-
-            SUM(
-                required_quantity
-            ) AS required_quantity,
-
-            MAX(
-                available_quantity
-            ) AS available_quantity,
-
-            SUM(
-                shortage_quantity
-            ) AS shortage_quantity,
-
-            MIN(
-                sufficient
-            ) AS sufficient,
-
-            CASE
-
-                WHEN MIN(sufficient) = 0
-                THEN 'red'
-
-                ELSE 'green'
-
-            END AS severity,
-
-            CASE
-
-                WHEN MIN(sufficient) = 0
-                THEN 'MATERIAL_SHORTAGE'
-
-                ELSE 'AVAILABLE'
-
-            END AS severity_code
-
-        FROM dashboard_snapshot_materials
-
-        WHERE 1 = 1
-
-    `;
-
-
-    const materialBindings = [];
+    let items = [];
 
 
     if (
         effectiveSnapshotId
     ) {
 
-        materialSql += `
-            AND snapshot_id = ?
+        let detailSql = `
+
+            SELECT *
+
+            FROM dashboard_snapshot_details
+
+            WHERE
+                snapshot_id = ?
+
         `;
 
-        materialBindings.push(
+
+        const detailBindings = [
+
             effectiveSnapshotId
-        );
+
+        ];
+
+
+        if (
+            planningId
+        ) {
+
+            detailSql += `
+
+                AND planning_id = ?
+
+            `;
+
+
+            detailBindings.push(
+
+                planningId
+
+            );
+
+        }
+
+
+        if (
+            productId
+        ) {
+
+            detailSql += `
+
+                AND product_id = ?
+
+            `;
+
+
+            detailBindings.push(
+
+                productId
+
+            );
+
+        }
+
+
+        detailSql += `
+
+            ORDER BY
+
+                plan_date DESC,
+
+                product_name,
+
+                planning_id
+
+        `;
+
+
+        const detailResult =
+            await env.DB
+                .prepare(
+                    detailSql
+                )
+                .bind(
+                    ...detailBindings
+                )
+                .all();
+
+
+        items =
+            detailResult.results ||
+            [];
 
     }
+
+
+    // ========================================================
+    // 3. LIVE FALLBACK
+    // ========================================================
+    //
+    // اگر Snapshot وجود نداشت، یا برای برنامه موردنظر
+    // Detail نداشت، مستقیماً از planning_daily و production
+    // اطلاعات زنده می‌گیریم.
+    //
+    // این بخش مشکل تاریخ‌هایی مثل 1405/06/06 را حل می‌کند.
+    //
+    // ========================================================
+
+    if (
+        items.length === 0 &&
+        planningId
+    ) {
+
+        const liveResult =
+            await env.DB
+                .prepare(`
+
+                    SELECT
+
+                        pd.id AS planning_id,
+
+                        pd.plan_date,
+
+                        pd.bom_id,
+
+                        pd.planned_quantity,
+
+                        pd.status AS status,
+
+                        bh.product_id,
+
+                        bh.code AS bom_code,
+
+                        p.code AS product_code,
+
+                        p.name AS product_name,
+
+                        COALESCE(
+
+                            (
+
+                                SELECT
+
+                                    SUM(
+                                        pr.produced_quantity
+                                    )
+
+                                FROM production pr
+
+                                WHERE
+
+                                    pr.planning_daily_id =
+                                    pd.id
+
+                                    AND
+
+                                    pr.status =
+                                    'completed'
+
+                            ),
+
+                            0
+
+                        ) AS produced_quantity
+
+                    FROM planning_daily pd
+
+                    INNER JOIN bom_headers bh
+
+                        ON bh.id =
+                           pd.bom_id
+
+                    INNER JOIN products p
+
+                        ON p.id =
+                           bh.product_id
+
+                    WHERE
+
+                        pd.id = ?
+
+                    ${
+                        productId
+                            ? `
+                                AND bh.product_id = ?
+                              `
+                            : ""
+                    }
+
+                    LIMIT 1
+
+                `)
+                .bind(
+                    ...(
+                        productId
+                            ? [
+                                planningId,
+                                productId
+                            ]
+                            : [
+                                planningId
+                            ]
+                    )
+                )
+                .all();
+
+
+        const liveRows =
+            liveResult.results ||
+            [];
+
+
+        if (
+            liveRows.length
+        ) {
+
+            items =
+                liveRows.map(
+                    row => {
+
+                        const planned =
+                            Number(
+                                row.planned_quantity ||
+                                0
+                            );
+
+
+                        const produced =
+                            Number(
+                                row.produced_quantity ||
+                                0
+                            );
+
+
+                        const remaining =
+                            Math.max(
+
+                                0,
+
+                                planned -
+                                produced
+
+                            );
+
+
+                        const achievement =
+                            planned > 0
+
+                                ? (
+                                    produced /
+                                    planned
+                                ) * 100
+
+                                : 0;
+
+
+                        const severity =
+                            getDashboardProductionSeverity(
+
+                                planned,
+
+                                produced
+
+                            );
+
+
+                        return {
+
+                            detail_type:
+                                "production_plan",
+
+                            entity_id:
+                                row.planning_id,
+
+                            planning_id:
+                                row.planning_id,
+
+                            product_id:
+                                row.product_id,
+
+                            bom_id:
+                                row.bom_id,
+
+                            plan_date:
+                                row.plan_date,
+
+                            product_code:
+                                row.product_code,
+
+                            product_name:
+                                row.product_name,
+
+                            bom_code:
+                                row.bom_code,
+
+                            planned_quantity:
+                                planned,
+
+                            produced_quantity:
+                                produced,
+
+                            remaining_quantity:
+                                remaining,
+
+                            achievement_percent:
+                                achievement,
+
+                            status:
+                                row.status,
+
+                            severity:
+                                severity.severity,
+
+                            severity_code:
+                                severity.code,
+
+                            severity_message:
+                                severity.message
+
+                        };
+
+                    }
+                );
+
+        }
+
+    }
+
+
+    // ========================================================
+    // 4. MATERIAL ANALYSIS
+    // ========================================================
+    //
+    // Snapshot:
+    //     dashboard_snapshot_materials
+    //
+    // Live fallback:
+    //     getDashboardMaterialRequirements()
+    //
+    // ========================================================
+
+    let materials = [];
 
 
     if (
-        filters.planningId
+        effectiveSnapshotId &&
+        items.length
     ) {
 
-        materialSql += `
-            AND planning_id = ?
+        let materialSql = `
+
+            SELECT
+
+                part_id,
+
+                part_code,
+
+                part_name,
+
+                unit_name,
+
+                MAX(
+                    consumption_factor
+                ) AS consumption_factor,
+
+                MAX(
+                    scrap_percent
+                ) AS scrap_percent,
+
+                SUM(
+                    required_quantity
+                ) AS required_quantity,
+
+                MAX(
+                    available_quantity
+                ) AS available_quantity,
+
+                SUM(
+                    shortage_quantity
+                ) AS shortage_quantity,
+
+                MIN(
+                    sufficient
+                ) AS sufficient
+
+            FROM dashboard_snapshot_materials
+
+            WHERE
+
+                snapshot_id = ?
+
         `;
 
-        materialBindings.push(
-            filters.planningId
-        );
+
+        const materialBindings = [
+
+            effectiveSnapshotId
+
+        ];
+
+
+        if (
+            planningId
+        ) {
+
+            materialSql += `
+
+                AND planning_id = ?
+
+            `;
+
+
+            materialBindings.push(
+
+                planningId
+
+            );
+
+        }
+
+
+        if (
+            productId
+        ) {
+
+            materialSql += `
+
+                AND product_id = ?
+
+            `;
+
+
+            materialBindings.push(
+
+                productId
+
+            );
+
+        }
+
+
+        materialSql += `
+
+            GROUP BY
+
+                part_id,
+
+                part_code,
+
+                part_name,
+
+                unit_name
+
+            ORDER BY
+
+                part_name
+
+        `;
+
+
+        const materialResult =
+            await env.DB
+                .prepare(
+                    materialSql
+                )
+                .bind(
+                    ...materialBindings
+                )
+                .all();
+
+
+        materials =
+            (
+                materialResult.results ||
+                []
+            ).map(
+                material => {
+
+                    const required =
+                        Number(
+                            material.required_quantity ||
+                            0
+                        );
+
+
+                    const available =
+                        Number(
+                            material.available_quantity ||
+                            0
+                        );
+
+
+                    const shortage =
+                        Math.max(
+
+                            0,
+
+                            required -
+                            available
+
+                        );
+
+
+                    const sufficient =
+                        shortage <= 0;
+
+
+                    return {
+
+                        ...material,
+
+                        required_quantity:
+                            required,
+
+                        available_quantity:
+                            available,
+
+                        shortage_quantity:
+                            shortage,
+
+                        sufficient:
+                            sufficient
+                                ? 1
+                                : 0,
+
+                        severity:
+                            sufficient
+                                ? "green"
+                                : "red",
+
+                        severity_code:
+                            sufficient
+                                ? "AVAILABLE"
+                                : "MATERIAL_SHORTAGE"
+
+                    };
+
+                }
+            );
 
     }
 
+
+    // ========================================================
+    // 5. LIVE MATERIAL FALLBACK
+    // ========================================================
+    //
+    // اگر Snapshot وجود نداشت، مواد را از BOM واقعی
+    // و موجودی فعلی محاسبه می‌کنیم.
+    //
+    // ========================================================
 
     if (
-        filters.productId
+        materials.length === 0 &&
+        items.length
     ) {
 
-        materialSql += `
-            AND product_id = ?
-        `;
+        const selectedPlan =
+            items[0];
 
-        materialBindings.push(
-            filters.productId
-        );
+
+        const planned =
+            Number(
+                selectedPlan.planned_quantity ||
+                0
+            );
+
+
+        const produced =
+            Number(
+                selectedPlan.produced_quantity ||
+                0
+            );
+
+
+        const remaining =
+            Math.max(
+
+                0,
+
+                planned -
+                produced
+
+            );
+
+
+        const livePlanningRow = {
+
+            planning_id:
+                selectedPlan.planning_id,
+
+            product_id:
+                selectedPlan.product_id,
+
+            bom_id:
+                selectedPlan.bom_id,
+
+            planned_quantity:
+                planned,
+
+            produced_quantity:
+                produced
+
+        };
+
+
+        materials =
+            await getDashboardMaterialRequirements(
+
+                env,
+
+                livePlanningRow,
+
+                remaining
+
+            );
 
     }
 
 
-    materialSql += `
-
-        GROUP BY
-
-            part_id,
-            part_code,
-            part_name,
-            unit_name
-
-        ORDER BY
-
-            severity DESC,
-            part_name
-
-    `;
-
-
-    const materialResult =
-        await env.DB
-            .prepare(
-                materialSql
-            )
-            .bind(
-                ...materialBindings
-            )
-            .all();
-
-
-    const materials =
-        (
-            materialResult.results ||
-            []
-        ).map(
-            material => {
-
-                const required =
-                    Number(
-                        material.required_quantity
-                        || 0
-                    );
-
-                const available =
-                    Number(
-                        material.available_quantity
-                        || 0
-                    );
-
-                const shortage =
-                    Math.max(
-                        0,
-                        required -
-                        available
-                    );
-
-                const sufficient =
-                    shortage <= 0;
-
-
-                return {
-
-                    ...material,
-
-                    required_quantity:
-                        required,
-
-                    available_quantity:
-                        available,
-
-                    shortage_quantity:
-                        shortage,
-
-                    sufficient:
-                        sufficient
-                            ? 1
-                            : 0,
-
-                    severity:
-                        sufficient
-                            ? "green"
-                            : "red",
-
-                    severity_code:
-                        sufficient
-                            ? "AVAILABLE"
-                            : "MATERIAL_SHORTAGE"
-
-                };
-
-            }
-        );
-
-
-    // --------------------------------------------------------
-    // MATERIAL SUMMARY
-    // --------------------------------------------------------
+    // ========================================================
+    // 6. MATERIAL SUMMARY
+    // ========================================================
 
     const totalMaterials =
         materials.length;
@@ -11069,54 +11440,71 @@ async function getDashboardDetails(
 
     const shortageMaterials =
         materials.filter(
+
             material =>
-                !material.sufficient
+                Number(
+                    material.sufficient
+                ) !== 1
+
         );
 
 
     const sufficientMaterials =
         materials.filter(
+
             material =>
-                material.sufficient
+                Number(
+                    material.sufficient
+                ) === 1
+
         );
 
 
     const totalRequired =
         materials.reduce(
+
             (
                 total,
                 material
             ) =>
+
                 total +
                 Number(
-                    material.required_quantity
-                    || 0
+                    material.required_quantity ||
+                    0
                 ),
+
             0
+
         );
 
 
     const totalShortage =
         materials.reduce(
+
             (
                 total,
                 material
             ) =>
+
                 total +
                 Number(
-                    material.shortage_quantity
-                    || 0
+                    material.shortage_quantity ||
+                    0
                 ),
+
             0
+
         );
 
 
-    // --------------------------------------------------------
-    // SELECTED PRODUCTION SUMMARY
-    // --------------------------------------------------------
+    // ========================================================
+    // 7. SELECTED PRODUCTION SUMMARY
+    // ========================================================
 
     const production =
         items.length
+
             ? {
 
                 planning_id:
@@ -11142,30 +11530,40 @@ async function getDashboardDetails(
 
                 planned_quantity:
                     Number(
-                        items[0]
-                            .planned_quantity
-                        || 0
+                        items[0].planned_quantity ||
+                        0
                     ),
 
                 produced_quantity:
                     Number(
-                        items[0]
-                            .produced_quantity
-                        || 0
+                        items[0].produced_quantity ||
+                        0
                     ),
 
                 remaining_quantity:
                     Number(
-                        items[0]
-                            .remaining_quantity
-                        || 0
+                        items[0].remaining_quantity ||
+                        Math.max(
+
+                            0,
+
+                            Number(
+                                items[0].planned_quantity ||
+                                0
+                            ) -
+
+                            Number(
+                                items[0].produced_quantity ||
+                                0
+                            )
+
+                        )
                     ),
 
                 achievement_percent:
                     Number(
-                        items[0]
-                            .achievement_percent
-                        || 0
+                        items[0].achievement_percent ||
+                        0
                     ),
 
                 status:
@@ -11181,8 +11579,13 @@ async function getDashboardDetails(
                     items[0].severity_message
 
             }
+
             : null;
 
+
+    // ========================================================
+    // 8. RESPONSE
+    // ========================================================
 
     return {
 
@@ -11224,9 +11627,6 @@ async function getDashboardDetails(
     };
 
 }
-
-
-
 // ============================================================
 // DASHBOARD PRODUCTION DETAILS
 // ============================================================
