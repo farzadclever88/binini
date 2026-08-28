@@ -3166,6 +3166,379 @@
                 transition-duration: .01ms !important;
             }
         }
+        /* ============================================================
+   DASHBOARD DATE PICKER
+   ============================================================ */
+
+.dashboard-date {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    min-height: 42px;
+    padding: 9px 14px;
+
+    border: 1px solid var(--dash-border);
+    border-radius: var(--dash-radius);
+
+    background: var(--dash-surface);
+    color: var(--dash-text);
+
+    font-size: 12px;
+    font-weight: 900;
+
+    box-shadow: var(--dash-shadow-sm);
+
+    cursor: pointer;
+
+    transition:
+        transform var(--dash-transition),
+        box-shadow var(--dash-transition),
+        border-color var(--dash-transition),
+        background var(--dash-transition);
+}
+
+.dashboard-date:hover {
+    transform: translateY(-1px);
+
+    border-color:
+        var(--dash-primary);
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.08);
+}
+
+.dashboard-date:active {
+    transform: translateY(0);
+}
+
+.dashboard-date-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 20px;
+    height: 20px;
+
+    border-radius: 6px;
+
+    background:
+        rgba(37,99,235,.10);
+
+    color:
+        var(--dash-primary);
+
+    font-size: 12px;
+}
+
+.dashboard-date-chevron {
+    margin-right: auto;
+
+    color:
+        var(--dash-muted);
+
+    font-size: 11px;
+}
+
+
+/* ============================================================
+   DATE PICKER OVERLAY
+   ============================================================ */
+
+.dashboard-date-picker-overlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: 99990;
+
+    display: none;
+
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    background:
+        rgba(15,23,42,.18);
+
+    backdrop-filter:
+        blur(2px);
+}
+
+.dashboard-date-picker-overlay.is-open {
+    display: flex;
+}
+
+
+/* ============================================================
+   DATE PICKER
+   ============================================================ */
+
+.dashboard-date-picker {
+    position: absolute;
+
+    width: 330px;
+    max-width: calc(100vw - 24px);
+
+    padding: 16px;
+
+    border:
+        1px solid var(--dash-border);
+
+    border-radius:
+        18px;
+
+    background:
+        var(--dash-surface);
+
+    box-shadow:
+        0 24px 70px rgba(15,23,42,.20);
+
+    direction: rtl;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.dashboard-date-picker-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px;
+
+    margin-bottom: 14px;
+}
+
+.dashboard-date-picker-title {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.dashboard-date-picker-month {
+    font-size: 15px;
+    font-weight: 950;
+
+    color:
+        var(--dash-text);
+}
+
+.dashboard-date-picker-year {
+    font-size: 11px;
+    font-weight: 700;
+
+    color:
+        var(--dash-muted);
+}
+
+.dashboard-date-picker-nav {
+    display: flex;
+
+    gap: 5px;
+}
+
+.dashboard-date-picker-nav button {
+    width: 34px;
+    height: 34px;
+
+    border:
+        1px solid var(--dash-border);
+
+    border-radius: 9px;
+
+    background:
+        var(--dash-surface);
+
+    color:
+        var(--dash-text);
+
+    cursor: pointer;
+
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.dashboard-date-picker-nav button:hover {
+    background:
+        var(--dash-surface-soft);
+
+    border-color:
+        var(--dash-primary);
+}
+
+
+/* ============================================================
+   WEEKDAYS
+   ============================================================ */
+
+.dashboard-calendar-weekdays,
+.dashboard-calendar-days {
+    display: grid;
+
+    grid-template-columns:
+        repeat(7, 1fr);
+
+    gap: 5px;
+}
+
+.dashboard-calendar-weekdays {
+    margin-bottom: 6px;
+}
+
+.dashboard-calendar-weekday {
+    height: 30px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color:
+        var(--dash-muted);
+
+    font-size: 10px;
+    font-weight: 900;
+}
+
+
+/* ============================================================
+   DAYS
+   ============================================================ */
+
+.dashboard-calendar-day {
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border:
+        1px solid transparent;
+
+    border-radius: 9px;
+
+    background:
+        transparent;
+
+    color:
+        var(--dash-text);
+
+    font-size: 12px;
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+.dashboard-calendar-day:hover {
+    background:
+        rgba(37,99,235,.08);
+
+    border-color:
+        rgba(37,99,235,.20);
+}
+
+.dashboard-calendar-day.is-selected {
+    background:
+        var(--dash-primary);
+
+    color:
+        #ffffff;
+
+    box-shadow:
+        0 5px 14px rgba(37,99,235,.24);
+}
+
+.dashboard-calendar-day.is-today {
+    border-color:
+        var(--dash-primary);
+
+    color:
+        var(--dash-primary);
+}
+
+.dashboard-calendar-day.is-selected.is-today {
+    color:
+        #ffffff;
+}
+
+.dashboard-calendar-day.is-outside {
+    color:
+        var(--dash-muted);
+
+    opacity: .38;
+}
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.dashboard-date-picker-footer {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px;
+
+    margin-top: 14px;
+    padding-top: 12px;
+
+    border-top:
+        1px solid var(--dash-border);
+}
+
+.dashboard-date-picker-today {
+    border: 0;
+
+    background: transparent;
+
+    color:
+        var(--dash-primary);
+
+    font-size: 11px;
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+.dashboard-date-picker-close {
+    border: 0;
+
+    background: transparent;
+
+    color:
+        var(--dash-muted);
+
+    font-size: 11px;
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 640px) {
+
+    .dashboard-date-picker {
+        width:
+            min(
+                330px,
+                calc(100vw - 24px)
+            );
+    }
+
+}
     </style>
 
 </head>
@@ -11793,9 +12166,9 @@
 
         }
 
-      /* ============================================================
+/* ============================================================
    DASHBOARD VIEW
-============================================================ */
+   ============================================================ */
 
 async function loadDashboard(
     selectedDate = null
@@ -11825,6 +12198,7 @@ async function loadDashboard(
                 endpoint,
                 {
                     method: "GET",
+
                     loadingText:
                         "در حال دریافت وضعیت داشبورد..."
                 }
@@ -11846,7 +12220,7 @@ async function loadDashboard(
     }
 
 }
-
+        
         function dashboardNumber(
             value
         ) {
@@ -12002,22 +12376,37 @@ async function loadDashboard(
 
                             </div>
 
-                            <div class="dashboard-actions">
+<div class="dashboard-actions">
 
-                                <div class="dashboard-date">
-                                    ${snapshot.business_date || "-"}
-                                </div>
+    <button
+        type="button"
+        class="dashboard-date"
+        id="dashboardDateButton"
+        aria-label="انتخاب تاریخ داشبورد"
+    >
+        <span class="dashboard-date-icon">▣</span>
 
-                                <button
-                                    type="button"
-                                    class="dashboard-refresh-button"
-                                    id="refreshDashboardButton"
-                                >
-                                    ↻
-                                    بروزرسانی
-                                </button>
+        <span
+            id="dashboardSelectedDate"
+        >
+            ${snapshot.business_date || "-"}
+        </span>
 
-                            </div>
+        <span class="dashboard-date-chevron">
+            ▾
+        </span>
+    </button>
+
+    <button
+        type="button"
+        class="dashboard-refresh-button"
+        id="refreshDashboardButton"
+    >
+        ↻
+        بروزرسانی
+    </button>
+
+</div>
 
                         </div>
 
@@ -12698,7 +13087,17 @@ async function loadDashboard(
 
                 `;
 
+$("#dashboardDateButton")
+    ?.addEventListener(
+        "click",
+        event => {
 
+            event.stopPropagation();
+
+            openDashboardDatePicker();
+
+        }
+    );
             $("#refreshDashboardButton")
                 ?.addEventListener(
                     "click",
@@ -12825,6 +13224,1193 @@ async function loadDashboard(
 
         }
 
+/* ============================================================
+   DASHBOARD PERSIAN DATE PICKER
+   ============================================================ */
+
+(function () {
+
+    let dashboardDatePickerState = {
+        date: null,
+        viewDate: null
+    };
+
+
+    const persianFormatter =
+        new Intl.DateTimeFormat(
+            "en-US-u-ca-persian",
+            {
+                timeZone:
+                    "Asia/Tehran",
+
+                year:
+                    "numeric",
+
+                month:
+                    "2-digit",
+
+                day:
+                    "2-digit"
+            }
+        );
+
+
+    const persianMonthFormatter =
+        new Intl.DateTimeFormat(
+            "fa-IR-u-ca-persian",
+            {
+                timeZone:
+                    "Asia/Tehran",
+
+                year:
+                    "numeric",
+
+                month:
+                    "long"
+            }
+        );
+
+
+    const persianDayFormatter =
+        new Intl.DateTimeFormat(
+            "en-US-u-ca-persian",
+            {
+                timeZone:
+                    "Asia/Tehran",
+
+                year:
+                    "numeric",
+
+                month:
+                    "2-digit",
+
+                day:
+                    "2-digit"
+            }
+        );
+
+
+    const normalizeDigits =
+        value => {
+
+            return String(
+                value ?? ""
+            )
+                .replace(
+                    /[\u06F0-\u06F9]/g,
+                    char =>
+                        String(
+                            char.charCodeAt(0) -
+                            0x06F0
+                        )
+                )
+                .replace(
+                    /[\u0660-\u0669]/g,
+                    char =>
+                        String(
+                            char.charCodeAt(0) -
+                            0x0660
+                        )
+                );
+
+        };
+
+
+    const parsePersianDate =
+        value => {
+
+            const text =
+                normalizeDigits(
+                    value
+                )
+                    .trim()
+                    .replace(
+                        /-/g,
+                        "/"
+                    );
+
+
+            const parts =
+                text
+                    .split("/")
+                    .map(
+                        item =>
+                            Number(
+                                item.trim()
+                            )
+                    );
+
+
+            if (
+                parts.length !== 3 ||
+                parts.some(
+                    item =>
+                        !Number.isFinite(
+                            item
+                        )
+                )
+            ) {
+
+                return null;
+
+            }
+
+
+            return {
+
+                year:
+                    parts[0],
+
+                month:
+                    parts[1],
+
+                day:
+                    parts[2]
+
+            };
+
+        };
+
+
+    const formatPersianDate =
+        date => {
+
+            if (!date) {
+
+                return "";
+
+            }
+
+
+            return (
+
+                String(
+                    date.year
+                ).padStart(
+                    4,
+                    "0"
+                )
+
+                +
+
+                "/"
+
+                +
+
+                String(
+                    date.month
+                ).padStart(
+                    2,
+                    "0"
+                )
+
+                +
+
+                "/"
+
+                +
+
+                String(
+                    date.day
+                ).padStart(
+                    2,
+                    "0"
+                )
+
+            );
+
+        };
+
+
+    const getTodayPersian =
+        () => {
+
+            return formatPersianDate(
+                parsePersianDate(
+                    persianFormatter.format(
+                        new Date()
+                    )
+                )
+            );
+
+        };
+
+
+    const getPersianParts =
+        date => {
+
+            return parsePersianDate(
+                persianDayFormatter.format(
+                    date
+                )
+            );
+
+        };
+
+
+    const createDateFromPersian =
+        (
+            year,
+            month,
+            day
+        ) => {
+
+            /*
+             * We only need an approximate Gregorian anchor.
+             * The correction loop below finds the exact Persian date.
+             */
+
+            let date =
+                new Date(
+                    Date.UTC(
+                        year - 621,
+                        month - 1,
+                        day
+                    )
+                );
+
+
+            for (
+                let i = 0;
+                i < 370;
+                i++
+            ) {
+
+                const current =
+                    getPersianParts(
+                        date
+                    );
+
+
+                if (
+                    current &&
+                    current.year === year &&
+                    current.month === month &&
+                    current.day === day
+                ) {
+
+                    return date;
+
+                }
+
+
+                date.setUTCDate(
+                    date.getUTCDate() + 1
+                );
+
+            }
+
+
+            return null;
+
+        };
+
+
+    const getMonthDays =
+        (
+            year,
+            month
+        ) => {
+
+            const days = [];
+
+
+            const firstDate =
+                createDateFromPersian(
+                    year,
+                    month,
+                    1
+                );
+
+
+            if (!firstDate) {
+
+                return days;
+
+            }
+
+
+            /*
+             * Persian calendar week:
+             *
+             * شنبه = 0
+             * یکشنبه = 1
+             * دوشنبه = 2
+             * سه‌شنبه = 3
+             * چهارشنبه = 4
+             * پنجشنبه = 5
+             * جمعه = 6
+             */
+
+            const gregorianWeekday =
+                firstDate.getUTCDay();
+
+
+            const persianWeekday =
+                (
+                    gregorianWeekday + 1
+                ) % 7;
+
+
+            let current =
+                new Date(
+                    firstDate.getTime()
+                );
+
+
+            for (
+                let day = 1;
+                day <= 31;
+                day++
+            ) {
+
+                const parts =
+                    getPersianParts(
+                        current
+                    );
+
+
+                if (
+                    !parts ||
+                    parts.year !== year ||
+                    parts.month !== month
+                ) {
+
+                    break;
+
+                }
+
+
+                days.push({
+
+                    day,
+
+                    weekday:
+                        day === 1
+                            ? persianWeekday
+                            : (
+                                persianWeekday +
+                                day -
+                                1
+                            ) % 7,
+
+                    date:
+                        new Date(
+                            current.getTime()
+                        )
+
+                });
+
+
+                current.setUTCDate(
+                    current.getUTCDate() + 1
+                );
+
+            }
+
+
+            return {
+
+                days,
+
+                firstWeekday:
+                    persianWeekday
+
+            };
+
+        };
+
+
+    const moveMonth =
+        (
+            year,
+            month,
+            delta
+        ) => {
+
+            let newYear =
+                year;
+
+            let newMonth =
+                month +
+                delta;
+
+
+            while (
+                newMonth < 1
+            ) {
+
+                newMonth += 12;
+                newYear--;
+
+            }
+
+
+            while (
+                newMonth > 12
+            ) {
+
+                newMonth -= 12;
+                newYear++;
+
+            }
+
+
+            return {
+
+                year:
+                    newYear,
+
+                month:
+                    newMonth
+
+            };
+
+        };
+
+
+    const getMonthName =
+        (
+            year,
+            month
+        ) => {
+
+            const date =
+                createDateFromPersian(
+                    year,
+                    month,
+                    1
+                );
+
+
+            if (!date) {
+
+                return "";
+
+            }
+
+
+            return persianMonthFormatter
+                .format(
+                    date
+                )
+                .replace(
+                    /۱۴۰[۰-۹]|۱۴[۰-۹]{2}/g,
+                    ""
+                )
+                .trim();
+
+        };
+
+
+    function ensureDashboardDatePicker() {
+
+        if (
+            document.getElementById(
+                "dashboardDatePickerOverlay"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        const overlay =
+            document.createElement(
+                "div"
+            );
+
+
+        overlay.id =
+            "dashboardDatePickerOverlay";
+
+
+        overlay.className =
+            "dashboard-date-picker-overlay";
+
+
+        overlay.innerHTML = `
+
+            <div
+                class="dashboard-date-picker"
+                id="dashboardDatePicker"
+                role="dialog"
+                aria-modal="true"
+                aria-label="انتخاب تاریخ داشبورد"
+            >
+
+                <div
+                    class="dashboard-date-picker-header"
+                >
+
+                    <div
+                        class="dashboard-date-picker-title"
+                    >
+
+                        <div
+                            class="dashboard-date-picker-month"
+                            id="dashboardCalendarMonth"
+                        ></div>
+
+                        <div
+                            class="dashboard-date-picker-year"
+                            id="dashboardCalendarYear"
+                        ></div>
+
+                    </div>
+
+
+                    <div
+                        class="dashboard-date-picker-nav"
+                    >
+
+                        <button
+                            type="button"
+                            id="dashboardCalendarNext"
+                            aria-label="ماه بعد"
+                        >
+                            ›
+                        </button>
+
+                        <button
+                            type="button"
+                            id="dashboardCalendarPrev"
+                            aria-label="ماه قبل"
+                        >
+                            ‹
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="dashboard-calendar-weekdays"
+                >
+
+                    <div class="dashboard-calendar-weekday">
+                        ش
+                    </div>
+
+                    <div class="dashboard-calendar-weekday">
+                        ی
+                    </div>
+
+                    <div class="dashboard-calendar-weekday">
+                        د
+                    </div>
+
+                    <div class="dashboard-calendar-weekday">
+                        س
+                    </div>
+
+                    <div class="dashboard-calendar-weekday">
+                        چ
+                    </div>
+
+                    <div class="dashboard-calendar-weekday">
+                        پ
+                    </div>
+
+                    <div class="dashboard-calendar-weekday">
+                        ج
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="dashboard-calendar-days"
+                    id="dashboardCalendarDays"
+                ></div>
+
+
+                <div
+                    class="dashboard-date-picker-footer"
+                >
+
+                    <button
+                        type="button"
+                        class="dashboard-date-picker-today"
+                        id="dashboardCalendarToday"
+                    >
+                        امروز
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="dashboard-date-picker-close"
+                        id="dashboardCalendarClose"
+                    >
+                        بستن
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        document.body.appendChild(
+            overlay
+        );
+
+
+        overlay.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    overlay
+                ) {
+
+                    closeDashboardDatePicker();
+
+                }
+
+            }
+        );
+
+
+        document
+            .getElementById(
+                "dashboardCalendarPrev"
+            )
+            ?.addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+
+                    dashboardDatePickerState.viewDate =
+                        moveMonth(
+
+                            dashboardDatePickerState
+                                .viewDate
+                                .year,
+
+                            dashboardDatePickerState
+                                .viewDate
+                                .month,
+
+                            -1
+
+                        );
+
+
+                    renderDashboardCalendar();
+
+                }
+            );
+
+
+        document
+            .getElementById(
+                "dashboardCalendarNext"
+            )
+            ?.addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+
+                    dashboardDatePickerState.viewDate =
+                        moveMonth(
+
+                            dashboardDatePickerState
+                                .viewDate
+                                .year,
+
+                            dashboardDatePickerState
+                                .viewDate
+                                .month,
+
+                            1
+
+                        );
+
+
+                    renderDashboardCalendar();
+
+                }
+            );
+
+
+        document
+            .getElementById(
+                "dashboardCalendarToday"
+            )
+            ?.addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+
+                    const today =
+                        getTodayPersian();
+
+
+                    const parsed =
+                        parsePersianDate(
+                            today
+                        );
+
+
+                    if (!parsed) {
+
+                        return;
+
+                    }
+
+
+                    dashboardDatePickerState.date =
+                        today;
+
+
+                    dashboardDatePickerState.viewDate = {
+
+                        year:
+                            parsed.year,
+
+                        month:
+                            parsed.month
+
+                    };
+
+
+                    renderDashboardCalendar();
+
+                }
+            );
+
+
+        document
+            .getElementById(
+                "dashboardCalendarClose"
+            )
+            ?.addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+                    closeDashboardDatePicker();
+
+                }
+            );
+
+    }
+
+
+    function renderDashboardCalendar() {
+
+        const overlay =
+            document.getElementById(
+                "dashboardDatePickerOverlay"
+            );
+
+
+        const monthElement =
+            document.getElementById(
+                "dashboardCalendarMonth"
+            );
+
+
+        const yearElement =
+            document.getElementById(
+                "dashboardCalendarYear"
+            );
+
+
+        const daysElement =
+            document.getElementById(
+                "dashboardCalendarDays"
+            );
+
+
+        if (
+            !overlay ||
+            !monthElement ||
+            !yearElement ||
+            !daysElement
+        ) {
+
+            return;
+
+        }
+
+
+        const {
+            year,
+            month
+        } =
+            dashboardDatePickerState
+                .viewDate;
+
+
+        monthElement.textContent =
+            getMonthName(
+                year,
+                month
+            );
+
+
+        yearElement.textContent =
+            String(
+                year
+            );
+
+
+        const calendar =
+            getMonthDays(
+                year,
+                month
+            );
+
+
+        daysElement.innerHTML =
+            "";
+
+
+        for (
+            let i = 0;
+            i < calendar.firstWeekday;
+            i++
+        ) {
+
+            const empty =
+                document.createElement(
+                    "div"
+                );
+
+
+            empty.className =
+                "dashboard-calendar-day is-outside";
+
+
+            daysElement.appendChild(
+                empty
+            );
+
+        }
+
+
+        const today =
+            getTodayPersian();
+
+
+        for (
+            const item
+            of calendar.days
+        ) {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.type =
+                "button";
+
+
+            button.className =
+                "dashboard-calendar-day";
+
+
+            const dateText =
+                formatPersianDate({
+
+                    year,
+
+                    month,
+
+                    day:
+                        item.day
+
+                });
+
+
+            button.textContent =
+                String(
+                    item.day
+                );
+
+
+            button.dataset.date =
+                dateText;
+
+
+            if (
+                dateText ===
+                dashboardDatePickerState.date
+            ) {
+
+                button.classList.add(
+                    "is-selected"
+                );
+
+            }
+
+
+            if (
+                dateText ===
+                today
+            ) {
+
+                button.classList.add(
+                    "is-today"
+                );
+
+            }
+
+
+            button.addEventListener(
+                "click",
+                async event => {
+
+                    event.stopPropagation();
+
+
+                    await selectDashboardDate(
+                        dateText
+                    );
+
+                }
+            );
+
+
+            daysElement.appendChild(
+                button
+            );
+
+        }
+
+    }
+
+
+    async function selectDashboardDate(
+        date
+    ) {
+
+        dashboardDatePickerState.date =
+            date;
+
+
+        closeDashboardDatePicker();
+
+
+        /*
+         * اینجا عمداً Snapshot جدید ساخته نمی‌شود.
+         *
+         * فقط داشبورد همان تاریخ را از API می‌گیرد.
+         */
+
+        await loadDashboard(
+            date
+        );
+
+    }
+
+
+    function openDashboardDatePicker() {
+
+        const button =
+            document.getElementById(
+                "dashboardDateButton"
+            );
+
+
+        if (!button) {
+
+            return;
+
+        }
+
+
+        ensureDashboardDatePicker();
+
+
+        const displayedDate =
+            document.getElementById(
+                "dashboardSelectedDate"
+            )?.textContent
+            ?.trim();
+
+
+        const parsed =
+            parsePersianDate(
+                displayedDate
+            )
+            ||
+            parsePersianDate(
+                getTodayPersian()
+            );
+
+
+        dashboardDatePickerState.date =
+            parsed
+                ? formatPersianDate(
+                    parsed
+                )
+                : getTodayPersian();
+
+
+        const selected =
+            parsePersianDate(
+                dashboardDatePickerState.date
+            );
+
+
+        dashboardDatePickerState.viewDate = {
+
+            year:
+                selected.year,
+
+            month:
+                selected.month
+
+        };
+
+
+        renderDashboardCalendar();
+
+
+        const overlay =
+            document.getElementById(
+                "dashboardDatePickerOverlay"
+            );
+
+
+        const picker =
+            document.getElementById(
+                "dashboardDatePicker"
+            );
+
+
+        if (
+            !overlay ||
+            !picker
+        ) {
+
+            return;
+
+        }
+
+
+        overlay.classList.add(
+            "is-open"
+        );
+
+
+        const rect =
+            button.getBoundingClientRect();
+
+
+        const pickerWidth =
+            Math.min(
+                330,
+                window.innerWidth - 24
+            );
+
+
+        let left =
+            rect.left;
+
+
+        let top =
+            rect.bottom + 8;
+
+
+        if (
+            left +
+            pickerWidth >
+            window.innerWidth - 12
+        ) {
+
+            left =
+                window.innerWidth -
+                pickerWidth -
+                12;
+
+        }
+
+
+        if (
+            left < 12
+        ) {
+
+            left = 12;
+
+        }
+
+
+        if (
+            top + 430 >
+            window.innerHeight - 12
+        ) {
+
+            top =
+                rect.top -
+                438;
+
+        }
+
+
+        if (
+            top < 12
+        ) {
+
+            top = 12;
+
+        }
+
+
+        picker.style.left =
+            `${left}px`;
+
+
+        picker.style.top =
+            `${top}px`;
+
+    }
+
+
+    function closeDashboardDatePicker() {
+
+        const overlay =
+            document.getElementById(
+                "dashboardDatePickerOverlay"
+            );
+
+
+        overlay
+            ?.classList
+            .remove(
+                "is-open"
+            );
+
+    }
+
+
+    window.openDashboardDatePicker =
+        openDashboardDatePicker;
+
+
+    window.closeDashboardDatePicker =
+        closeDashboardDatePicker;
+
+
+})();
+        
         function dashboardStatusLabel(
             severity
         ) {
