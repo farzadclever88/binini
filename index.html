@@ -8972,29 +8972,38 @@
                             >
 
 
-                            <div class="form-grid">
+                           <div class="form-group">
 
-                                <div class="form-group">
+    <label class="form-label">
+        کد قطعه
+    </label>
 
-                                    <label class="form-label">
-                                        کد قطعه *
-                                    </label>
+    <div class="generated-field">
 
-                                    <input
-                                        class="form-control"
-                                        name="code"
-                                        required
-                                        value="${escapeHtml(
-                    item?.code || ""
-                )}"
-                                    >
+        <input
+            class="form-control generated-field-input"
+            type="text"
+            value="${
+                escapeHtml(
+                    item?.code ||
+                    "پس از ثبت توسط سیستم تولید می‌شود"
+                )
+            }"
+            readonly
+            aria-readonly="true"
+        >
 
-                                    <small
-                                        class="form-error"
-                                        data-error-for="code"
-                                    ></small>
+        <span class="generated-field-badge">
+            سیستمی
+        </span>
 
-                                </div>
+    </div>
+
+    <small class="form-help">
+        کد قطعه به‌صورت خودکار تولید می‌شود و قابل تغییر نیست.
+    </small>
+
+</div>
 
 
                                 <div class="form-group">
@@ -9040,22 +9049,40 @@
                                 </div>
 
 
-                                <div class="form-group">
+<div class="form-group">
 
-                                    <label class="form-label">
-                                        بارکد
-                                    </label>
+    <label class="form-label">
+        بارکد
+    </label>
 
-                                    <input
-                                        class="form-control"
-                                        name="barcode"
-                                        value="${escapeHtml(
-                    item?.barcode || ""
-                )}"
-                                        inputmode="numeric"
-                                    >
+    <div class="generated-field">
 
-                                </div>
+        <input
+            class="form-control generated-field-input barcode-preview-input"
+            type="text"
+            value="${
+                escapeHtml(
+                    item?.barcode ||
+                    "پس از ثبت توسط سیستم تولید می‌شود"
+                )
+            }"
+            readonly
+            aria-readonly="true"
+            inputmode="numeric"
+        >
+
+        <span class="generated-field-badge">
+            سیستمی
+        </span>
+
+    </div>
+
+    <small class="form-help">
+        بارکد بر اساس شناسه ثابت قطعه تولید می‌شود و قابل تغییر نیست.
+    </small>
+
+</div>
+                              
 
 
                                 <div class="form-group">
