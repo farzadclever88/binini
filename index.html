@@ -7803,7 +7803,26 @@
                         raw: true
                     }
 
-                ]
+                ],
+
+    rowActions:
+        function(row) {
+
+            return `
+
+                <button
+                    type="button"
+                    class="btn small barcode-print-btn"
+                    data-action="print-barcode"
+                    data-id="${row.id}"
+                    title="چاپ بارکد قطعه"
+                >
+                    🖨 چاپ بارکد قطعه
+                </button>
+
+            `;
+
+        }
 
             },
 
