@@ -8241,686 +8241,785 @@
 
 
 
-        /* ============================================================
-       UNIVERSAL BARCODE PRINT SYSTEM
-       ============================================================ */
+/* ============================================================
+   UNIVERSAL BARCODE PRINT SYSTEM
+   ============================================================ */
 
-        function printBarcode(options = {}) {
+function printBarcode(options = {}) {
 
-            const value =
-                String(
-                    options.value ??
-                    ""
-                ).trim();
-
-
-            if (!value) {
-
-                showMessage(
-                    "برای این مورد بارکدی ثبت نشده است.",
-                    "error"
-                );
-
-                return;
-
-            }
+    const value =
+        String(
+            options.value ??
+            ""
+        ).trim();
 
 
-            const title =
-                String(
-                    options.title ??
-                    "-"
-                );
+    if (!value) {
+
+        showMessage(
+            "برای این مورد بارکدی ثبت نشده است.",
+            "error"
+        );
+
+        return;
+
+    }
 
 
-            const code =
-                String(
-                    options.code ??
-                    ""
-                );
+    const title =
+        String(
+            options.title ??
+            "-"
+        ).trim();
 
 
-            /*
-             * ----------------------------------------------------------
-             * PRINT WINDOW
-             * ----------------------------------------------------------
-             */
-
-            const printWindow =
-                window.open(
-                    "",
-                    "_blank",
-                    "width=1100,height=850"
-                );
+    const code =
+        String(
+            options.code ??
+            ""
+        ).trim();
 
 
-            if (!printWindow) {
+    /*
+     * ----------------------------------------------------------
+     * PRINT WINDOW
+     * ----------------------------------------------------------
+     */
 
-                showMessage(
-                    "پنجره چاپ توسط مرورگر مسدود شده است.",
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            /*
-             * ----------------------------------------------------------
-             * ESCAPE HTML
-             * ----------------------------------------------------------
-             */
-
-            const escapeHtmlLocal =
-                function (text) {
-
-                    return String(
-                        text ?? ""
-                    )
-                        .replace(
-                            /&/g,
-                            "&amp;"
-                        )
-                        .replace(
-                            /</g,
-                            "&lt;"
-                        )
-                        .replace(
-                            />/g,
-                            "&gt;"
-                        )
-                        .replace(
-                            /"/g,
-                            "&quot;"
-                        )
-                        .replace(
-                            /'/g,
-                            "&#039;"
-                        );
-
-                };
+    const printWindow =
+        window.open(
+            "",
+            "_blank",
+            "width=1100,height=850"
+        );
 
 
-            const safeTitle =
-                escapeHtmlLocal(
-                    title
-                );
+    if (!printWindow) {
+
+        showMessage(
+            "پنجره چاپ توسط مرورگر مسدود شده است.",
+            "error"
+        );
+
+        return;
+
+    }
 
 
-            const safeCode =
-                escapeHtmlLocal(
-                    code
-                );
+    /*
+     * ----------------------------------------------------------
+     * DATA
+     * ----------------------------------------------------------
+     *
+     * JSON.stringify باعث می‌شود:
+     * - فارسی امن منتقل شود
+     * - کوتیشن داخل نام مشکل ایجاد نکند
+     * - کاراکترهای خاص HTML/JS باعث شکستن کد نشوند
+     */
+
+    const safeTitle =
+        JSON.stringify(
+            title
+        );
 
 
-            const safeValue =
-                escapeHtmlLocal(
-                    value
-                );
+    const safeCode =
+        JSON.stringify(
+            code
+        );
 
 
-            /*
-             * ----------------------------------------------------------
-             * BARCODE LIBRARY CHECK
-             * ----------------------------------------------------------
-             */
-
-            if (
-                typeof JsBarcode !==
-                "function"
-            ) {
-
-                printWindow.close();
-
-                showMessage(
-                    "کتابخانه بارکد بارگذاری نشده است.",
-                    "error"
-                );
-
-                console.error(
-                    "JsBarcode is not available."
-                );
-
-                return;
-
-            }
+    const safeValue =
+        JSON.stringify(
+            value
+        );
 
 
-            /*
-             * ----------------------------------------------------------
-             * PRINT PAGE
-             * ----------------------------------------------------------
-             */
+    /*
+     * ----------------------------------------------------------
+     * PRINT DOCUMENT
+     * ----------------------------------------------------------
+     */
 
-            const html = `
+    const html = `
 
 <!doctype html>
 
 <html
-                            lang="fa"
-                            dir="rtl"
+    lang="fa"
+    dir="rtl"
 >
 
 <head>
 
-                            <meta charset="utf-8">
+    <meta charset="utf-8">
 
-                            <meta
-                                name="viewport"
-                                content="width=device-width, initial-scale=1"
-                            >
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
 
-                            <title>
-                                چاپ بارکد
-                            </title>
+    <title>
+        چاپ بارکد
+    </title>
 
 
-                            <style>
+    <!-- ========================================================
+         FONT
+         ======================================================== -->
 
-                                * {
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
 
-                                    box-sizing:
-                                        border-box;
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
 
-                                }
+    <link
+        href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
 
 
-                                html,
-                                body {
+    <!-- ========================================================
+         JSBARCODE
+         ======================================================== -->
 
-                                    margin:
-                                        0;
+    <script
+        src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"
+    ><\/script>
 
-                                    padding:
-                                        0;
 
-                                    background:
-                                        #ffffff;
+    <style>
 
-                                    color:
-                                        #111111;
+        * {
 
-                                    font-family:
-                                        Tahoma,
-                                        Arial,
-                                        sans-serif;
+            box-sizing:
+                border-box;
 
-                                }
+        }
 
 
-                                body {
+        html,
+        body {
 
-                                    min-height:
-                                        100vh;
+            margin:
+                0;
 
-                                }
+            padding:
+                0;
 
+            background:
+                #ffffff;
 
-                                /* ========================================================
-                                   SETTINGS
-                                   ======================================================== */
+            color:
+                #111827;
 
-                                #settings {
+            font-family:
+                "Vazirmatn",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-                                    width:
-                                        min(
-                                            760px,
-                                            calc(100% - 32px)
-                                        );
+        }
 
-                                    margin:
-                                        24px auto;
 
-                                    padding:
-                                        24px;
+        body {
 
-                                    background:
-                                        #ffffff;
+            min-height:
+                100vh;
 
-                                    border:
-                                        1px solid
-                                        #d1d5db;
+        }
 
-                                    border-radius:
-                                        12px;
 
-                                }
+        /* ========================================================
+           SETTINGS
+           ======================================================== */
 
+        #settings {
 
-                                #settings h1 {
+            width:
+                min(
+                    760px,
+                    calc(100% - 32px)
+                );
 
-                                    margin:
-                                        0 0 20px;
+            margin:
+                24px auto;
 
-                                    font-size:
-                                        21px;
+            padding:
+                24px;
 
-                                }
+            background:
+                #ffffff;
 
+            border:
+                1px solid
+                #d1d5db;
 
-                                .setting-row {
+            border-radius:
+                12px;
 
-                                    display:
-                                        grid;
+            box-shadow:
+                0 8px 30px
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.08
+                );
 
-                                    grid-template-columns:
-                                        190px
-                                        minmax(0, 1fr);
+        }
 
-                                    gap:
-                                        12px;
 
-                                    align-items:
-                                        center;
+        #settings h1 {
 
-                                    margin-bottom:
-                                        13px;
+            margin:
+                0 0 20px;
 
-                                }
+            font-size:
+                21px;
 
+            font-weight:
+                700;
 
-                                .setting-row label {
+        }
 
-                                    font-weight:
-                                        700;
 
-                                }
+        .setting-row {
 
+            display:
+                grid;
 
-                                select,
-                                input {
+            grid-template-columns:
+                190px
+                minmax(0, 1fr);
 
-                                    width:
-                                        100%;
+            gap:
+                12px;
 
-                                    min-height:
-                                        40px;
+            align-items:
+                center;
 
-                                    padding:
-                                        7px 10px;
+            margin-bottom:
+                13px;
 
-                                    border:
-                                        1px solid
-                                        #d1d5db;
+        }
 
-                                    border-radius:
-                                        7px;
 
-                                    background:
-                                        #ffffff;
+        .setting-row label {
 
-                                    color:
-                                        #111111;
+            font-weight:
+                700;
 
-                                    font-family:
-                                        Tahoma,
-                                        Arial,
-                                        sans-serif;
+        }
 
-                                    font-size:
-                                        14px;
 
-                                }
+        select,
+        input {
 
+            width:
+                100%;
 
-                                input[type="checkbox"] {
+            min-height:
+                40px;
 
-                                    width:
-                                        auto;
+            padding:
+                7px 10px;
 
-                                    min-height:
-                                        auto;
+            border:
+                1px solid
+                #d1d5db;
 
-                                }
+            border-radius:
+                7px;
 
+            background:
+                #ffffff;
 
-                                .checkbox-row {
+            color:
+                #111827;
 
-                                    display:
-                                        flex;
+            font-family:
+                "Vazirmatn",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-                                    align-items:
-                                        center;
+            font-size:
+                14px;
 
-                                    gap:
-                                        8px;
+        }
 
-                                    margin:
-                                        12px 0;
 
-                                }
+        input[type="checkbox"] {
 
+            width:
+                auto;
 
-                                .info-box {
+            min-height:
+                auto;
 
-                                    margin-top:
-                                        15px;
+        }
 
-                                    padding:
-                                        12px 14px;
 
-                                    background:
-                                        #f3f4f6;
+        .checkbox-row {
 
-                                    border-radius:
-                                        8px;
+            display:
+                flex;
 
-                                    line-height:
-                                        1.8;
+            align-items:
+                center;
 
-                                    font-size:
-                                        13px;
+            gap:
+                8px;
 
-                                }
+            margin:
+                12px 0;
 
+        }
 
-                                .actions {
 
-                                    display:
-                                        flex;
+        .info-box {
 
-                                    flex-wrap:
-                                        wrap;
+            margin-top:
+                15px;
 
-                                    gap:
-                                        10px;
+            padding:
+                12px 14px;
 
-                                    margin-top:
-                                        20px;
+            background:
+                #f3f4f6;
 
-                                }
+            border-radius:
+                8px;
 
+            line-height:
+                1.8;
 
-                                button {
+            font-size:
+                13px;
 
-                                    min-height:
-                                        40px;
+        }
 
-                                    border:
-                                        0;
 
-                                    border-radius:
-                                        8px;
+        .actions {
 
-                                    padding:
-                                        8px 18px;
+            display:
+                flex;
 
-                                    cursor:
-                                        pointer;
+            flex-wrap:
+                wrap;
 
-                                    font-family:
-                                        Tahoma,
-                                        Arial,
-                                        sans-serif;
+            gap:
+                10px;
 
-                                    font-size:
-                                        14px;
+            margin-top:
+                20px;
 
-                                    font-weight:
-                                        700;
+        }
 
-                                }
 
+        button {
 
-                                #previewButton {
+            min-height:
+                40px;
 
-                                    background:
-                                        #e5e7eb;
+            border:
+                0;
 
-                                    color:
-                                        #111111;
+            border-radius:
+                8px;
 
-                                }
+            padding:
+                8px 18px;
 
+            cursor:
+                pointer;
 
-                                #printButton {
+            font-family:
+                "Vazirmatn",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-                                    background:
-                                        #111111;
+            font-size:
+                14px;
 
-                                    color:
-                                        #ffffff;
+            font-weight:
+                700;
 
-                                }
+        }
 
 
-                                /* ========================================================
-                                   PREVIEW
-                                   ======================================================== */
+        button:disabled {
 
-                                #previewArea {
+            opacity:
+                0.55;
 
-                                    display:
-                                        none;
+            cursor:
+                not-allowed;
 
-                                    margin:
-                                        20px auto;
+        }
 
-                                    padding:
-                                        20px;
 
-                                    background:
-                                        #e5e7eb;
+        #previewButton {
 
-                                    overflow:
-                                        auto;
+            background:
+                #e5e7eb;
 
-                                }
+            color:
+                #111827;
 
+        }
 
-                                .print-page {
 
-                                    margin:
-                                        0 auto;
+        #printButton {
 
-                                    background:
-                                        #ffffff;
+            background:
+                #111827;
 
-                                    display:
-                                        grid;
+            color:
+                #ffffff;
 
-                                    align-content:
-                                        start;
+        }
 
-                                    justify-content:
-                                        start;
 
-                                }
+        /* ========================================================
+           PREVIEW
+           ======================================================== */
 
+        #previewArea {
 
-                                .label {
+            display:
+                none;
 
-        position: relative;
+            margin:
+                20px auto;
 
-        background: #ffffff;
+            padding:
+                20px;
 
-        overflow: hidden;
+            background:
+                #e5e7eb;
 
-        display: flex;
+            overflow:
+                auto;
 
-        flex-direction: column;
+        }
 
-        align-items: center;
 
-        justify-content: flex-start;
+        .print-page {
 
-        gap: 1.5mm;
+            margin:
+                0 auto;
 
-        padding: 3mm 4mm;
+            background:
+                #ffffff;
 
-        font-family:
-            "Vazirmatn",
-            Tahoma,
-            Arial,
-            sans-serif;
+            display:
+                grid;
 
-}
+            align-content:
+                start;
 
+            justify-content:
+                start;
 
-                                .label.cut-border {
+        }
 
-                                    border:
-                                        0.25mm
-                                        solid
-                                        #777777;
 
-                                }
+        /* ========================================================
+           LABEL
+           ======================================================== */
 
+        .label {
 
-                               .part-name {
+            position:
+                relative;
 
-                                width: 100%;
+            width:
+                100%;
 
-                                min-height: 6mm;
+            height:
+                100%;
 
-                                text-align: center;
+            background:
+                #ffffff;
 
-                                font-size: 12pt;
+            overflow:
+                hidden;
 
-                                font-weight: 700;
+            display:
+                flex;
 
-                                line-height: 1.35;
+            flex-direction:
+                column;
 
-                                white-space: nowrap;
+            align-items:
+                center;
 
-                                overflow: hidden;
+            justify-content:
+                flex-start;
 
-                                text-overflow: ellipsis;
+            gap:
+                1.5mm;
 
-                                }
-                                .part-code {
+            padding:
+                3mm 4mm;
 
-                                        width: 100%;
+            font-family:
+                "Vazirmatn",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-                                        min-height: 5mm;
+        }
 
-                                        text-align: center;
 
-                                        font-size: 9pt;
+        .label.cut-border {
 
-                                        font-weight: 500;
+            border:
+                0.25mm
+                solid
+                #777777;
 
-                                        line-height: 1.3;
+        }
 
-                                        white-space: nowrap;
 
-                                        overflow: hidden;
+        /* ========================================================
+           TITLE
+           ======================================================== */
 
-                                        text-overflow: ellipsis;
+        .part-name {
 
-                                }
+            width:
+                100%;
 
+            min-height:
+                7mm;
 
-                                .barcode {
+            text-align:
+                center;
 
-                                        display: block;
+            font-family:
+                "Vazirmatn",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-                                        width: 88%;
+            font-size:
+                12pt;
 
-                                        max-width: 88mm;
+            font-weight:
+                700;
 
-                                        height: auto;
+            line-height:
+                1.35;
 
-                                        max-height: 20mm;
+            white-space:
+                nowrap;
 
-                                        margin-top: 1mm;
+            overflow:
+                hidden;
 
-                                        margin-bottom: 1mm;
+            text-overflow:
+                ellipsis;
 
-                                }
+            flex-shrink:
+                0;
 
-                                .barcode-value {
+        }
 
-                                        width: 100%;
 
-                                        min-height: 4mm;
+        /* ========================================================
+           CODE
+           ======================================================== */
 
-                                        text-align: center;
+        .part-code {
 
-                                        direction: ltr;
+            width:
+                100%;
 
-                                        font-family:
-                                            "Vazirmatn",
-                                            Tahoma,
-                                            Arial,
-                                            sans-serif;
+            min-height:
+                5mm;
 
-                                        font-size: 8pt;
+            text-align:
+                center;
 
-                                        font-weight: 500;
+            font-family:
+                "Vazirmatn",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-                                        letter-spacing: .5px;
+            font-size:
+                8.5pt;
 
-                                        line-height: 1.2;
+            font-weight:
+                500;
 
-                                }
+            line-height:
+                1.35;
 
+            white-space:
+                nowrap;
 
-                                /* ========================================================
-                                   PRINT
-                                   ======================================================== */
+            overflow:
+                hidden;
 
-                                @media print {
+            text-overflow:
+                ellipsis;
 
-                                    html,
-                                    body {
+            flex-shrink:
+                0;
 
-                                        background:
-                                            #ffffff !important;
+        }
 
-                                    }
 
+        /* ========================================================
+           BARCODE
+           ======================================================== */
 
-                                    #settings {
+        .barcode {
 
-                                        display:
-                                            none !important;
+            display:
+                block;
 
-                                    }
+            width:
+                88%;
 
+            max-width:
+                88mm;
 
-                                    #previewArea {
+            height:
+                20mm;
 
-                                        display:
-                                            block !important;
+            margin:
+                1mm auto;
 
-                                        margin:
-                                            0 !important;
+            flex-shrink:
+                0;
 
-                                        padding:
-                                            0 !important;
+        }
 
-                                        background:
-                                            #ffffff !important;
 
-                                        overflow:
-                                            visible !important;
+        /* ========================================================
+           BARCODE NUMBER
+           ======================================================== */
 
-                                    }
+        .barcode-value {
 
+            width:
+                100%;
 
-                                    .print-page {
+            min-height:
+                4mm;
 
-                                        margin:
-                                            0 !important;
+            text-align:
+                center;
 
-                                    }
+            direction:
+                ltr;
 
+            font-family:
+                "Vazirmatn",
+                Tahoma,
+                Arial,
+                sans-serif;
 
-                                    .label {
+            font-size:
+                8pt;
 
-                                        break-inside:
-                                            avoid;
+            font-weight:
+                500;
 
-                                        page-break-inside:
-                                            avoid;
+            letter-spacing:
+                0.5px;
 
-                                    }
+            line-height:
+                1.2;
 
-                                }
+            flex-shrink:
+                0;
 
-                            </style>
+        }
+
+
+        /* ========================================================
+           PRINT
+           ======================================================== */
+
+        @media print {
+
+            html,
+            body {
+
+                background:
+                    #ffffff !important;
+
+                margin:
+                    0 !important;
+
+                padding:
+                    0 !important;
+
+            }
+
+
+            #settings {
+
+                display:
+                    none !important;
+
+            }
+
+
+            #previewArea {
+
+                display:
+                    block !important;
+
+                margin:
+                    0 !important;
+
+                padding:
+                    0 !important;
+
+                background:
+                    #ffffff !important;
+
+                overflow:
+                    visible !important;
+
+            }
+
+
+            .print-page {
+
+                margin:
+                    0 !important;
+
+            }
+
+
+            .label {
+
+                break-inside:
+                    avoid;
+
+                page-break-inside:
+                    avoid;
+
+            }
+
+        }
+
+    </style>
 
 </head>
 
@@ -8930,244 +9029,304 @@
 
 <div id="settings">
 
-                            <h1>
-                                تنظیمات چاپ بارکد
-                            </h1>
+    <h1>
+        تنظیمات چاپ بارکد
+    </h1>
 
 
-                            <div class="setting-row">
+    <!-- ========================================================
+         PAPER
+         ======================================================== -->
 
-                                <label>
-                                    نوع کاغذ
-                                </label>
+    <div class="setting-row">
 
-                                <select id="paperType">
+        <label>
+            نوع کاغذ
+        </label>
 
-                                    <option value="a4">
-                                        A4
-                                    </option>
 
-                                    <option value="a5">
-                                        A5
-                                    </option>
+        <select id="paperType">
 
-                                    <option value="roll">
-                                        رول لیبل‌زن
-                                    </option>
+            <option value="a4">
+                A4
+            </option>
 
-                                </select>
+            <option value="a5">
+                A5
+            </option>
 
-                            </div>
+            <option value="roll">
+                رول لیبل‌زن
+            </option>
 
+        </select>
 
-                            <div class="setting-row">
+    </div>
 
-                                <label>
-                                    جهت چاپ
-                                </label>
 
-                                <select id="orientation">
+    <!-- ========================================================
+         ORIENTATION
+         ======================================================== -->
 
-                                    <option value="portrait">
-                                        عمودی
-                                    </option>
+    <div class="setting-row">
 
-                                    <option value="landscape">
-                                        افقی
-                                    </option>
+        <label>
+            جهت چاپ
+        </label>
 
-                                </select>
 
-                            </div>
+        <select id="orientation">
 
+            <option value="portrait">
+                عمودی
+            </option>
 
-                            <div class="setting-row">
+            <option value="landscape">
+                افقی
+            </option>
 
-                                <label>
-                                    عرض لیبل (میلی‌متر)
-                                </label>
+        </select>
 
-                                <input
-                                    id="labelWidth"
-                                    type="number"
-                                    min="20"
-                                    max="300"
-                                    step="1"
-                                    value="100"
-                                >
+    </div>
 
-                            </div>
 
+    <!-- ========================================================
+         LABEL WIDTH
+         ======================================================== -->
 
-                            <div class="setting-row">
+    <div class="setting-row">
 
-                                <label>
-                                    ارتفاع لیبل (میلی‌متر)
-                                </label>
+        <label>
+            عرض لیبل (میلی‌متر)
+        </label>
 
-                                <input
-                                    id="labelHeight"
-                                    type="number"
-                                    min="15"
-                                    max="200"
-                                    step="1"
-                                    value="40"
-                                >
 
-                            </div>
+        <input
+            id="labelWidth"
+            type="number"
+            min="20"
+            max="300"
+            step="1"
+            value="100"
+        >
 
+    </div>
 
-                            <div class="setting-row">
 
-                                <label>
-                                    نحوه چیدمان
-                                </label>
+    <!-- ========================================================
+         LABEL HEIGHT
+         ======================================================== -->
 
-                                <select id="layoutMode">
+    <div class="setting-row">
 
-                                    <option value="auto">
-                                        خودکار — بیشترین تعداد ممکن
-                                    </option>
+        <label>
+            ارتفاع لیبل (میلی‌متر)
+        </label>
 
-                                    <option value="manual">
-                                        دستی
-                                    </option>
 
-                                </select>
+        <input
+            id="labelHeight"
+            type="number"
+            min="15"
+            max="200"
+            step="1"
+            value="40"
+        >
 
-                            </div>
+    </div>
 
 
-                            <div
-                                id="manualLayout"
-                                style="display:none"
-                            >
+    <!-- ========================================================
+         LAYOUT MODE
+         ======================================================== -->
 
-                                <div class="setting-row">
+    <div class="setting-row">
 
-                                    <label>
-                                        تعداد ستون
-                                    </label>
+        <label>
+            نحوه چیدمان
+        </label>
 
-                                    <input
-                                        id="columns"
-                                        type="number"
-                                        min="1"
-                                        max="20"
-                                        step="1"
-                                        value="2"
-                                    >
 
-                                </div>
+        <select id="layoutMode">
 
+            <option value="auto">
+                خودکار — بیشترین تعداد ممکن
+            </option>
 
-                                <div class="setting-row">
+            <option value="manual">
+                دستی
+            </option>
 
-                                    <label>
-                                        تعداد ردیف
-                                    </label>
+        </select>
 
-                                    <input
-                                        id="rows"
-                                        type="number"
-                                        min="1"
-                                        max="30"
-                                        step="1"
-                                        value="6"
-                                    >
+    </div>
 
-                                </div>
 
-                            </div>
+    <!-- ========================================================
+         MANUAL LAYOUT
+         ======================================================== -->
 
+    <div
+        id="manualLayout"
+        style="display:none"
+    >
 
-                            <div class="setting-row">
+        <div class="setting-row">
 
-                                <label>
-                                    فاصله بین لیبل‌ها (میلی‌متر)
-                                </label>
+            <label>
+                تعداد ستون
+            </label>
 
-                                <input
-                                    id="gap"
-                                    type="number"
-                                    min="0"
-                                    max="30"
-                                    step="1"
-                                    value="4"
-                                >
 
-                            </div>
+            <input
+                id="columns"
+                type="number"
+                min="1"
+                max="20"
+                step="1"
+                value="2"
+            >
 
+        </div>
 
-                            <div class="checkbox-row">
 
-                                <input
-                                    id="border"
-                                    type="checkbox"
-                                    checked
-                                >
+        <div class="setting-row">
 
-                                <label for="border">
-                                    نمایش کادر دور لیبل برای برش
-                                </label>
+            <label>
+                تعداد ردیف
+            </label>
 
-                            </div>
 
+            <input
+                id="rows"
+                type="number"
+                min="1"
+                max="30"
+                step="1"
+                value="6"
+            >
 
-                            <div class="checkbox-row">
+        </div>
 
-                                <input
-                                    id="showCode"
-                                    type="checkbox"
-                                    checked
-                                >
+    </div>
 
-                                <label for="showCode">
-                                    نمایش کد قطعه
-                                </label>
 
-                            </div>
+    <!-- ========================================================
+         GAP
+         ======================================================== -->
 
+    <div class="setting-row">
 
-                            <div class="checkbox-row">
+        <label>
+            فاصله بین لیبل‌ها (میلی‌متر)
+        </label>
 
-                                <input
-                                    id="showBarcodeNumber"
-                                    type="checkbox"
-                                    checked
-                                >
 
-                                <label for="showBarcodeNumber">
-                                    نمایش شماره بارکد
-                                </label>
+        <input
+            id="gap"
+            type="number"
+            min="0"
+            max="30"
+            step="1"
+            value="4"
+        >
 
-                            </div>
+    </div>
 
 
-                            <div
-                                id="layoutInfo"
-                                class="info-box"
-                            ></div>
+    <!-- ========================================================
+         BORDER
+         ======================================================== -->
 
+    <div class="checkbox-row">
 
-                            <div class="actions">
+        <input
+            id="border"
+            type="checkbox"
+            checked
+        >
 
-                                <button
-                                    type="button"
-                                    id="previewButton"
-                                >
-                                    پیش‌نمایش
-                                </button>
 
+        <label for="border">
+            نمایش کادر دور لیبل برای برش
+        </label>
 
-                                <button
-                                    type="button"
-                                    id="printButton"
-                                >
-                                    🖨 چاپ
-                                </button>
+    </div>
 
-                            </div>
+
+    <!-- ========================================================
+         CODE
+         ======================================================== -->
+
+    <div class="checkbox-row">
+
+        <input
+            id="showCode"
+            type="checkbox"
+            checked
+        >
+
+
+        <label for="showCode">
+            نمایش کد قطعه
+        </label>
+
+    </div>
+
+
+    <!-- ========================================================
+         BARCODE NUMBER
+         ======================================================== -->
+
+    <div class="checkbox-row">
+
+        <input
+            id="showBarcodeNumber"
+            type="checkbox"
+            checked
+        >
+
+
+        <label for="showBarcodeNumber">
+            نمایش شماره بارکد
+        </label>
+
+    </div>
+
+
+    <!-- ========================================================
+         INFO
+         ======================================================== -->
+
+    <div
+        id="layoutInfo"
+        class="info-box"
+    ></div>
+
+
+    <!-- ========================================================
+         ACTIONS
+         ======================================================== -->
+
+    <div class="actions">
+
+        <button
+            type="button"
+            id="previewButton"
+        >
+            پیش‌نمایش
+        </button>
+
+
+        <button
+            type="button"
+            id="printButton"
+            disabled
+        >
+            🖨 چاپ
+        </button>
+
+    </div>
 
 </div>
 
@@ -9179,1038 +9338,1292 @@
 
 (function () {
 
-                            const partData = {
+    "use strict";
 
-                                name:
-                                    ${JSON.stringify(title)},
 
-                                code:
-                                    ${JSON.stringify(code)},
+    /* ============================================================
+       PART DATA
+       ============================================================ */
 
-                                barcode:
-                                    ${JSON.stringify(value)}
+    const partData = {
 
-                            };
+        name:
+            ${safeTitle},
 
+        code:
+            ${safeCode},
 
-                            const paperType =
-                                document.getElementById(
-                                    "paperType"
-                                );
+        barcode:
+            ${safeValue}
 
+    };
 
-                            const orientation =
-                                document.getElementById(
-                                    "orientation"
-                                );
 
+    /* ============================================================
+       ELEMENTS
+       ============================================================ */
 
-                            const labelWidth =
-                                document.getElementById(
-                                    "labelWidth"
-                                );
+    const paperType =
+        document.getElementById(
+            "paperType"
+        );
 
 
-                            const labelHeight =
-                                document.getElementById(
-                                    "labelHeight"
-                                );
+    const orientation =
+        document.getElementById(
+            "orientation"
+        );
 
 
-                            const layoutMode =
-                                document.getElementById(
-                                    "layoutMode"
-                                );
+    const labelWidth =
+        document.getElementById(
+            "labelWidth"
+        );
 
 
-                            const manualLayout =
-                                document.getElementById(
-                                    "manualLayout"
-                                );
+    const labelHeight =
+        document.getElementById(
+            "labelHeight"
+        );
 
 
-                            const columns =
-                                document.getElementById(
-                                    "columns"
-                                );
+    const layoutMode =
+        document.getElementById(
+            "layoutMode"
+        );
 
 
-                            const rows =
-                                document.getElementById(
-                                    "rows"
-                                );
+    const manualLayout =
+        document.getElementById(
+            "manualLayout"
+        );
 
 
-                            const gap =
-                                document.getElementById(
-                                    "gap"
-                                );
+    const columns =
+        document.getElementById(
+            "columns"
+        );
 
 
-                            const border =
-                                document.getElementById(
-                                    "border"
-                                );
+    const rows =
+        document.getElementById(
+            "rows"
+        );
 
 
-                            const showCode =
-                                document.getElementById(
-                                    "showCode"
-                                );
+    const gap =
+        document.getElementById(
+            "gap"
+        );
 
 
-                            const showBarcodeNumber =
-                                document.getElementById(
-                                    "showBarcodeNumber"
-                                );
+    const border =
+        document.getElementById(
+            "border"
+        );
 
 
-                            const previewButton =
-                                document.getElementById(
-                                    "previewButton"
-                                );
+    const showCode =
+        document.getElementById(
+            "showCode"
+        );
 
 
-                            const printButton =
-                                document.getElementById(
-                                    "printButton"
-                                );
+    const showBarcodeNumber =
+        document.getElementById(
+            "showBarcodeNumber"
+        );
 
 
-                            const previewArea =
-                                document.getElementById(
-                                    "previewArea"
-                                );
+    const previewButton =
+        document.getElementById(
+            "previewButton"
+        );
 
 
-                            const layoutInfo =
-                                document.getElementById(
-                                    "layoutInfo"
-                                );
+    const printButton =
+        document.getElementById(
+            "printButton"
+        );
 
 
-                            function getPaper() {
+    const previewArea =
+        document.getElementById(
+            "previewArea"
+        );
 
-                                if (
-                                    paperType.value ===
-                                    "a5"
-                                ) {
 
-                                    return {
+    const layoutInfo =
+        document.getElementById(
+            "layoutInfo"
+        );
 
-                                        width: 148,
 
-                                        height: 210,
+    /* ============================================================
+       JSBARCODE READY STATE
+       ============================================================ */
 
-                                        name: "A5"
+    let barcodeReady =
+        false;
 
-                                    };
 
-                                }
+    function waitForJsBarcode(
+        callback
+    ) {
 
+        let attempts =
+            0;
 
-                                if (
-                                    paperType.value ===
-                                    "roll"
-                                ) {
 
-                                    return {
+        const maxAttempts =
+            100;
 
-                                        width:
-                                            Number(
-                                                labelWidth.value
-                                            ),
 
-                                        height:
-                                            Number(
-                                                labelHeight.value
-                                            ),
+        const timer =
+            setInterval(
+                function () {
 
-                                        name:
-                                            "رول لیبل"
+                    attempts++;
 
-                                    };
 
-                                }
+                    if (
+                        typeof JsBarcode ===
+                        "function"
+                    ) {
 
+                        clearInterval(
+                            timer
+                        );
 
-                                return {
 
-                                    width: 210,
+                        barcodeReady =
+                            true;
 
-                                    height: 297,
 
-                                    name: "A4"
+                        printButton.disabled =
+                            false;
 
-                                };
 
-                            }
+                        callback();
 
+                        return;
 
-                            function getOrientedPaper() {
+                    }
 
-                                const paper =
-                                    getPaper();
 
+                    if (
+                        attempts >=
+                        maxAttempts
+                    ) {
 
-                                if (
-                                    orientation.value ===
-                                    "landscape" &&
-                                    paper.name !==
-                                    "رول لیبل"
-                                ) {
+                        clearInterval(
+                            timer
+                        );
 
-                                    return {
 
-                                        width:
-                                            paper.height,
+                        console.error(
+                            "JsBarcode failed to load."
+                        );
 
-                                        height:
-                                            paper.width,
 
-                                        name:
-                                            paper.name
+                        layoutInfo.textContent =
+                            "خطا: کتابخانه تولید بارکد بارگذاری نشد.";
 
-                                    };
+                    }
 
-                                }
+                },
+                100
+            );
 
+    }
 
-                                return paper;
 
-                            }
+    /* ============================================================
+       PAPER
+       ============================================================ */
 
+    function getPaper() {
 
-                            function calculateAutoLayout() {
+        if (
+            paperType.value ===
+            "a5"
+        ) {
 
-                                const paper =
-                                    getOrientedPaper();
+            return {
 
+                width:
+                    148,
 
-                                const width =
-                                    Math.max(
-                                        1,
-                                        Number(
-                                            labelWidth.value
-                                        ) || 1
-                                    );
+                height:
+                    210,
 
+                name:
+                    "A5"
 
-                                const height =
-                                    Math.max(
-                                        1,
-                                        Number(
-                                            labelHeight.value
-                                        ) || 1
-                                    );
+            };
 
+        }
 
-                                const spacing =
-                                    Math.max(
-                                        0,
-                                        Number(
-                                            gap.value
-                                        ) || 0
-                                    );
 
+        if (
+            paperType.value ===
+            "roll"
+        ) {
 
-                                if (
-                                    paper.name ===
-                                    "رول لیبل"
-                                ) {
+            return {
 
-                                    return {
+                width:
+                    Math.max(
+                        20,
+                        Number(
+                            labelWidth.value
+                        ) || 100
+                    ),
 
-                                        columns: 1,
+                height:
+                    Math.max(
+                        15,
+                        Number(
+                            labelHeight.value
+                        ) || 40
+                    ),
 
-                                        rows: 1,
+                name:
+                    "رول لیبل"
 
-                                        total: 1,
+            };
 
-                                        paperWidth:
-                                            paper.width,
+        }
 
-                                        paperHeight:
-                                            paper.height
 
-                                    };
+        return {
 
-                                }
+            width:
+                210,
 
+            height:
+                297,
 
-                                const margin =
-                                    5;
+            name:
+                "A4"
 
+        };
 
-                                const usableWidth =
-                                    Math.max(
-                                        0,
-                                        paper.width -
-                                        (
-                                            margin * 2
-                                        )
-                                    );
+    }
 
 
-                                const usableHeight =
-                                    Math.max(
-                                        0,
-                                        paper.height -
-                                        (
-                                            margin * 2
-                                        )
-                                    );
+    /* ============================================================
+       ORIENTED PAPER
+       ============================================================ */
 
+    function getOrientedPaper() {
 
-                                let columnCount =
-                                    Math.floor(
-                                        (
-                                            usableWidth +
-                                            spacing
-                                        ) /
-                                        (
-                                            width +
-                                            spacing
-                                        )
-                                    );
+        const paper =
+            getPaper();
 
 
-                                let rowCount =
-                                    Math.floor(
-                                        (
-                                            usableHeight +
-                                            spacing
-                                        ) /
-                                        (
-                                            height +
-                                            spacing
-                                        )
-                                    );
+        if (
+            orientation.value ===
+            "landscape" &&
+            paper.name !==
+            "رول لیبل"
+        ) {
 
+            return {
 
-                                columnCount =
-                                    Math.max(
-                                        1,
-                                        columnCount
-                                    );
+                width:
+                    paper.height,
 
+                height:
+                    paper.width,
 
-                                rowCount =
-                                    Math.max(
-                                        1,
-                                        rowCount
-                                    );
+                name:
+                    paper.name
 
+            };
 
-                                return {
+        }
 
-                                    columns:
-                                        columnCount,
 
-                                    rows:
-                                        rowCount,
+        return paper;
 
-                                    total:
-                                        columnCount *
-                                        rowCount,
+    }
 
-                                    paperWidth:
-                                        paper.width,
 
-                                    paperHeight:
-                                        paper.height
+    /* ============================================================
+       AUTO LAYOUT
+       ============================================================ */
 
-                                };
+    function calculateAutoLayout() {
 
-                            }
+        const paper =
+            getOrientedPaper();
 
 
-                            function updateLayoutMode() {
+        const width =
+            Math.max(
+                1,
+                Number(
+                    labelWidth.value
+                ) || 1
+            );
 
-                                manualLayout.style.display =
-                                    layoutMode.value ===
-                                    "manual"
-                                        ? "block"
-                                        : "none";
 
-                            }
+        const height =
+            Math.max(
+                1,
+                Number(
+                    labelHeight.value
+                ) || 1
+            );
 
 
-                            function updateLayoutInfo() {
+        const spacing =
+            Math.max(
+                0,
+                Number(
+                    gap.value
+                ) || 0
+            );
 
-                                const paper =
-                                    getOrientedPaper();
 
+        if (
+            paper.name ===
+            "رول لیبل"
+        ) {
 
-                                if (
-                                    paper.name ===
-                                    "رول لیبل"
-                                ) {
+            return {
 
-                                    layoutInfo.textContent =
-                                        "رول لیبل: یک لیبل در هر چاپ.";
+                columns:
+                    1,
 
-                                    return;
+                rows:
+                    1,
 
-                                }
+                total:
+                    1,
 
+                paperWidth:
+                    paper.width,
 
-                                if (
-                                    layoutMode.value ===
-                                    "manual"
-                                ) {
+                paperHeight:
+                    paper.height
 
-                                    const c =
-                                        Math.max(
-                                            1,
-                                            Number(
-                                                columns.value
-                                            ) || 1
-                                        );
+            };
 
+        }
 
-                                    const r =
-                                        Math.max(
-                                            1,
-                                            Number(
-                                                rows.value
-                                            ) || 1
-                                        );
 
+        const margin =
+            5;
 
-                                    layoutInfo.textContent =
-                                        "چیدمان دستی: " +
-                                        c +
-                                        " ستون × " +
-                                        r +
-                                        " ردیف = " +
-                                        (
-                                            c * r
-                                        ) +
-                                        " لیبل در هر صفحه.";
 
-                                    return;
+        const usableWidth =
+            Math.max(
+                0,
+                paper.width -
+                (
+                    margin * 2
+                )
+            );
 
-                                }
 
+        const usableHeight =
+            Math.max(
+                0,
+                paper.height -
+                (
+                    margin * 2
+                )
+            );
 
-                                const result =
-                                    calculateAutoLayout();
 
+        let columnCount =
+            Math.floor(
+                (
+                    usableWidth +
+                    spacing
+                ) /
+                (
+                    width +
+                    spacing
+                )
+            );
 
-                                layoutInfo.textContent =
-                                    "چیدمان خودکار: " +
-                                    result.columns +
-                                    " ستون × " +
-                                    result.rows +
-                                    " ردیف = " +
-                                    result.total +
-                                    " لیبل در هر صفحه.";
 
-                            }
+        let rowCount =
+            Math.floor(
+                (
+                    usableHeight +
+                    spacing
+                ) /
+                (
+                    height +
+                    spacing
+                )
+            );
 
 
-                            function buildLabel() {
+        columnCount =
+            Math.max(
+                1,
+                columnCount
+            );
 
-                                const label =
-                                    document.createElement(
-                                        "div"
-                                    );
 
+        rowCount =
+            Math.max(
+                1,
+                rowCount
+            );
 
-                                label.className =
-                                    "label";
 
+        return {
 
-                                label.style.width =
-                                    Number(
-                                        labelWidth.value
-                                    ) +
-                                    "mm";
+            columns:
+                columnCount,
 
+            rows:
+                rowCount,
 
-                                label.style.height =
-                                    Number(
-                                        labelHeight.value
-                                    ) +
-                                    "mm";
+            total:
+                columnCount *
+                rowCount,
 
+            paperWidth:
+                paper.width,
 
-                                if (
-                                    border.checked
-                                ) {
+            paperHeight:
+                paper.height
 
-                                    label.classList.add(
-                                        "cut-border"
-                                    );
+        };
 
-                                }
+    }
 
 
-                                const name =
-                                    document.createElement(
-                                        "div"
-                                    );
+    /* ============================================================
+       LAYOUT MODE
+       ============================================================ */
 
+    function updateLayoutMode() {
 
-                                name.className =
-                                    "part-name";
+        manualLayout.style.display =
+            layoutMode.value ===
+            "manual"
+                ? "block"
+                : "none";
 
+    }
 
-                                name.textContent =
-                                    partData.name;
 
+    /* ============================================================
+       LAYOUT INFO
+       ============================================================ */
 
-                                label.appendChild(
-                                    name
-                                );
+    function updateLayoutInfo() {
 
+        const paper =
+            getOrientedPaper();
 
-                                if (
-                                    showCode.checked &&
-                                    partData.code
-                                ) {
 
-                                    const code =
-                                        document.createElement(
-                                            "div"
-                                        );
+        if (
+            paper.name ===
+            "رول لیبل"
+        ) {
 
+            layoutInfo.textContent =
+                "رول لیبل: یک لیبل در هر چاپ.";
 
-                                    code.className =
-                                        "part-code";
+            return;
 
+        }
 
-                                    code.textContent =
-                                        "کد قطعه: " +
-                                        partData.code;
 
+        if (
+            layoutMode.value ===
+            "manual"
+        ) {
 
-                                    label.appendChild(
-                                        code
-                                    );
+            const c =
+                Math.max(
+                    1,
+                    Number(
+                        columns.value
+                    ) || 1
+                );
 
-                                }
 
+            const r =
+                Math.max(
+                    1,
+                    Number(
+                        rows.value
+                    ) || 1
+                );
 
-                                const svg =
-                                    document.createElementNS(
-                                        "http://www.w3.org/2000/svg",
-                                        "svg"
-                                    );
 
+            layoutInfo.textContent =
+                "چیدمان دستی: " +
+                c +
+                " ستون × " +
+                r +
+                " ردیف = " +
+                (
+                    c * r
+                ) +
+                " لیبل در هر صفحه.";
 
-                                svg.classList.add(
-                                    "barcode"
-                                );
+            return;
 
+        }
 
-                                label.appendChild(
-                                    svg
-                                );
 
+        const result =
+            calculateAutoLayout();
 
-                                if (
-                                    showBarcodeNumber.checked
-                                ) {
 
-                                    const number =
-                                        document.createElement(
-                                            "div"
-                                        );
+        layoutInfo.textContent =
+            "چیدمان خودکار: " +
+            result.columns +
+            " ستون × " +
+            result.rows +
+            " ردیف = " +
+            result.total +
+            " لیبل در هر صفحه.";
 
+    }
 
-                                    number.className =
-                                        "barcode-value";
 
+    /* ============================================================
+       BUILD LABEL
+       ============================================================ */
 
-                                    number.textContent =
-                                        partData.barcode;
+    function buildLabel() {
 
+        if (
+            !barcodeReady ||
+            typeof JsBarcode !==
+            "function"
+        ) {
 
-                                    label.appendChild(
-                                        number
-                                    );
+            throw new Error(
+                "JsBarcode is not ready."
+            );
 
-                                }
+        }
 
 
-                                try {
+        const label =
+            document.createElement(
+                "div"
+            );
 
-                                    JsBarcode(
-                                        svg,
-                                        partData.barcode,
-                                        {
 
-                                            format:
-                                                "CODE128",
+        label.className =
+            "label";
 
-                                            width:
-                                                2,
 
-                                            height:
-                                                50,
+        label.style.width =
+            Math.max(
+                20,
+                Number(
+                    labelWidth.value
+                ) || 100
+            ) +
+            "mm";
 
-                                            displayValue:
-                                                false,
 
-                                            margin:
-                                                8,
+        label.style.height =
+            Math.max(
+                15,
+                Number(
+                    labelHeight.value
+                ) || 40
+            ) +
+            "mm";
 
-                                            background:
-                                                "#ffffff",
 
-                                            lineColor:
-                                                "#000000"
+        if (
+            border.checked
+        ) {
 
-                                        }
-                                    );
+            label.classList.add(
+                "cut-border"
+            );
 
-                                }
+        }
 
-                                catch (error) {
 
-                                    console.error(
-                                        "BARCODE_GENERATION_ERROR",
-                                        error
-                                    );
+        /* --------------------------------------------------------
+           TITLE
+           -------------------------------------------------------- */
 
-                                }
+        const name =
+            document.createElement(
+                "div"
+            );
 
 
-                                return label;
+        name.className =
+            "part-name";
 
-                            }
 
+        name.textContent =
+            partData.name ||
+            "-";
 
-                            function buildPreview() {
 
-                                previewArea.innerHTML =
-                                    "";
+        label.appendChild(
+            name
+        );
 
 
-                                const paper =
-                                    getOrientedPaper();
+        /* --------------------------------------------------------
+           CODE
+           -------------------------------------------------------- */
 
+        if (
+            showCode.checked &&
+            partData.code
+        ) {
 
-                                const width =
-                                    Math.max(
-                                        1,
-                                        Number(
-                                            labelWidth.value
-                                        ) || 1
-                                    );
+            const codeElement =
+                document.createElement(
+                    "div"
+                );
 
 
-                                const height =
-                                    Math.max(
-                                        1,
-                                        Number(
-                                            labelHeight.value
-                                        ) || 1
-                                    );
+            codeElement.className =
+                "part-code";
 
 
-                                const spacing =
-                                    Math.max(
-                                        0,
-                                        Number(
-                                            gap.value
-                                        ) || 0
-                                    );
+            codeElement.textContent =
+                "کد قطعه: " +
+                partData.code;
 
 
-                                let columnCount;
-                                let rowCount;
+            label.appendChild(
+                codeElement
+            );
 
+        }
 
-                                if (
-                                    layoutMode.value ===
-                                    "manual"
-                                ) {
 
-                                    columnCount =
-                                        Math.max(
-                                            1,
-                                            Number(
-                                                columns.value
-                                            ) || 1
-                                        );
+        /* --------------------------------------------------------
+           BARCODE SVG
+           -------------------------------------------------------- */
 
+        const svg =
+            document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "svg"
+            );
 
-                                    rowCount =
-                                        Math.max(
-                                            1,
-                                            Number(
-                                                rows.value
-                                            ) || 1
-                                        );
 
-                                }
+        svg.classList.add(
+            "barcode"
+        );
 
-                                else {
 
-                                    const auto =
-                                        calculateAutoLayout();
+        svg.setAttribute(
+            "aria-label",
+            "بارکد " +
+            partData.barcode
+        );
 
 
-                                    columnCount =
-                                        auto.columns;
+        label.appendChild(
+            svg
+        );
 
 
-                                    rowCount =
-                                        auto.rows;
+        /* --------------------------------------------------------
+           BARCODE NUMBER
+           -------------------------------------------------------- */
 
-                                }
+        if (
+            showBarcodeNumber.checked
+        ) {
 
+            const number =
+                document.createElement(
+                    "div"
+                );
 
-                                const page =
-                                    document.createElement(
-                                        "div"
-                                    );
 
+            number.className =
+                "barcode-value";
 
-                                page.className =
-                                    "print-page";
 
+            number.textContent =
+                partData.barcode;
 
-                                page.style.width =
-                                    paper.width +
-                                    "mm";
 
+            label.appendChild(
+                number
+            );
 
-                                page.style.minHeight =
-                                    paper.height +
-                                    "mm";
+        }
 
 
-                                page.style.gridTemplateColumns =
-                                    "repeat(" +
-                                    columnCount +
-                                    ", " +
-                                    width +
-                                    "mm)";
+        /* --------------------------------------------------------
+           GENERATE BARCODE
+           -------------------------------------------------------- */
 
+        try {
 
-                                page.style.gridAutoRows =
-                                    height +
-                                    "mm";
+            JsBarcode(
+                svg,
+                partData.barcode,
+                {
 
+                    format:
+                        "CODE128",
 
-                                page.style.columnGap =
-                                    spacing +
-                                    "mm";
+                    width:
+                        2,
 
+                    height:
+                        50,
 
-                                page.style.rowGap =
-                                    spacing +
-                                    "mm";
+                    displayValue:
+                        false,
 
+                    margin:
+                        8,
 
-                                if (
-                                    paper.name ===
-                                    "رول لیبل"
-                                ) {
+                    background:
+                        "#ffffff",
 
-                                    page.style.padding =
-                                        "0";
+                    lineColor:
+                        "#000000"
 
-                                }
+                }
+            );
 
-                                else {
+        }
 
-                                    page.style.padding =
-                                        "5mm";
+        catch (error) {
 
-                                }
+            console.error(
+                "BARCODE_GENERATION_ERROR",
+                error
+            );
 
+            svg.innerHTML =
+                "";
 
-                                const total =
-                                    paper.name ===
-                                    "رول لیبل"
-                                        ? 1
-                                        : columnCount *
-                                          rowCount;
+        }
 
 
-                                for (
-                                    let i = 0;
-                                    i < total;
-                                    i++
-                                ) {
+        return label;
 
-                                    page.appendChild(
-                                        buildLabel()
-                                    );
+    }
 
-                                }
 
+    /* ============================================================
+       BUILD PREVIEW
+       ============================================================ */
 
-                                previewArea.appendChild(
-                                    page
-                                );
+    function buildPreview() {
 
+        if (
+            !barcodeReady
+        ) {
 
-                                previewArea.style.display =
-                                    "block";
+            return;
 
+        }
 
-                                updateLayoutInfo();
 
-                            }
+        previewArea.innerHTML =
+            "";
 
 
-                            function updatePrintStyle() {
+        const paper =
+            getOrientedPaper();
 
-                                let style =
-                                    document.getElementById(
-                                        "dynamicPrintStyle"
-                                    );
 
+        const width =
+            Math.max(
+                1,
+                Number(
+                    labelWidth.value
+                ) || 1
+            );
 
-                                if (!style) {
 
-                                    style =
-                                        document.createElement(
-                                            "style"
-                                        );
+        const height =
+            Math.max(
+                1,
+                Number(
+                    labelHeight.value
+                ) || 1
+            );
 
 
-                                    style.id =
-                                        "dynamicPrintStyle";
+        const spacing =
+            Math.max(
+                0,
+                Number(
+                    gap.value
+                ) || 0
+            );
 
 
-                                    document.head.appendChild(
-                                        style
-                                    );
+        let columnCount;
+        let rowCount;
 
-                                }
 
+        if (
+            layoutMode.value ===
+            "manual"
+        ) {
 
-                                const paper =
-                                    getOrientedPaper();
+            columnCount =
+                Math.max(
+                    1,
+                    Number(
+                        columns.value
+                    ) || 1
+                );
 
 
-                                if (
-                                    paper.name ===
-                                    "رول لیبل"
-                                ) {
+            rowCount =
+                Math.max(
+                    1,
+                    Number(
+                        rows.value
+                    ) || 1
+                );
 
-                                    style.textContent =
+        }
 
-                                        "@page {" +
+        else {
 
-                                            "size: " +
-                                            paper.width +
-                                            "mm " +
-                                            paper.height +
-                                            "mm;" +
+            const auto =
+                calculateAutoLayout();
 
-                                            "margin: 0;" +
 
-                                        "}" +
+            columnCount =
+                auto.columns;
 
-                                        "@media print {" +
 
-                                            "html,body {" +
+            rowCount =
+                auto.rows;
 
-                                                "width: " +
-                                                paper.width +
-                                                "mm;" +
+        }
 
-                                                "height: " +
-                                                paper.height +
-                                                "mm;" +
 
-                                                "margin: 0;" +
+        const page =
+            document.createElement(
+                "div"
+            );
 
-                                                "padding: 0;" +
 
-                                            "}" +
+        page.className =
+            "print-page";
 
-                                            ".print-page {" +
 
-                                                "width: " +
-                                                paper.width +
-                                                "mm !important;" +
+        page.style.width =
+            paper.width +
+            "mm";
 
-                                                "min-height: " +
-                                                paper.height +
-                                                "mm !important;" +
 
-                                            "}" +
+        page.style.minHeight =
+            paper.height +
+            "mm";
 
-                                        "}";
 
-                                }
+        page.style.gridTemplateColumns =
+            "repeat(" +
+            columnCount +
+            ", " +
+            width +
+            "mm)";
 
-                                else {
 
-                                    style.textContent =
+        page.style.gridAutoRows =
+            height +
+            "mm";
 
-                                        "@page {" +
 
-                                            "size: " +
-                                            paper.name +
-                                            " " +
-                                            orientation.value +
-                                            ";" +
+        page.style.columnGap =
+            spacing +
+            "mm";
 
-                                            "margin: 0;" +
 
-                                        "}";
+        page.style.rowGap =
+            spacing +
+            "mm";
 
-                                }
 
-                            }
+        if (
+            paper.name ===
+            "رول لیبل"
+        ) {
 
+            page.style.padding =
+                "0";
 
-                            paperType.addEventListener(
-                                "change",
-                                function () {
+        }
 
-                                    if (
-                                        paperType.value ===
-                                        "roll"
-                                    ) {
+        else {
 
-                                        orientation.value =
-                                            "portrait";
+            page.style.padding =
+                "5mm";
 
-                                        gap.value =
-                                            0;
+        }
 
-                                    }
 
-                                    else {
+        const total =
+            paper.name ===
+            "رول لیبل"
+                ? 1
+                : columnCount *
+                  rowCount;
 
-                                        gap.value =
-                                            4;
 
-                                    }
+        for (
+            let i = 0;
+            i < total;
+            i++
+        ) {
 
+            try {
 
-                                    updateLayoutMode();
+                page.appendChild(
+                    buildLabel()
+                );
 
-                                    updateLayoutInfo();
+            }
 
-                                    updatePrintStyle();
+            catch (error) {
 
-                                    buildPreview();
+                console.error(
+                    "LABEL_BUILD_ERROR",
+                    error
+                );
 
-                                }
-                            );
+            }
 
+        }
 
-                            orientation.addEventListener(
-                                "change",
-                                function () {
 
-                                    updateLayoutInfo();
+        previewArea.appendChild(
+            page
+        );
 
-                                    updatePrintStyle();
 
-                                    buildPreview();
+        previewArea.style.display =
+            "block";
 
-                                }
-                            );
 
+        updateLayoutInfo();
 
-                            layoutMode.addEventListener(
-                                "change",
-                                function () {
+    }
 
-                                    updateLayoutMode();
 
-                                    updateLayoutInfo();
+    /* ============================================================
+       PRINT STYLE
+       ============================================================ */
 
-                                    buildPreview();
+    function updatePrintStyle() {
 
-                                }
-                            );
+        let style =
+            document.getElementById(
+                "dynamicPrintStyle"
+            );
 
 
-                            [
-                                labelWidth,
-                                labelHeight,
-                                columns,
-                                rows,
-                                gap,
-                                border,
-                                showCode,
-                                showBarcodeNumber
-                            ]
-                                .forEach(
-                                    element => {
+        if (!style) {
 
-                                        element.addEventListener(
-                                            "input",
-                                            function () {
+            style =
+                document.createElement(
+                    "style"
+                );
 
-                                                updateLayoutInfo();
 
-                                            }
-                                        );
+            style.id =
+                "dynamicPrintStyle";
 
 
-                                        element.addEventListener(
-                                            "change",
-                                            function () {
+            document.head.appendChild(
+                style
+            );
 
-                                                updateLayoutInfo();
+        }
 
-                                                buildPreview();
 
-                                            }
-                                        );
+        const paper =
+            getOrientedPaper();
 
-                                    }
-                                );
 
+        if (
+            paper.name ===
+            "رول لیبل"
+        ) {
 
-                            previewButton.addEventListener(
-                                "click",
-                                function () {
+            style.textContent =
 
-                                    updatePrintStyle();
+                "@page {" +
 
-                                    buildPreview();
+                    "size: " +
+                    paper.width +
+                    "mm " +
+                    paper.height +
+                    "mm;" +
 
-                                }
-                            );
+                    "margin: 0;" +
 
+                "}" +
 
-                            printButton.addEventListener(
-                                "click",
-                                function () {
+                "@media print {" +
 
-                                    updatePrintStyle();
+                    "html,body {" +
 
-                                    buildPreview();
+                        "width: " +
+                        paper.width +
+                        "mm;" +
 
+                        "height: " +
+                        paper.height +
+                        "mm;" +
 
-                                    setTimeout(
-                                        function () {
+                        "margin: 0 !important;" +
 
-                                            window.print();
+                        "padding: 0 !important;" +
 
-                                        },
-                                        250
-                                    );
+                    "}" +
 
-                                }
-                            );
+                    ".print-page {" +
 
+                        "width: " +
+                        paper.width +
+                        "mm !important;" +
 
-                            updateLayoutMode();
+                        "min-height: " +
+                        paper.height +
+                        "mm !important;" +
 
-                            updatePrintStyle();
+                    "}" +
 
-                            buildPreview();
+                "}";
+
+        }
+
+        else {
+
+            style.textContent =
+
+                "@page {" +
+
+                    "size: " +
+                    paper.name +
+                    " " +
+                    orientation.value +
+                    ";" +
+
+                    "margin: 0;" +
+
+                "}";
+
+        }
+
+    }
+
+
+    /* ============================================================
+       EVENTS
+       ============================================================ */
+
+    paperType.addEventListener(
+        "change",
+        function () {
+
+            if (
+                paperType.value ===
+                "roll"
+            ) {
+
+                orientation.value =
+                    "portrait";
+
+                gap.value =
+                    0;
+
+            }
+
+            else {
+
+                gap.value =
+                    4;
+
+            }
+
+
+            updateLayoutMode();
+
+            updateLayoutInfo();
+
+            updatePrintStyle();
+
+            buildPreview();
+
+        }
+    );
+
+
+    orientation.addEventListener(
+        "change",
+        function () {
+
+            updateLayoutInfo();
+
+            updatePrintStyle();
+
+            buildPreview();
+
+        }
+    );
+
+
+    layoutMode.addEventListener(
+        "change",
+        function () {
+
+            updateLayoutMode();
+
+            updateLayoutInfo();
+
+            buildPreview();
+
+        }
+    );
+
+
+    [
+        labelWidth,
+        labelHeight,
+        columns,
+        rows,
+        gap,
+        border,
+        showCode,
+        showBarcodeNumber
+    ]
+        .forEach(
+            function (element) {
+
+                element.addEventListener(
+                    "input",
+                    function () {
+
+                        updateLayoutInfo();
+
+                    }
+                );
+
+
+                element.addEventListener(
+                    "change",
+                    function () {
+
+                        updateLayoutInfo();
+
+                        buildPreview();
+
+                    }
+                );
+
+            }
+        );
+
+
+    previewButton.addEventListener(
+        "click",
+        function () {
+
+            if (
+                !barcodeReady
+            ) {
+
+                showMessage(
+                    "کتابخانه بارکد هنوز آماده نشده است.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            updatePrintStyle();
+
+            buildPreview();
+
+        }
+    );
+
+
+    printButton.addEventListener(
+        "click",
+        function () {
+
+            if (
+                !barcodeReady
+            ) {
+
+                showMessage(
+                    "کتابخانه بارکد هنوز آماده نشده است.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            updatePrintStyle();
+
+            buildPreview();
+
+
+            setTimeout(
+                function () {
+
+                    window.print();
+
+                },
+                350
+            );
+
+        }
+    );
+
+
+    /* ============================================================
+       INITIALIZATION
+       ============================================================ */
+
+    updateLayoutMode();
+
+    updateLayoutInfo();
+
+    updatePrintStyle();
+
+
+    waitForJsBarcode(
+        function () {
+
+            buildPreview();
+
+        }
+    );
 
 })();
 
-            <\/script>
+<\/script>
 
 
 </body>
@@ -10220,15 +10633,21 @@
 `;
 
 
-            printWindow.document.open();
+    /*
+     * ----------------------------------------------------------
+     * WRITE DOCUMENT
+     * ----------------------------------------------------------
+     */
 
-            printWindow.document.write(
-                html
-            );
+    printWindow.document.open();
 
-            printWindow.document.close();
+    printWindow.document.write(
+        html
+    );
 
-        }
+    printWindow.document.close();
+
+}
         /* ============================================================
            PART BARCODE PRINT
            ============================================================ */
