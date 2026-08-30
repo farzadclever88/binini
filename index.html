@@ -8230,9 +8230,11 @@
 
                             }
 
-                            printPartBarcode(
-                                item
-                            );
+                            printBarcode({
+                                value: item.barcode,
+                                title: item.name,
+                                code: item.code
+                            });
 
                         }
                     );
@@ -10219,7 +10221,7 @@
 
 })();
 
-    </script>
+    <\/script>
 
 
 </body>
@@ -11927,9 +11929,11 @@ function printPartBarcode(part) {
                             }
 
 
-                            printPartBarcode(
-                                item
-                            );
+                            printBarcode({
+                                value: item.barcode,
+                                title: item.name,
+                                code: item.code
+                            });
 
                         }
                     );
