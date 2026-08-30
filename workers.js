@@ -2417,6 +2417,190 @@ async function createProduct(
 
 }
 
+// ============================================================
+// PART IDENTIFIER HELPERS
+// ============================================================
+
+function generatePartCode(partId) {
+
+    const id =
+        Number(partId);
+
+    if (
+        !Number.isInteger(id) ||
+        id <= 0
+    ) {
+
+        throw new AppError(
+            "PART-CODE-001",
+            "شناسه قطعه برای تولید کد معتبر نیست.",
+            500
+        );
+
+    }
+
+    return (
+        "PT-" +
+        String(id)
+            .padStart(8, "0")
+    );
+
+}
+
+
+function calculateLuhnCheckDigit(
+    value
+) {
+
+    const digits =
+        String(value)
+            .replace(
+                /\D/g,
+                ""
+            );
+
+    let sum = 0;
+
+    let doubleDigit =
+        true;
+
+
+    for (
+        let i =
+            digits.length - 1;
+        i >= 0;
+        i--
+    ) {
+
+        let digit =
+            Number(
+                digits[i]
+            );
+
+
+        if (doubleDigit) {
+
+            digit *= 2;
+
+
+            if (digit > 9) {
+
+                digit -= 9;
+
+            }
+
+        }
+
+
+        sum +=
+            digit;
+
+
+        doubleDigit =
+            !doubleDigit;
+
+    }
+
+
+    return (
+        10 -
+        (
+            sum % 10
+        )
+    ) % 10;
+
+}
+
+
+/*
+ * Barcode structure — CODE 128
+ *
+ * 21 | 01 | 00 | 00000001 | X
+ * │    │    │       │        │
+ * │    │    │       │        └─ Check digit
+ * │    │    │       └────────── Part sequence / DB ID
+ * │    │    └────────────────── Reserved family segment
+ * │    └─────────────────────── Item type: raw material / part
+ * └──────────────────────────── Company/system prefix
+ *
+ * Total:
+ *
+ * 2 + 2 + 2 + 8 + 1 = 15 digits
+ *
+ * Capacity:
+ *
+ * 99,999,999 unique part IDs
+ *
+ * The barcode NEVER depends on:
+ *
+ * name
+ * unit
+ * min_stock
+ * reorder_point
+ *
+ * Therefore those fields can be edited without changing barcode.
+ */
+
+function generatePartBarcode(
+    partId
+) {
+
+    const id =
+        Number(partId);
+
+
+    if (
+        !Number.isInteger(id) ||
+        id <= 0 ||
+        id > 99999999
+    ) {
+
+        throw new AppError(
+            "PART-BARCODE-001",
+            "شناسه قطعه برای تولید بارکد معتبر نیست.",
+            500
+        );
+
+    }
+
+
+    const companyPrefix =
+        "21";
+
+
+    const itemType =
+        "01";
+
+
+    const reservedFamily =
+        "00";
+
+
+    const sequence =
+        String(id)
+            .padStart(8, "0");
+
+
+    const payload =
+        companyPrefix +
+        itemType +
+        reservedFamily +
+        sequence;
+
+
+    const checkDigit =
+        calculateLuhnCheckDigit(
+            payload
+        );
+
+
+    return (
+        payload +
+        String(checkDigit)
+    );
+
+}
+
 
 // ============================================================
 // CREATE PART
@@ -2433,12 +2617,6 @@ async function createPart(
             request
         );
 
-    const code =
-        requiredText(
-            body.code,
-            "کد قطعه",
-            "PART-001"
-        );
 
     const name =
         requiredText(
@@ -2447,6 +2625,7 @@ async function createPart(
             "PART-002"
         );
 
+
     const unitId =
         positiveId(
             body.unit_id,
@@ -2454,12 +2633,6 @@ async function createPart(
             "PART-003"
         );
 
-    const barcode =
-        body.barcode
-            ? String(
-                body.barcode
-            ).trim()
-            : null;
 
     const minStock =
         nonNegativeNumber(
@@ -2468,6 +2641,7 @@ async function createPart(
             "PART-004"
         );
 
+
     const reorderPoint =
         nonNegativeNumber(
             body.reorder_point ?? 0,
@@ -2475,16 +2649,21 @@ async function createPart(
             "PART-005"
         );
 
+
+    // --------------------------------------------------------
+    // VALIDATE UNIT
+    // --------------------------------------------------------
+
     const unit =
         await env.DB
             .prepare(`
 
-                SELECT id
+                SELECT
+                    id
 
                 FROM units
 
                 WHERE
-
                     id = ?
 
                     AND
@@ -2495,9 +2674,12 @@ async function createPart(
 
             `)
 
-            .bind(unitId)
+            .bind(
+                unitId
+            )
 
             .first();
+
 
     if (!unit) {
 
@@ -2513,7 +2695,35 @@ async function createPart(
 
     }
 
+
+    /*
+     * IMPORTANT
+     *
+     * code and barcode are NOT accepted
+     * from the client.
+     *
+     * A temporary unique code is inserted first
+     * only because parts.code is NOT NULL + UNIQUE.
+     *
+     * Immediately after receiving AUTOINCREMENT id,
+     * the permanent code and barcode are generated
+     * from that immutable database id.
+     */
+
+    const temporaryCode =
+        "TMP-" +
+        crypto.randomUUID();
+
+
+    let partId =
+        null;
+
+
     try {
+
+        // ----------------------------------------------------
+        // INSERT INITIAL PART
+        // ----------------------------------------------------
 
         const result =
             await env.DB
@@ -2550,7 +2760,7 @@ async function createPart(
 
                         ?,
 
-                        ?,
+                        NULL,
 
                         ?,
 
@@ -2566,13 +2776,11 @@ async function createPart(
 
                 .bind(
 
-                    code,
+                    temporaryCode,
 
                     name,
 
                     unitId,
-
-                    barcode || null,
 
                     minStock,
 
@@ -2584,6 +2792,81 @@ async function createPart(
 
                 .run();
 
+
+        partId =
+            result.meta.last_row_id;
+
+
+        if (
+            !partId
+        ) {
+
+            throw new AppError(
+
+                "PART-008",
+
+                "شناسه قطعه تولید نشد.",
+
+                500
+
+            );
+
+        }
+
+
+        // ----------------------------------------------------
+        // GENERATE PERMANENT IDENTIFIERS
+        // ----------------------------------------------------
+
+        const code =
+            generatePartCode(
+                partId
+            );
+
+
+        const barcode =
+            generatePartBarcode(
+                partId
+            );
+
+
+        // ----------------------------------------------------
+        // FINALIZE PART
+        // ----------------------------------------------------
+
+        await env.DB
+            .prepare(`
+
+                UPDATE parts
+
+                SET
+
+                    code = ?,
+
+                    barcode = ?
+
+                WHERE
+                    id = ?
+
+            `)
+
+            .bind(
+
+                code,
+
+                barcode,
+
+                partId
+
+            )
+
+            .run();
+
+
+        // ----------------------------------------------------
+        // AUDIT
+        // ----------------------------------------------------
+
         await writeAudit(
 
             env,
@@ -2594,25 +2877,106 @@ async function createPart(
 
             "parts",
 
-            result.meta.last_row_id,
+            partId,
 
-            body
+            {
+
+                name,
+
+                unit_id:
+                    unitId,
+
+                min_stock:
+                    minStock,
+
+                reorder_point:
+                    reorderPoint,
+
+                generated_code:
+                    code,
+
+                generated_barcode:
+                    barcode
+
+            }
 
         );
+
+
+        // ----------------------------------------------------
+        // RESPONSE
+        // ----------------------------------------------------
 
         return {
 
             id:
-                result.meta.last_row_id,
+                partId,
+
+            code,
+
+            barcode,
 
             message:
-                "قطعه با موفقیت ثبت شد."
+                "قطعه با موفقیت ثبت شد و کد قطعه و بارکد به‌صورت سیستمی تولید شدند."
 
         };
 
     }
 
     catch (error) {
+
+        /*
+         * If identifier generation/finalization failed,
+         * remove the temporary record so that no half-created
+         * part remains in the database.
+         */
+
+        if (
+            partId
+        ) {
+
+            try {
+
+                await env.DB
+                    .prepare(`
+
+                        DELETE FROM parts
+
+                        WHERE
+                            id = ?
+
+                    `)
+
+                    .bind(
+                        partId
+                    )
+
+                    .run();
+
+            }
+
+            catch (
+                cleanupError
+            ) {
+
+                console.error(
+                    "PART_CLEANUP_ERROR",
+                    cleanupError
+                );
+
+            }
+
+        }
+
+
+        if (
+            error instanceof AppError
+        ) {
+
+            throw error;
+
+        }
+
 
         throw databaseError(
 
@@ -2627,7 +2991,6 @@ async function createPart(
     }
 
 }
-
 
 // ============================================================
 // CREATE BOM
@@ -7629,6 +7992,399 @@ async function handlePost(
     );
 
 }
+
+// ============================================================
+// UPDATE PART
+// ============================================================
+
+async function updatePart(
+    request,
+    env,
+    user,
+    path
+) {
+
+    const body =
+        await readJson(
+            request
+        );
+
+
+    /*
+     * ID can come from:
+     *
+     * /api/parts/123
+     *
+     * or body.id
+     */
+
+    const pathMatch =
+        String(path || "")
+            .match(
+                /\/(\d+)$/
+            );
+
+
+    const partId =
+        positiveId(
+
+            body.id ||
+            pathMatch?.[1],
+
+            "قطعه",
+
+            "PART-101"
+
+        );
+
+
+    const name =
+        requiredText(
+            body.name,
+            "نام قطعه",
+            "PART-102"
+        );
+
+
+    const unitId =
+        positiveId(
+            body.unit_id,
+            "واحد قطعه",
+            "PART-103"
+        );
+
+
+    const minStock =
+        nonNegativeNumber(
+            body.min_stock ?? 0,
+            "حداقل موجودی",
+            "PART-104"
+        );
+
+
+    const reorderPoint =
+        nonNegativeNumber(
+            body.reorder_point ?? 0,
+            "نقطه سفارش",
+            "PART-105"
+        );
+
+
+    // --------------------------------------------------------
+    // LOAD EXISTING PART
+    // --------------------------------------------------------
+
+    const existing =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    id,
+
+                    code,
+
+                    name,
+
+                    unit_id,
+
+                    barcode,
+
+                    min_stock,
+
+                    reorder_point,
+
+                    status
+
+                FROM parts
+
+                WHERE
+                    id = ?
+
+                LIMIT 1
+
+            `)
+
+            .bind(
+                partId
+            )
+
+            .first();
+
+
+    if (!existing) {
+
+        throw new AppError(
+
+            "PART-106",
+
+            "قطعه موردنظر پیدا نشد.",
+
+            404
+
+        );
+
+    }
+
+
+    if (
+        existing.status !==
+        "active"
+    ) {
+
+        throw new AppError(
+
+            "PART-107",
+
+            "این قطعه فعال نیست و قابل ویرایش نیست.",
+
+            409
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // VALIDATE UNIT
+    // --------------------------------------------------------
+
+    const unit =
+        await env.DB
+            .prepare(`
+
+                SELECT
+                    id
+
+                FROM units
+
+                WHERE
+
+                    id = ?
+
+                    AND
+
+                    status = 'active'
+
+                LIMIT 1
+
+            `)
+
+            .bind(
+                unitId
+            )
+
+            .first();
+
+
+    if (!unit) {
+
+        throw new AppError(
+
+            "PART-108",
+
+            "واحد انتخاب‌شده وجود ندارد.",
+
+            404
+
+        );
+
+    }
+
+
+    /*
+     * IMPORTANT
+     *
+     * code and barcode are deliberately NOT updated.
+     *
+     * Even if somebody sends:
+     *
+     * {
+     *     code: "...",
+     *     barcode: "..."
+     * }
+     *
+     * these values are completely ignored.
+     */
+
+    try {
+
+        await env.DB
+            .prepare(`
+
+                UPDATE parts
+
+                SET
+
+                    name = ?,
+
+                    unit_id = ?,
+
+                    min_stock = ?,
+
+                    reorder_point = ?
+
+                WHERE
+                    id = ?
+
+            `)
+
+            .bind(
+
+                name,
+
+                unitId,
+
+                minStock,
+
+                reorderPoint,
+
+                partId
+
+            )
+
+            .run();
+
+
+        await writeAudit(
+
+            env,
+
+            user.id,
+
+            "UPDATE",
+
+            "parts",
+
+            partId,
+
+            {
+
+                before: {
+
+                    code:
+                        existing.code,
+
+                    barcode:
+                        existing.barcode,
+
+                    name:
+                        existing.name,
+
+                    unit_id:
+                        existing.unit_id,
+
+                    min_stock:
+                        existing.min_stock,
+
+                    reorder_point:
+                        existing.reorder_point
+
+                },
+
+                after: {
+
+                    code:
+                        existing.code,
+
+                    barcode:
+                        existing.barcode,
+
+                    name,
+
+                    unit_id:
+                        unitId,
+
+                    min_stock:
+                        minStock,
+
+                    reorder_point:
+                        reorderPoint
+
+                }
+
+            }
+
+        );
+
+    }
+
+    catch (error) {
+
+        throw databaseError(
+
+            error,
+
+            "PART-109",
+
+            "ویرایش قطعه انجام نشد."
+
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // RETURN UPDATED PART
+    // --------------------------------------------------------
+
+    const updated =
+        await env.DB
+            .prepare(`
+
+                SELECT
+
+                    p.id,
+
+                    p.code,
+
+                    p.name,
+
+                    p.unit_id,
+
+                    u.name AS unit_name,
+
+                    p.barcode,
+
+                    p.min_stock,
+
+                    p.reorder_point,
+
+                    p.status
+
+                FROM parts p
+
+                INNER JOIN units u
+
+                    ON u.id =
+                       p.unit_id
+
+                WHERE
+                    p.id = ?
+
+                LIMIT 1
+
+            `)
+
+            .bind(
+                partId
+            )
+
+            .first();
+
+
+    return {
+
+        item:
+            updated,
+
+        message:
+            "قطعه با موفقیت ویرایش شد."
+
+    };
+
+}
+
 // ============================================================
 // UPDATE PRODUCT
 // ============================================================
@@ -7999,7 +8755,28 @@ async function handlePut(
     path
 ) {
 
+// --------------------------------------------------------
+// PARTS
+// --------------------------------------------------------
 
+if (
+    path === "/api/parts" ||
+    path.startsWith("/api/parts/")
+) {
+
+    return await updatePart(
+
+        request,
+
+        env,
+
+        user,
+
+        path
+
+    );
+
+}
     // --------------------------------------------------------
     // // UPDATE PRODUCT
     // --------------------------------------------------------
