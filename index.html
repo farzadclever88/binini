@@ -6332,33 +6332,33 @@
 
             return `
 
-                                                                                <section class="page-head">
+                                                                                                        <section class="page-head">
 
-                                                                                    <div>
+                                                                                                            <div>
 
-                                                                                        <h1 class="page-title">
-                                                                                            ${escapeHtml(title)}
-                                                                                        </h1>
+                                                                                                                <h1 class="page-title">
+                                                                                                                    ${escapeHtml(title)}
+                                                                                                                </h1>
 
-                                                                                        <p class="page-description">
-                                                                                            ${escapeHtml(description)}
-                                                                                        </p>
+                                                                                                                <p class="page-description">
+                                                                                                                    ${escapeHtml(description)}
+                                                                                                                </p>
 
-                                                                                    </div>
+                                                                                                            </div>
 
-                                                                                    ${count !== null
+                                                                                                            ${count !== null
                     ? `
-                                                                                                <span class="connection-status">
-                                                                                                    ${formatNumber(count)}
-                                                                                                    رکورد
-                                                                                                </span>
-                                                                                            `
+                                                                                                                        <span class="connection-status">
+                                                                                                                            ${formatNumber(count)}
+                                                                                                                            رکورد
+                                                                                                                        </span>
+                                                                                                                    `
                     : ""
                 }
 
-                                                                                </section>
+                                                                                                        </section>
 
-                                                                            `;
+                                                                                                    `;
 
         }
 
@@ -6373,17 +6373,17 @@
 
             return `
 
-                                                                                <div class="empty-state">
+                                                                                                        <div class="empty-state">
 
-                                                                                    <div class="empty-icon">
-                                                                                        ◌
-                                                                                    </div>
+                                                                                                            <div class="empty-icon">
+                                                                                                                ◌
+                                                                                                            </div>
 
-                                                                                    ${escapeHtml(text)}
+                                                                                                            ${escapeHtml(text)}
 
-                                                                                </div>
+                                                                                                        </div>
 
-                                                                            `;
+                                                                                                    `;
 
         }
 
@@ -6417,19 +6417,19 @@
 
                 toolbarHtml = `
 
-                                                                                    <div class="table-toolbar">
+                                                                                                            <div class="table-toolbar">
 
-                                                                                        <button
-                                                                                            type="button"
-                                                                                            class="btn secondary small"
-                                                                                            data-table-export="excel"
-                                                                                        >
-                                                                                            📊 خروجی Excel
-                                                                                        </button>
+                                                                                                                <button
+                                                                                                                    type="button"
+                                                                                                                    class="btn secondary small"
+                                                                                                                    data-table-export="excel"
+                                                                                                                >
+                                                                                                                    📊 خروجی Excel
+                                                                                                                </button>
 
-                                                                                    </div>
+                                                                                                            </div>
 
-                                                                                `;
+                                                                                                        `;
 
             }
 
@@ -6442,14 +6442,14 @@
 
                 return `
 
-                                                                                    ${toolbarHtml}
+                                                                                                            ${toolbarHtml}
 
-                                                                                    ${emptyState(
+                                                                                                            ${emptyState(
                     options.empty ||
                     "اطلاعاتی ثبت نشده است."
                 )}
 
-                                                                                `;
+                                                                                                        `;
 
             }
 
@@ -6460,32 +6460,32 @@
 
             let html = `
 
-                                                                                ${toolbarHtml}
+                                                                                                        ${toolbarHtml}
 
-                                                                                <div class="table-container">
+                                                                                                        <div class="table-container">
 
-                                                                                    <table
-                                                                                        class="data-table"
-                                                                                        data-exportable="true"
-                                                                                    >
+                                                                                                            <table
+                                                                                                                class="data-table"
+                                                                                                                data-exportable="true"
+                                                                                                            >
 
-                                                                                        <thead>
+                                                                                                                <thead>
 
-                                                                                            <tr>
+                                                                                                                    <tr>
 
-                                                                            `;
+                                                                                                    `;
 
 
             columns.forEach(
                 column => {
 
                     html += `
-                                                                                        <th>
-                                                                                            ${escapeHtml(
+                                                                                                                <th>
+                                                                                                                    ${escapeHtml(
                         column.label
                     )}
-                                                                                        </th>
-                                                                                    `;
+                                                                                                                </th>
+                                                                                                            `;
 
                 }
             );
@@ -6494,23 +6494,23 @@
             if (options.actions) {
 
                 html += `
-                                                                                    <th>
-                                                                                        عملیات
-                                                                                    </th>
-                                                                                `;
+                                                                                                            <th>
+                                                                                                                عملیات
+                                                                                                            </th>
+                                                                                                        `;
 
             }
 
 
             html += `
 
-                                                                                            </tr>
+                                                                                                                    </tr>
 
-                                                                                        </thead>
+                                                                                                                </thead>
 
-                                                                                        <tbody>
+                                                                                                                <tbody>
 
-                                                                            `;
+                                                                                                    `;
 
 
             safeRows.forEach(
@@ -6586,9 +6586,9 @@
 
                             html += `
 
-                                                                                                <td>
+                                                                                                                        <td>
 
-                                                                                                    ${column.raw
+                                                                                                                            ${column.raw
                                     ? String(
                                         value ?? ""
                                     )
@@ -6598,9 +6598,9 @@
                                     )
                                 }
 
-                                                                                                </td>
+                                                                                                                        </td>
 
-                                                                                            `;
+                                                                                                                    `;
 
                         }
                     );
@@ -6611,39 +6611,39 @@
 
                         html += `
 
-                                                                                <td>
+                                                                                                        <td>
 
-                                                                                    <div class="toolbar">
+                                                                                                            <div class="toolbar">
 
-                                                                                        <button
-                                                                                            type="button"
-                                                                                            class="btn small secondary"
-                                                                                            data-action="edit"
-                                                                                            data-id="${row.id}"
-                                                                                        >
-                                                                                            ویرایش
-                                                                                        </button>
+                                                                                                                <button
+                                                                                                                    type="button"
+                                                                                                                    class="btn small secondary"
+                                                                                                                    data-action="edit"
+                                                                                                                    data-id="${row.id}"
+                                                                                                                >
+                                                                                                                    ویرایش
+                                                                                                                </button>
 
-                                                                                        <button
-                                                                                            type="button"
-                                                                                            class="btn small danger"
-                                                                                            data-action="delete"
-                                                                                            data-id="${row.id}"
-                                                                                        >
-                                                                                            حذف
-                                                                                        </button>
+                                                                                                                <button
+                                                                                                                    type="button"
+                                                                                                                    class="btn small danger"
+                                                                                                                    data-action="delete"
+                                                                                                                    data-id="${row.id}"
+                                                                                                                >
+                                                                                                                    حذف
+                                                                                                                </button>
 
-                                                                                        ${typeof options.rowActions ===
+                                                                                                                ${typeof options.rowActions ===
                                 "function"
                                 ? options.rowActions(row)
                                 : ""
                             }
 
-                                                                                    </div>
+                                                                                                            </div>
 
-                                                                                </td>
+                                                                                                        </td>
 
-                                                                            `;
+                                                                                                    `;
 
                     }
 
@@ -6655,13 +6655,13 @@
 
             html += `
 
-                                                                                        </tbody>
+                                                                                                                </tbody>
 
-                                                                                    </table>
+                                                                                                            </table>
 
-                                                                                </div>
+                                                                                                        </div>
 
-                                                                            `;
+                                                                                                    `;
 
 
             return html;
@@ -7030,15 +7030,15 @@
 
             return `
 
-                                                                                <span class="badge ${type}">
+                                                                                                        <span class="badge ${type}">
 
-                                                                                    ${escapeHtml(
+                                                                                                            ${escapeHtml(
                 value || "-"
             )}
 
-                                                                                </span>
+                                                                                                        </span>
 
-                                                                            `;
+                                                                                                    `;
 
         }
 
@@ -7218,219 +7218,219 @@
 
             $("#mainContent").innerHTML = `
 
-                                                                                ${pageHeader(
+                                                                                                        ${pageHeader(
                 "داشبورد مدیریت",
                 "نمای کلی وضعیت تولید، برنامه‌ریزی و موجودی"
             )}
 
 
-                                                                                <!-- ===================================================
-                                                                                     PRODUCTION KPI
-                                                                                ==================================================== -->
+                                                                                                        <!-- ===================================================
+                                                                                                             PRODUCTION KPI
+                                                                                                        ==================================================== -->
 
-                                                                                <section class="stats">
+                                                                                                        <section class="stats">
 
 
-                                                                                    <div class="stat-card">
+                                                                                                            <div class="stat-card">
 
-                                                                                        <span class="stat-label">
-                                                                                            مجموع برنامه تولید
-                                                                                        </span>
+                                                                                                                <span class="stat-label">
+                                                                                                                    مجموع برنامه تولید
+                                                                                                                </span>
 
-                                                                                        <strong class="stat-value">
-                                                                                            ${formatNumber(
+                                                                                                                <strong class="stat-value">
+                                                                                                                    ${formatNumber(
                 plannedTotal
             )}
-                                                                                        </strong>
+                                                                                                                </strong>
 
-                                                                                    </div>
+                                                                                                            </div>
 
 
-                                                                                    <div class="stat-card">
+                                                                                                            <div class="stat-card">
 
-                                                                                        <span class="stat-label">
-                                                                                            مجموع تولید واقعی
-                                                                                        </span>
+                                                                                                                <span class="stat-label">
+                                                                                                                    مجموع تولید واقعی
+                                                                                                                </span>
 
-                                                                                        <strong class="stat-value">
-                                                                                            ${formatNumber(
+                                                                                                                <strong class="stat-value">
+                                                                                                                    ${formatNumber(
                 producedTotal
             )}
-                                                                                        </strong>
+                                                                                                                </strong>
 
-                                                                                    </div>
+                                                                                                            </div>
 
 
-                                                                                    <div class="stat-card">
+                                                                                                            <div class="stat-card">
 
-                                                                                        <span class="stat-label">
-                                                                                            باقیمانده تولید
-                                                                                        </span>
+                                                                                                                <span class="stat-label">
+                                                                                                                    باقیمانده تولید
+                                                                                                                </span>
 
-                                                                                        <strong class="stat-value">
-                                                                                            ${formatNumber(
+                                                                                                                <strong class="stat-value">
+                                                                                                                    ${formatNumber(
                 remainingTotal
             )}
-                                                                                        </strong>
+                                                                                                                </strong>
 
-                                                                                    </div>
+                                                                                                            </div>
 
 
-                                                                                    <div class="stat-card">
+                                                                                                            <div class="stat-card">
 
-                                                                                        <span class="stat-label">
-                                                                                            تحقق تولید
-                                                                                        </span>
+                                                                                                                <span class="stat-label">
+                                                                                                                    تحقق تولید
+                                                                                                                </span>
 
-                                                                                        <strong class="stat-value">
-                                                                                            ${formatNumber(
+                                                                                                                <strong class="stat-value">
+                                                                                                                    ${formatNumber(
                 productionCompletion
             )}%
-                                                                                        </strong>
+                                                                                                                </strong>
 
-                                                                                    </div>
+                                                                                                            </div>
 
 
-                                                                                    <div class="stat-card">
+                                                                                                            <div class="stat-card">
 
-                                                                                        <span class="stat-label">
-                                                                                            برنامه‌های فعال
-                                                                                        </span>
+                                                                                                                <span class="stat-label">
+                                                                                                                    برنامه‌های فعال
+                                                                                                                </span>
 
-                                                                                        <strong class="stat-value">
-                                                                                            ${formatNumber(
+                                                                                                                <strong class="stat-value">
+                                                                                                                    ${formatNumber(
                 activePlans
             )}
-                                                                                        </strong>
+                                                                                                                </strong>
 
-                                                                                    </div>
+                                                                                                            </div>
 
 
-                                                                                    <div class="stat-card">
+                                                                                                            <div class="stat-card">
 
-                                                                                        <span class="stat-label">
-                                                                                            برنامه‌های تکمیل‌شده
-                                                                                        </span>
+                                                                                                                <span class="stat-label">
+                                                                                                                    برنامه‌های تکمیل‌شده
+                                                                                                                </span>
 
-                                                                                        <strong class="stat-value">
-                                                                                            ${formatNumber(
+                                                                                                                <strong class="stat-value">
+                                                                                                                    ${formatNumber(
                 completedPlans
             )}
-                                                                                        </strong>
+                                                                                                                </strong>
 
-                                                                                    </div>
-
-
-                                                                                </section>
+                                                                                                            </div>
 
 
-                                                                                <!-- ===================================================
-                                                                                     MANAGEMENT ALERTS
-                                                                                ==================================================== -->
-
-                                                                                <section class="card">
-
-                                                                                    <div class="card-header">
-
-                                                                                        <h2 class="card-title">
-                                                                                            موارد نیازمند توجه
-                                                                                        </h2>
-
-                                                                                    </div>
+                                                                                                        </section>
 
 
-                                                                                    <div class="stats">
+                                                                                                        <!-- ===================================================
+                                                                                                             MANAGEMENT ALERTS
+                                                                                                        ==================================================== -->
+
+                                                                                                        <section class="card">
+
+                                                                                                            <div class="card-header">
+
+                                                                                                                <h2 class="card-title">
+                                                                                                                    موارد نیازمند توجه
+                                                                                                                </h2>
+
+                                                                                                            </div>
 
 
-                                                                                        <div class="stat-card">
+                                                                                                            <div class="stats">
 
-                                                                                            <span class="stat-label">
-                                                                                                برنامه‌های ناقص
-                                                                                            </span>
 
-                                                                                            <strong class="stat-value">
-                                                                                                ${formatNumber(
+                                                                                                                <div class="stat-card">
+
+                                                                                                                    <span class="stat-label">
+                                                                                                                        برنامه‌های ناقص
+                                                                                                                    </span>
+
+                                                                                                                    <strong class="stat-value">
+                                                                                                                        ${formatNumber(
                 incompletePlans
             )}
-                                                                                            </strong>
+                                                                                                                    </strong>
 
-                                                                                        </div>
+                                                                                                                </div>
 
 
-                                                                                        <div class="stat-card">
+                                                                                                                <div class="stat-card">
 
-                                                                                            <span class="stat-label">
-                                                                                                اقلام دارای موجودی
-                                                                                            </span>
+                                                                                                                    <span class="stat-label">
+                                                                                                                        اقلام دارای موجودی
+                                                                                                                    </span>
 
-                                                                                            <strong class="stat-value">
-                                                                                                ${formatNumber(
+                                                                                                                    <strong class="stat-value">
+                                                                                                                        ${formatNumber(
                 inventoryItems
             )}
-                                                                                            </strong>
+                                                                                                                    </strong>
 
-                                                                                        </div>
+                                                                                                                </div>
 
 
-                                                                                        <div class="stat-card">
+                                                                                                                <div class="stat-card">
 
-                                                                                            <span class="stat-label">
-                                                                                                اقلام بدون موجودی
-                                                                                            </span>
+                                                                                                                    <span class="stat-label">
+                                                                                                                        اقلام بدون موجودی
+                                                                                                                    </span>
 
-                                                                                            <strong class="stat-value">
-                                                                                                ${formatNumber(
+                                                                                                                    <strong class="stat-value">
+                                                                                                                        ${formatNumber(
                 zeroInventoryItems
             )}
-                                                                                            </strong>
+                                                                                                                    </strong>
 
-                                                                                        </div>
+                                                                                                                </div>
 
 
-                                                                                        <div class="stat-card">
+                                                                                                                <div class="stat-card">
 
-                                                                                            <span class="stat-label">
-                                                                                                مجموع موجودی
-                                                                                            </span>
+                                                                                                                    <span class="stat-label">
+                                                                                                                        مجموع موجودی
+                                                                                                                    </span>
 
-                                                                                            <strong class="stat-value">
-                                                                                                ${formatNumber(
+                                                                                                                    <strong class="stat-value">
+                                                                                                                        ${formatNumber(
                 inventoryTotal
             )}
-                                                                                            </strong>
+                                                                                                                    </strong>
 
-                                                                                        </div>
-
-
-                                                                                    </div>
-
-                                                                                </section>
+                                                                                                                </div>
 
 
-                                                                                <!-- ===================================================
-                                                                                     PRODUCTION STATUS
-                                                                                ==================================================== -->
+                                                                                                            </div>
 
-                                                                                <section class="card">
-
-                                                                                    <div class="card-header">
-
-                                                                                        <h2 class="card-title">
-                                                                                            وضعیت برنامه تولید
-                                                                                        </h2>
-
-                                                                                        <button
-                                                                                            type="button"
-                                                                                            class="btn small secondary"
-                                                                                            data-refresh-section="planning"
-                                                                                        >
-                                                                                            بروزرسانی
-                                                                                        </button>
-
-                                                                                    </div>
+                                                                                                        </section>
 
 
-                                                                                    ${buildTable(
+                                                                                                        <!-- ===================================================
+                                                                                                             PRODUCTION STATUS
+                                                                                                        ==================================================== -->
+
+                                                                                                        <section class="card">
+
+                                                                                                            <div class="card-header">
+
+                                                                                                                <h2 class="card-title">
+                                                                                                                    وضعیت برنامه تولید
+                                                                                                                </h2>
+
+                                                                                                                <button
+                                                                                                                    type="button"
+                                                                                                                    class="btn small secondary"
+                                                                                                                    data-refresh-section="planning"
+                                                                                                                >
+                                                                                                                    بروزرسانی
+                                                                                                                </button>
+
+                                                                                                            </div>
+
+
+                                                                                                            ${buildTable(
 
                 [
 
@@ -7499,33 +7499,33 @@
             )
                 }
 
-                                                                                </section>
+                                                                                                        </section>
 
 
-                                                                                <!-- ===================================================
-                                                                                     INVENTORY STATUS
-                                                                                ==================================================== -->
+                                                                                                        <!-- ===================================================
+                                                                                                             INVENTORY STATUS
+                                                                                                        ==================================================== -->
 
-                                                                                <section class="card">
+                                                                                                        <section class="card">
 
-                                                                                    <div class="card-header">
+                                                                                                            <div class="card-header">
 
-                                                                                        <h2 class="card-title">
-                                                                                            وضعیت موجودی انبار
-                                                                                        </h2>
+                                                                                                                <h2 class="card-title">
+                                                                                                                    وضعیت موجودی انبار
+                                                                                                                </h2>
 
-                                                                                        <button
-                                                                                            type="button"
-                                                                                            class="btn small secondary"
-                                                                                            data-refresh-section="inventory"
-                                                                                        >
-                                                                                            بروزرسانی
-                                                                                        </button>
+                                                                                                                <button
+                                                                                                                    type="button"
+                                                                                                                    class="btn small secondary"
+                                                                                                                    data-refresh-section="inventory"
+                                                                                                                >
+                                                                                                                    بروزرسانی
+                                                                                                                </button>
 
-                                                                                    </div>
+                                                                                                            </div>
 
 
-                                                                                    ${buildTable(
+                                                                                                            ${buildTable(
 
                     [
 
@@ -7572,9 +7572,9 @@
                 )
                 }
 
-                                                                                </section>
+                                                                                                        </section>
 
-                                                                            `;
+                                                                                                    `;
 
 
             /* ---------------------------------------------------------
@@ -7785,17 +7785,17 @@
 
                         return `
 
-                                                                            <button
-                                                                                type="button"
-                                                                                class="btn small barcode-print-btn"
-                                                                                data-action="print-barcode"
-                                                                                data-id="${row.id}"
-                                                                                title="چاپ بارکد قطعه"
-                                                                            >
-                                                                                🖨 چاپ بارکد قطعه
-                                                                            </button>
+                                                                                                    <button
+                                                                                                        type="button"
+                                                                                                        class="btn small barcode-print-btn"
+                                                                                                        data-action="print-barcode"
+                                                                                                        data-id="${row.id}"
+                                                                                                        title="چاپ بارکد قطعه"
+                                                                                                    >
+                                                                                                        🖨 چاپ بارکد قطعه
+                                                                                                    </button>
 
-                                                                        `;
+                                                                                                `;
 
                     }
 
@@ -7873,72 +7873,72 @@
 
             $("#mainContent").innerHTML = `
 
-                                                                                ${pageHeader(
+                                                                                                        ${pageHeader(
                 config.title,
                 config.description,
                 rows.length
             )}
 
 
-                                                                                <section class="card">
+                                                                                                        <section class="card">
 
-                                                                                    <div class="card-header">
+                                                                                                            <div class="card-header">
 
-                                                                                        <h2 class="card-title">
-                                                                                            ${escapeHtml(
+                                                                                                                <h2 class="card-title">
+                                                                                                                    ${escapeHtml(
                 config.title
             )}
-                                                                                        </h2>
+                                                                                                                </h2>
 
 
-                                                                                        <div class="toolbar">
+                                                                                                                <div class="toolbar">
 
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                class="btn secondary small"
-                                                                                                data-action-create="${entityName}"
-                                                                                            >
-                                                                                                + ثبت جدید
-                                                                                            </button>
-
-
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                class="btn secondary small"
-                                                                                                data-action-refresh="${entityName}"
-                                                                                            >
-                                                                                                بروزرسانی
-                                                                                            </button>
-
-                                                                                        </div>
-
-                                                                                    </div>
+                                                                                                                    <button
+                                                                                                                        type="button"
+                                                                                                                        class="btn secondary small"
+                                                                                                                        data-action-create="${entityName}"
+                                                                                                                    >
+                                                                                                                        + ثبت جدید
+                                                                                                                    </button>
 
 
-                                                                                    <div class="card-body">
+                                                                                                                    <button
+                                                                                                                        type="button"
+                                                                                                                        class="btn secondary small"
+                                                                                                                        data-action-refresh="${entityName}"
+                                                                                                                    >
+                                                                                                                        بروزرسانی
+                                                                                                                    </button>
 
-                                                                                        <div
-                                                                                            class="search"
-                                                                                            style="
-                                                                                                display:flex;
-                                                                                                gap:7px;
-                                                                                                margin-bottom:12px;
-                                                                                            "
-                                                                                        >
+                                                                                                                </div>
 
-                                                                                            <input
-                                                                                                type="search"
-                                                                                                class="form-control"
-                                                                                                id="gridSearch"
-                                                                                                placeholder="جستجو در اطلاعات..."
-                                                                                            >
-
-                                                                                        </div>
+                                                                                                            </div>
 
 
-                                                                                        <div id="entityGrid">
+                                                                                                            <div class="card-body">
 
-                                                                                       ${buildTable(
+                                                                                                                <div
+                                                                                                                    class="search"
+                                                                                                                    style="
+                                                                                                                        display:flex;
+                                                                                                                        gap:7px;
+                                                                                                                        margin-bottom:12px;
+                                                                                                                    "
+                                                                                                                >
+
+                                                                                                                    <input
+                                                                                                                        type="search"
+                                                                                                                        class="form-control"
+                                                                                                                        id="gridSearch"
+                                                                                                                        placeholder="جستجو در اطلاعات..."
+                                                                                                                    >
+
+                                                                                                                </div>
+
+
+                                                                                                                <div id="entityGrid">
+
+                                                                                                               ${buildTable(
                 config.columns,
                 rows,
                 {
@@ -7959,28 +7959,28 @@
 
                                 return `
 
-                                                                                                            <button
-                                                                                                                type="button"
-                                                                                                                class="btn small secondary"
-                                                                                                                data-action="print-barcode"
-                                                                                                                data-id="${row.id}"
-                                                                                                            >
-                                                                                                                🖨️ چاپ بارکد
-                                                                                                            </button>
+                                                                                                                                    <button
+                                                                                                                                        type="button"
+                                                                                                                                        class="btn small secondary"
+                                                                                                                                        data-action="print-barcode"
+                                                                                                                                        data-id="${row.id}"
+                                                                                                                                    >
+                                                                                                                                        🖨️ چاپ بارکد
+                                                                                                                                    </button>
 
-                                                                                                        `;
+                                                                                                                                `;
 
                             }
                             : null
                 }
             )}
-                                                                                        </div>
+                                                                                                                </div>
 
-                                                                                    </div>
+                                                                                                            </div>
 
-                                                                                </section>
+                                                                                                        </section>
 
-                                                                            `;
+                                                                                                    `;
 
 
             const search =
@@ -8042,16 +8042,16 @@
 
                                                 return `
 
-                                                        <button
-                                                            type="button"
-                                                            class="btn small secondary"
-                                                            data-action="print-barcode"
-                                                            data-id="${row.id}"
-                                                        >
-                                                            🖨️ چاپ بارکد
-                                                        </button>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    class="btn small secondary"
+                                                                                    data-action="print-barcode"
+                                                                                    data-id="${row.id}"
+                                                                                >
+                                                                                    🖨️ چاپ بارکد
+                                                                                </button>
 
-                                                    `;
+                                                                            `;
 
                                             }
                                             : null
@@ -8245,25 +8245,22 @@
 
 
         /* ============================================================
-           PRINT PART BARCODE
-           Universal / Adaptive Print System
-           ============================================================ */
+       UNIVERSAL BARCODE PRINT SYSTEM
+       ============================================================ */
 
-        /* ============================================================
-           PRINT PART BARCODE
-           Universal / Offline / Printer-Friendly
-           Code 128-B
-           ============================================================ */
+        function printBarcode(options = {}) {
 
-        function printPartBarcode(part) {
+            const value =
+                String(
+                    options.value ??
+                    ""
+                ).trim();
 
-            if (
-                !part ||
-                !part.barcode
-            ) {
+
+            if (!value) {
 
                 showMessage(
-                    "برای این قطعه بارکد ثبت نشده است.",
+                    "برای این مورد بارکدی ثبت نشده است.",
                     "error"
                 );
 
@@ -8272,14 +8269,57 @@
             }
 
 
-            /* ============================================================
-               SAFE DATA
-               ============================================================ */
+            const title =
+                String(
+                    options.title ??
+                    "-"
+                );
 
-            const escapeText =
-                value =>
-                    String(
-                        value ?? ""
+
+            const code =
+                String(
+                    options.code ??
+                    ""
+                );
+
+
+            /*
+             * ----------------------------------------------------------
+             * PRINT WINDOW
+             * ----------------------------------------------------------
+             */
+
+            const printWindow =
+                window.open(
+                    "",
+                    "_blank",
+                    "width=1100,height=850"
+                );
+
+
+            if (!printWindow) {
+
+                showMessage(
+                    "پنجره چاپ توسط مرورگر مسدود شده است.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            /*
+             * ----------------------------------------------------------
+             * ESCAPE HTML
+             * ----------------------------------------------------------
+             */
+
+            const escapeHtmlLocal =
+                function (text) {
+
+                    return String(
+                        text ?? ""
                     )
                         .replace(
                             /&/g,
@@ -8302,525 +8342,47 @@
                             "&#039;"
                         );
 
+                };
 
-            const partName =
-                String(
-                    part.name || "-"
+
+            const safeTitle =
+                escapeHtmlLocal(
+                    title
                 );
 
 
-            const partCode =
-                String(
-                    part.code || "-"
+            const safeCode =
+                escapeHtmlLocal(
+                    code
                 );
 
 
-            const barcodeValue =
-                String(
-                    part.barcode || ""
+            const safeValue =
+                escapeHtmlLocal(
+                    value
                 );
 
 
-            /* ============================================================
-               CODE 128 PATTERNS
-               ============================================================ */
+            /*
+             * ----------------------------------------------------------
+             * BARCODE LIBRARY CHECK
+             * ----------------------------------------------------------
+             */
 
-            const CODE128_PATTERNS = [
-
-                "212222",
-                "222122",
-                "222221",
-                "121223",
-                "121322",
-                "131222",
-                "122213",
-                "122312",
-                "132212",
-                "221213",
-                "221312",
-                "231212",
-                "112232",
-                "122132",
-                "122231",
-                "113222",
-                "123122",
-                "123221",
-                "223211",
-                "221132",
-                "221231",
-                "213212",
-                "223112",
-                "312131",
-                "311222",
-                "321122",
-                "321221",
-                "312212",
-                "322112",
-                "322211",
-                "212123",
-                "212321",
-                "232121",
-                "111323",
-                "131123",
-                "131321",
-                "112313",
-                "132113",
-                "132311",
-                "211313",
-                "231113",
-                "231311",
-                "112133",
-                "112331",
-                "132131",
-                "113123",
-                "113321",
-                "133121",
-                "313121",
-                "211331",
-                "231131",
-                "213113",
-                "213311",
-                "213131",
-                "311123",
-                "311321",
-                "331121",
-                "312113",
-                "312311",
-                "332111",
-                "314111",
-                "221411",
-                "431111",
-                "111224",
-                "111422",
-                "121124",
-                "121421",
-                "141122",
-                "141221",
-                "112214",
-                "112412",
-                "122114",
-                "122411",
-                "142112",
-                "142211",
-                "241211",
-                "221114",
-                "413111",
-                "241112",
-                "134111",
-                "111242",
-                "121142",
-                "121241",
-                "114212",
-                "124112",
-                "124211",
-                "411212",
-                "421112",
-                "421211",
-                "212141",
-                "214121",
-                "412121",
-                "111143",
-                "111341",
-                "131141",
-                "114113",
-                "114311",
-                "411113",
-                "411311",
-                "113141",
-                "114131",
-                "311141",
-                "411131",
-                "211412",
-                "211214",
-                "211232",
-                "2331112"
-
-            ];
-
-
-            /* ============================================================
-               CODE 128-B ENCODER
-               ============================================================ */
-
-            function encodeCode128B(value) {
-
-                const text =
-                    String(
-                        value ?? ""
-                    );
-
-
-                if (!text.length) {
-
-                    return null;
-
-                }
-
-
-                /*
-                 * Code 128-B supports ASCII 32..127.
-                 */
-
-                for (
-                    let i = 0;
-                    i < text.length;
-                    i++
-                ) {
-
-                    const code =
-                        text.charCodeAt(i);
-
-
-                    if (
-                        code < 32 ||
-                        code > 126
-                    ) {
-
-                        return null;
-
-                    }
-
-                }
-
-
-                const codes = [
-
-                    104
-                    /* Start Code B */
-
-                ];
-
-
-                let checksum =
-                    104;
-
-
-                for (
-                    let i = 0;
-                    i < text.length;
-                    i++
-                ) {
-
-                    const code =
-                        text.charCodeAt(i) -
-                        32;
-
-
-                    codes.push(
-                        code
-                    );
-
-
-                    checksum +=
-                        code *
-                        (i + 1);
-
-                }
-
-
-                checksum =
-                    checksum %
-                    103;
-
-
-                codes.push(
-                    checksum
-                );
-
-
-                /*
-                 * Stop
-                 */
-
-                codes.push(
-                    106
-                );
-
-
-                return codes;
-
-            }
-
-
-            /* ============================================================
-               SVG BARCODE GENERATOR
-               ============================================================ */
-
-            function createBarcodeSvg(
-                value,
-                widthMm,
-                heightMm
+            if (
+                typeof JsBarcode !==
+                "function"
             ) {
 
-                const codes =
-                    encodeCode128B(
-                        value
-                    );
-
-
-                if (!codes) {
-
-                    return null;
-
-                }
-
-
-                /*
-                 * Code 128:
-                 *
-                 * Every normal symbol = 11 modules
-                 * Stop = 13 modules
-                 *
-                 * We reserve quiet zones on both sides.
-                 *
-                 * 10X minimum is the safe target.
-                 */
-
-                const quietModules =
-                    10;
-
-
-                let totalModules =
-                    quietModules * 2;
-
-
-                codes.forEach(
-                    code => {
-
-                        const pattern =
-                            CODE128_PATTERNS[
-                            code
-                            ];
-
-
-                        for (
-                            let i = 0;
-                            i < pattern.length;
-                            i++
-                        ) {
-
-                            totalModules +=
-                                Number(
-                                    pattern[i]
-                                );
-
-                        }
-
-                    }
-                );
-
-
-                const svgNS =
-                    "http://www.w3.org/2000/svg";
-
-
-                const svg =
-                    document.createElementNS(
-                        svgNS,
-                        "svg"
-                    );
-
-
-                svg.setAttribute(
-                    "xmlns",
-                    svgNS
-                );
-
-
-                svg.setAttribute(
-                    "viewBox",
-                    `0 0 ${totalModules} 100`
-                );
-
-
-                svg.setAttribute(
-                    "width",
-                    `${widthMm}mm`
-                );
-
-
-                svg.setAttribute(
-                    "height",
-                    `${heightMm}mm`
-                );
-
-
-                svg.setAttribute(
-                    "preserveAspectRatio",
-                    "none"
-                );
-
-
-                svg.style.display =
-                    "block";
-
-
-                svg.style.background =
-                    "#ffffff";
-
-
-                /*
-                 * White background.
-                 */
-
-                const background =
-                    document.createElementNS(
-                        svgNS,
-                        "rect"
-                    );
-
-
-                background.setAttribute(
-                    "x",
-                    "0"
-                );
-
-
-                background.setAttribute(
-                    "y",
-                    "0"
-                );
-
-
-                background.setAttribute(
-                    "width",
-                    String(
-                        totalModules
-                    )
-                );
-
-
-                background.setAttribute(
-                    "height",
-                    "100"
-                );
-
-
-                background.setAttribute(
-                    "fill",
-                    "#ffffff"
-                );
-
-
-                svg.appendChild(
-                    background
-                );
-
-
-                let x =
-                    quietModules;
-
-
-                codes.forEach(
-                    code => {
-
-                        const pattern =
-                            CODE128_PATTERNS[
-                            code
-                            ];
-
-
-                        let drawBar =
-                            true;
-
-
-                        for (
-                            let i = 0;
-                            i < pattern.length;
-                            i++
-                        ) {
-
-                            const moduleWidth =
-                                Number(
-                                    pattern[i]
-                                );
-
-
-                            if (
-                                drawBar
-                            ) {
-
-                                const rect =
-                                    document.createElementNS(
-                                        svgNS,
-                                        "rect"
-                                    );
-
-
-                                rect.setAttribute(
-                                    "x",
-                                    String(x)
-                                );
-
-
-                                rect.setAttribute(
-                                    "y",
-                                    "0"
-                                );
-
-
-                                rect.setAttribute(
-                                    "width",
-                                    String(
-                                        moduleWidth
-                                    )
-                                );
-
-
-                                rect.setAttribute(
-                                    "height",
-                                    "100"
-                                );
-
-
-                                rect.setAttribute(
-                                    "fill",
-                                    "#000000"
-                                );
-
-
-                                svg.appendChild(
-                                    rect
-                                );
-
-                            }
-
-
-                            x +=
-                                moduleWidth;
-
-
-                            drawBar =
-                                !drawBar;
-
-                        }
-
-                    }
-                );
-
-
-                return svg;
-
-            }
-
-
-            /* ============================================================
-               OPEN PRINT WINDOW
-               ============================================================ */
-
-            const printWindow =
-                window.open(
-                    "",
-                    "_blank",
-                    "width=1200,height=900"
-                );
-
-
-            if (!printWindow) {
+                printWindow.close();
 
                 showMessage(
-                    "پنجره چاپ توسط مرورگر مسدود شده است.",
+                    "کتابخانه بارکد بارگذاری نشده است.",
                     "error"
+                );
+
+                console.error(
+                    "JsBarcode is not available."
                 );
 
                 return;
@@ -8828,613 +8390,546 @@
             }
 
 
-            /* ============================================================
-               PRINT WINDOW HTML
-               No external scripts.
-               No CDN.
-               No document.write.
-               ============================================================ */
+            /*
+             * ----------------------------------------------------------
+             * PRINT PAGE
+             * ----------------------------------------------------------
+             */
 
-            const documentHtml = `
+            const html = `
+
 <!doctype html>
 
 <html
-            lang="fa"
-            dir="rtl"
+                    lang="fa"
+                    dir="rtl"
 >
 
 <head>
 
-<meta charset="utf-8">
+                    <meta charset="utf-8">
 
-<meta
-            name="viewport"
-            content="width=device-width, initial-scale=1"
->
+                    <meta
+                        name="viewport"
+                        content="width=device-width, initial-scale=1"
+                    >
 
-<title>
-            چاپ بارکد قطعه
-</title>
+                    <title>
+                        چاپ بارکد
+                    </title>
 
-<style>
 
-* {
-            box-sizing:
-                border-box;
-}
+                    <style>
 
+                        * {
 
-html,
-body {
+                            box-sizing:
+                                border-box;
 
-            margin:
-                0;
+                        }
 
-            padding:
-                0;
 
-            background:
-                #f1f5f9;
+                        html,
+                        body {
 
-            color:
-                #111827;
+                            margin:
+                                0;
 
-            font-family:
-                Tahoma,
-                Arial,
-                sans-serif;
+                            padding:
+                                0;
 
-}
+                            background:
+                                #ffffff;
 
+                            color:
+                                #111111;
 
-body {
+                            font-family:
+                                Tahoma,
+                                Arial,
+                                sans-serif;
 
-            min-height:
-                100vh;
+                        }
 
-}
 
+                        body {
 
-/* ============================================================
-           SETTINGS
-           ============================================================ */
+                            min-height:
+                                100vh;
 
-#settings {
+                        }
 
-            width:
-                calc(100% - 32px);
 
-            max-width:
-                820px;
+                        /* ========================================================
+                           SETTINGS
+                           ======================================================== */
 
-            margin:
-                20px auto;
+                        #settings {
 
-            padding:
-                22px;
+                            width:
+                                min(
+                                    760px,
+                                    calc(100% - 32px)
+                                );
 
-            background:
-                #ffffff;
+                            margin:
+                                24px auto;
 
-            border:
-                1px solid
-                #e5e7eb;
+                            padding:
+                                24px;
 
-            border-radius:
-                12px;
+                            background:
+                                #ffffff;
 
-            box-shadow:
-                0 8px 30px
-                rgba(
-                    0,
-                    0,
-                    0,
-                    .08
-                );
+                            border:
+                                1px solid
+                                #d1d5db;
 
-}
+                            border-radius:
+                                12px;
 
+                        }
 
-#settings h1 {
 
-            margin:
-                0 0 20px;
+                        #settings h1 {
 
-            font-size:
-                21px;
+                            margin:
+                                0 0 20px;
 
-}
+                            font-size:
+                                21px;
 
+                        }
 
-.setting-row {
 
-            display:
-                grid;
+                        .setting-row {
 
-            grid-template-columns:
-                210px
-                minmax(
-                    0,
-                    1fr
-                );
+                            display:
+                                grid;
 
-            gap:
-                12px;
+                            grid-template-columns:
+                                190px
+                                minmax(0, 1fr);
 
-            align-items:
-                center;
+                            gap:
+                                12px;
 
-            margin-bottom:
-                12px;
+                            align-items:
+                                center;
 
-}
+                            margin-bottom:
+                                13px;
 
+                        }
 
-.setting-row label {
 
-            font-weight:
-                700;
+                        .setting-row label {
 
-}
+                            font-weight:
+                                700;
 
+                        }
 
-select,
-input {
 
-            width:
-                100%;
+                        select,
+                        input {
 
-            min-height:
-                40px;
+                            width:
+                                100%;
 
-            padding:
-                8px 10px;
+                            min-height:
+                                40px;
 
-            border:
-                1px solid
-                #cbd5e1;
+                            padding:
+                                7px 10px;
 
-            border-radius:
-                7px;
+                            border:
+                                1px solid
+                                #d1d5db;
 
-            background:
-                #ffffff;
+                            border-radius:
+                                7px;
 
-            color:
-                #111827;
+                            background:
+                                #ffffff;
 
-            font-family:
-                Tahoma,
-                Arial,
-                sans-serif;
+                            color:
+                                #111111;
 
-            font-size:
-                14px;
+                            font-family:
+                                Tahoma,
+                                Arial,
+                                sans-serif;
 
-}
+                            font-size:
+                                14px;
 
+                        }
 
-input[type="checkbox"] {
 
-            width:
-                auto;
+                        input[type="checkbox"] {
 
-            min-height:
-                auto;
+                            width:
+                                auto;
 
-}
+                            min-height:
+                                auto;
 
+                        }
 
-.checkbox-row {
 
-            display:
-                flex;
+                        .checkbox-row {
 
-            align-items:
-                center;
+                            display:
+                                flex;
 
-            gap:
-                8px;
+                            align-items:
+                                center;
 
-            margin:
-                11px 0;
+                            gap:
+                                8px;
 
-}
+                            margin:
+                                12px 0;
 
+                        }
 
-.info-box {
 
-            margin-top:
-                16px;
+                        .info-box {
 
-            padding:
-                13px 15px;
+                            margin-top:
+                                15px;
 
-            border:
-                1px solid
-                #e2e8f0;
+                            padding:
+                                12px 14px;
 
-            border-radius:
-                8px;
+                            background:
+                                #f3f4f6;
 
-            background:
-                #f8fafc;
+                            border-radius:
+                                8px;
 
-            font-size:
-                13px;
+                            line-height:
+                                1.8;
 
-            line-height:
-                1.9;
+                            font-size:
+                                13px;
 
-}
+                        }
 
 
-.warning-box {
+                        .actions {
 
-            margin-top:
-                10px;
+                            display:
+                                flex;
 
-            padding:
-                11px 14px;
+                            flex-wrap:
+                                wrap;
 
-            border-radius:
-                8px;
+                            gap:
+                                10px;
 
-            background:
-                #fff7ed;
+                            margin-top:
+                                20px;
 
-            color:
-                #9a3412;
+                        }
 
-            font-size:
-                12px;
 
-            line-height:
-                1.8;
+                        button {
 
-}
+                            min-height:
+                                40px;
 
+                            border:
+                                0;
 
-.actions {
+                            border-radius:
+                                8px;
 
-            display:
-                flex;
+                            padding:
+                                8px 18px;
 
-            flex-wrap:
-                wrap;
+                            cursor:
+                                pointer;
 
-            gap:
-                10px;
+                            font-family:
+                                Tahoma,
+                                Arial,
+                                sans-serif;
 
-            margin-top:
-                20px;
+                            font-size:
+                                14px;
 
-}
+                            font-weight:
+                                700;
 
+                        }
 
-button {
 
-            border:
-                0;
+                        #previewButton {
 
-            border-radius:
-                7px;
+                            background:
+                                #e5e7eb;
 
-            padding:
-                11px 20px;
+                            color:
+                                #111111;
 
-            cursor:
-                pointer;
+                        }
 
-            font-family:
-                Tahoma,
-                Arial,
-                sans-serif;
 
-            font-size:
-                14px;
+                        #printButton {
 
-            font-weight:
-                700;
+                            background:
+                                #111111;
 
-}
+                            color:
+                                #ffffff;
 
+                        }
 
-#previewButton {
 
-            background:
-                #e5e7eb;
+                        /* ========================================================
+                           PREVIEW
+                           ======================================================== */
 
-            color:
-                #111827;
+                        #previewArea {
 
-}
+                            display:
+                                none;
 
+                            margin:
+                                20px auto;
 
-#printButton {
+                            padding:
+                                20px;
 
-            background:
-                #111827;
+                            background:
+                                #e5e7eb;
 
-            color:
-                #ffffff;
+                            overflow:
+                                auto;
 
-}
+                        }
 
 
-/* ============================================================
-           PREVIEW
-           ============================================================ */
+                        .print-page {
 
-#previewArea {
+                            margin:
+                                0 auto;
 
-            width:
-                100%;
+                            background:
+                                #ffffff;
 
-            overflow:
-                auto;
+                            display:
+                                grid;
 
-            padding:
-                20px;
+                            align-content:
+                                start;
 
-}
+                            justify-content:
+                                start;
 
+                        }
 
-.print-page {
 
-            position:
-                relative;
+                        .label {
 
-            margin:
-                0 auto;
+                            position:
+                                relative;
 
-            background:
-                #ffffff;
+                            background:
+                                #ffffff;
 
-            display:
-                grid;
+                            display:
+                                flex;
 
-            align-content:
-                start;
+                            flex-direction:
+                                column;
 
-            justify-content:
-                start;
+                            align-items:
+                                center;
 
-}
+                            justify-content:
+                                space-between;
 
+                            overflow:
+                                hidden;
 
-.label {
+                            padding:
+                                3mm;
 
-            position:
-                relative;
+                        }
 
-            overflow:
-                hidden;
 
-            background:
-                #ffffff;
+                        .label.cut-border {
 
-            display:
-                flex;
+                            border:
+                                0.25mm
+                                solid
+                                #777777;
 
-            flex-direction:
-                column;
+                        }
 
-            align-items:
-                center;
 
-            justify-content:
-                space-between;
+                        .part-name {
 
-            padding:
-                3mm 4mm;
+                            width:
+                                100%;
 
-}
+                            text-align:
+                                center;
 
+                            font-size:
+                                13pt;
 
-.label.cut-border {
+                            font-weight:
+                                800;
 
-            border:
-                .25mm
-                solid
-                #777777;
+                            line-height:
+                                1.2;
 
-}
+                            white-space:
+                                nowrap;
 
+                            overflow:
+                                hidden;
 
-.part-name {
+                            text-overflow:
+                                ellipsis;
 
-            width:
-                100%;
+                        }
 
-            text-align:
-                center;
 
-            font-size:
-                13pt;
+                        .part-code {
 
-            font-weight:
-                800;
+                            width:
+                                100%;
 
-            line-height:
-                1.15;
+                            text-align:
+                                center;
 
-            white-space:
-                nowrap;
+                            font-size:
+                                8.5pt;
 
-            overflow:
-                hidden;
+                            font-weight:
+                                700;
 
-            text-overflow:
-                ellipsis;
+                            line-height:
+                                1.2;
 
-}
+                        }
 
 
-.part-code {
+                        .barcode {
 
-            width:
-                100%;
+                            display:
+                                block;
 
-            text-align:
-                center;
+                            width:
+                                88%;
 
-            font-size:
-                8.5pt;
+                            max-width:
+                                88mm;
 
-            font-weight:
-                700;
+                            height:
+                                auto;
 
-            line-height:
-                1.2;
+                        }
 
-}
 
+                        .barcode-value {
 
-.barcode-wrapper {
+                            width:
+                                100%;
 
-            width:
-                100%;
+                            text-align:
+                                center;
 
-            display:
-                flex;
+                            direction:
+                                ltr;
 
-            align-items:
-                center;
+                            font-family:
+                                monospace;
 
-            justify-content:
-                center;
+                            font-size:
+                                8pt;
 
-}
+                            font-weight:
+                                700;
 
+                            letter-spacing:
+                                .8px;
 
-.barcode-svg {
+                            line-height:
+                                1.2;
 
-            display:
-                block;
+                        }
 
-}
 
+                        /* ========================================================
+                           PRINT
+                           ======================================================== */
 
-.barcode-value {
+                        @media print {
 
-            width:
-                100%;
+                            html,
+                            body {
 
-            text-align:
-                center;
+                                background:
+                                    #ffffff !important;
 
-            direction:
-                ltr;
+                            }
 
-            unicode-bidi:
-                plaintext;
 
-            font-family:
-                Consolas,
-                "Courier New",
-                monospace;
+                            #settings {
 
-            font-size:
-                7.5pt;
+                                display:
+                                    none !important;
 
-            font-weight:
-                700;
+                            }
 
-            line-height:
-                1.1;
 
-            letter-spacing:
-                .5px;
+                            #previewArea {
 
-}
+                                display:
+                                    block !important;
 
+                                margin:
+                                    0 !important;
 
-@media screen {
+                                padding:
+                                    0 !important;
 
-            .print-page {
+                                background:
+                                    #ffffff !important;
 
-                box-shadow:
-                    0 5px 25px
-                    rgba(
-                        0,
-                        0,
-                        0,
-                        .12
-                    );
+                                overflow:
+                                    visible !important;
 
-            }
+                            }
 
-}
 
+                            .print-page {
 
-@media print {
+                                margin:
+                                    0 !important;
 
-            html,
-            body {
+                            }
 
-                background:
-                    #ffffff !important;
 
-                margin:
-                    0 !important;
+                            .label {
 
-                padding:
-                    0 !important;
+                                break-inside:
+                                    avoid;
 
-            }
+                                page-break-inside:
+                                    avoid;
 
+                            }
 
-            #settings {
+                        }
 
-                display:
-                    none !important;
-
-            }
-
-
-            #previewArea {
-
-                display:
-                    block !important;
-
-                margin:
-                    0 !important;
-
-                padding:
-                    0 !important;
-
-                overflow:
-                    visible !important;
-
-            }
-
-
-            .print-page {
-
-                margin:
-                    0 !important;
-
-                box-shadow:
-                    none !important;
-
-            }
-
-
-            .label {
-
-                break-inside:
-                    avoid;
-
-                page-break-inside:
-                    avoid;
-
-            }
-
-}
-
-
-</style>
+                    </style>
 
 </head>
 
@@ -9444,299 +8939,244 @@ button {
 
 <div id="settings">
 
-            <h1>
-                تنظیمات چاپ بارکد
-            </h1>
+                    <h1>
+                        تنظیمات چاپ بارکد
+                    </h1>
 
 
-            <div class="setting-row">
+                    <div class="setting-row">
 
-                <label>
-                    نوع چاپ
-                </label>
+                        <label>
+                            نوع کاغذ
+                        </label>
 
-                <select id="paperType">
+                        <select id="paperType">
 
-                    <option value="a4">
-                        کاغذ A4
-                    </option>
+                            <option value="a4">
+                                A4
+                            </option>
 
-                    <option value="a5">
-                        کاغذ A5
-                    </option>
+                            <option value="a5">
+                                A5
+                            </option>
 
-                    <option value="roll">
-                        رول لیبل‌زن
-                    </option>
+                            <option value="roll">
+                                رول لیبل‌زن
+                            </option>
 
-                </select>
+                        </select>
 
-            </div>
-
-
-            <div
-                class="setting-row"
-                id="orientationRow"
-            >
-
-                <label>
-                    جهت صفحه
-                </label>
-
-                <select id="orientation">
-
-                    <option value="portrait">
-                        عمودی
-                    </option>
-
-                    <option value="landscape">
-                        افقی
-                    </option>
-
-                    <option value="auto">
-                        خودکار
-                    </option>
-
-                </select>
-
-            </div>
+                    </div>
 
 
-            <div class="setting-row">
+                    <div class="setting-row">
 
-                <label>
-                    عرض لیبل (میلی‌متر)
-                </label>
+                        <label>
+                            جهت چاپ
+                        </label>
 
-                <input
-                    id="labelWidth"
-                    type="number"
-                    min="20"
-                    max="300"
-                    step="1"
-                    value="100"
-                >
+                        <select id="orientation">
 
-            </div>
+                            <option value="portrait">
+                                عمودی
+                            </option>
 
+                            <option value="landscape">
+                                افقی
+                            </option>
 
-            <div class="setting-row">
+                        </select>
 
-                <label>
-                    ارتفاع لیبل (میلی‌متر)
-                </label>
-
-                <input
-                    id="labelHeight"
-                    type="number"
-                    min="15"
-                    max="200"
-                    step="1"
-                    value="40"
-                >
-
-            </div>
+                    </div>
 
 
-            <div class="setting-row">
+                    <div class="setting-row">
 
-                <label>
-                    نحوه چیدمان
-                </label>
+                        <label>
+                            عرض لیبل (میلی‌متر)
+                        </label>
 
-                <select id="layoutMode">
+                        <input
+                            id="labelWidth"
+                            type="number"
+                            min="20"
+                            max="300"
+                            step="1"
+                            value="100"
+                        >
 
-                    <option value="auto">
-                        خودکار — بیشترین تعداد
-                    </option>
-
-                    <option value="manual">
-                        دستی
-                    </option>
-
-                </select>
-
-            </div>
+                    </div>
 
 
-            <div
-                id="manualLayout"
-                style="display:none"
-            >
+                    <div class="setting-row">
 
-                <div class="setting-row">
+                        <label>
+                            ارتفاع لیبل (میلی‌متر)
+                        </label>
 
-                    <label>
-                        تعداد ستون
-                    </label>
+                        <input
+                            id="labelHeight"
+                            type="number"
+                            min="15"
+                            max="200"
+                            step="1"
+                            value="40"
+                        >
 
-                    <input
-                        id="columns"
-                        type="number"
-                        min="1"
-                        max="20"
-                        step="1"
-                        value="2"
+                    </div>
+
+
+                    <div class="setting-row">
+
+                        <label>
+                            نحوه چیدمان
+                        </label>
+
+                        <select id="layoutMode">
+
+                            <option value="auto">
+                                خودکار — بیشترین تعداد ممکن
+                            </option>
+
+                            <option value="manual">
+                                دستی
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div
+                        id="manualLayout"
+                        style="display:none"
                     >
 
-                </div>
+                        <div class="setting-row">
+
+                            <label>
+                                تعداد ستون
+                            </label>
+
+                            <input
+                                id="columns"
+                                type="number"
+                                min="1"
+                                max="20"
+                                step="1"
+                                value="2"
+                            >
+
+                        </div>
 
 
-                <div class="setting-row">
+                        <div class="setting-row">
 
-                    <label>
-                        تعداد ردیف
-                    </label>
+                            <label>
+                                تعداد ردیف
+                            </label>
 
-                    <input
-                        id="rows"
-                        type="number"
-                        min="1"
-                        max="30"
-                        step="1"
-                        value="6"
-                    >
+                            <input
+                                id="rows"
+                                type="number"
+                                min="1"
+                                max="30"
+                                step="1"
+                                value="6"
+                            >
 
-                </div>
+                        </div>
 
-            </div>
-
-
-            <div class="setting-row">
-
-                <label>
-                    فاصله بین لیبل‌ها (میلی‌متر)
-                </label>
-
-                <input
-                    id="gap"
-                    type="number"
-                    min="0"
-                    max="30"
-                    step="1"
-                    value="4"
-                >
-
-            </div>
+                    </div>
 
 
-            <div class="setting-row">
+                    <div class="setting-row">
 
-                <label>
-                    حاشیه امن چاپ (میلی‌متر)
-                </label>
+                        <label>
+                            فاصله بین لیبل‌ها (میلی‌متر)
+                        </label>
 
-                <input
-                    id="margin"
-                    type="number"
-                    min="0"
-                    max="30"
-                    step="1"
-                    value="5"
-                >
+                        <input
+                            id="gap"
+                            type="number"
+                            min="0"
+                            max="30"
+                            step="1"
+                            value="4"
+                        >
 
-            </div>
-
-
-            <div class="setting-row">
-
-                <label>
-                    تعداد لیبل
-                </label>
-
-                <input
-                    id="quantity"
-                    type="number"
-                    min="1"
-                    max="1000"
-                    step="1"
-                    value="1"
-                >
-
-            </div>
+                    </div>
 
 
-            <div class="checkbox-row">
+                    <div class="checkbox-row">
 
-                <input
-                    id="border"
-                    type="checkbox"
-                    checked
-                >
+                        <input
+                            id="border"
+                            type="checkbox"
+                            checked
+                        >
 
-                <label for="border">
-                    نمایش کادر دور لیبل برای برش
-                </label>
+                        <label for="border">
+                            نمایش کادر دور لیبل برای برش
+                        </label>
 
-            </div>
-
-
-            <div class="checkbox-row">
-
-                <input
-                    id="showCode"
-                    type="checkbox"
-                    checked
-                >
-
-                <label for="showCode">
-                    نمایش کد قطعه
-                </label>
-
-            </div>
+                    </div>
 
 
-            <div class="checkbox-row">
+                    <div class="checkbox-row">
 
-                <input
-                    id="showBarcodeNumber"
-                    type="checkbox"
-                    checked
-                >
+                        <input
+                            id="showCode"
+                            type="checkbox"
+                            checked
+                        >
 
-                <label for="showBarcodeNumber">
-                    نمایش شماره بارکد
-                </label>
+                        <label for="showCode">
+                            نمایش کد قطعه
+                        </label>
 
-            </div>
-
-
-            <div
-                id="layoutInfo"
-                class="info-box"
-            ></div>
+                    </div>
 
 
-            <div class="warning-box">
+                    <div class="checkbox-row">
 
-                برای بهترین نتیجه در چاپگرهای کاغذی،
-                در پنجره چاپ مرورگر گزینه
-                <strong>Actual Size / اندازه واقعی</strong>
-                یا Scale = 100%
-                را انتخاب کنید و Margins را روی Default یا None قرار دهید.
-                تنظیمات نهایی حاشیه چاپ به قابلیت خود چاپگر نیز بستگی دارد.
+                        <input
+                            id="showBarcodeNumber"
+                            type="checkbox"
+                            checked
+                        >
 
-            </div>
+                        <label for="showBarcodeNumber">
+                            نمایش شماره بارکد
+                        </label>
 
-
-            <div class="actions">
-
-                <button
-                    type="button"
-                    id="previewButton"
-                >
-                    پیش‌نمایش
-                </button>
+                    </div>
 
 
-                <button
-                    type="button"
-                    id="printButton"
-                >
-                    🖨 چاپ
-                </button>
+                    <div
+                        id="layoutInfo"
+                        class="info-box"
+                    ></div>
 
-            </div>
+
+                    <div class="actions">
+
+                        <button
+                            type="button"
+                            id="previewButton"
+                        >
+                            پیش‌نمایش
+                        </button>
+
+
+                        <button
+                            type="button"
+                            id="printButton"
+                        >
+                            🖨 چاپ
+                        </button>
+
+                    </div>
 
 </div>
 
@@ -9748,1417 +9188,1034 @@ button {
 
 (function () {
 
-            "use strict";
-
-
-            /* ============================================================
-               DATA
-               ============================================================ */
-
-            const partData = {
-
-                name:
-                    ${JSON.stringify(partName)},
-
-                code:
-                    ${JSON.stringify(partCode)},
-
-                barcode:
-                    ${JSON.stringify(barcodeValue)}
-
-            };
-
-
-            /* ============================================================
-               ELEMENTS
-               ============================================================ */
-
-            const paperType =
-                document.getElementById(
-                    "paperType"
-                );
-
-
-            const orientation =
-                document.getElementById(
-                    "orientation"
-                );
-
-
-            const orientationRow =
-                document.getElementById(
-                    "orientationRow"
-                );
-
-
-            const labelWidth =
-                document.getElementById(
-                    "labelWidth"
-                );
-
-
-            const labelHeight =
-                document.getElementById(
-                    "labelHeight"
-                );
-
-
-            const layoutMode =
-                document.getElementById(
-                    "layoutMode"
-                );
-
-
-            const manualLayout =
-                document.getElementById(
-                    "manualLayout"
-                );
-
-
-            const columns =
-                document.getElementById(
-                    "columns"
-                );
-
-
-            const rows =
-                document.getElementById(
-                    "rows"
-                );
-
-
-            const gap =
-                document.getElementById(
-                    "gap"
-                );
-
-
-            const margin =
-                document.getElementById(
-                    "margin"
-                );
-
-
-            const quantity =
-                document.getElementById(
-                    "quantity"
-                );
-
-
-            const border =
-                document.getElementById(
-                    "border"
-                );
-
-
-            const showCode =
-                document.getElementById(
-                    "showCode"
-                );
-
-
-            const showBarcodeNumber =
-                document.getElementById(
-                    "showBarcodeNumber"
-                );
-
-
-            const previewButton =
-                document.getElementById(
-                    "previewButton"
-                );
-
-
-            const printButton =
-                document.getElementById(
-                    "printButton"
-                );
-
-
-            const previewArea =
-                document.getElementById(
-                    "previewArea"
-                );
-
-
-            const layoutInfo =
-                document.getElementById(
-                    "layoutInfo"
-                );
-
-
-            /* ============================================================
-               PAPER
-               ============================================================ */
-
-            function getPaper() {
-
-                let width =
-                    210;
-
-                let height =
-                    297;
-
-                let name =
-                    "A4";
-
-
-                if (
-                    paperType.value ===
-                    "a5"
-                ) {
-
-                    width =
-                        148;
-
-                    height =
-                        210;
-
-                    name =
-                        "A5";
-
-                }
-
-
-                if (
-                    paperType.value ===
-                    "roll"
-                ) {
-
-                    width =
-                        Math.max(
-                            20,
-                            Number(
-                                labelWidth.value
-                            ) || 100
-                        );
-
-                    height =
-                        Math.max(
-                            15,
-                            Number(
-                                labelHeight.value
-                            ) || 40
-                        );
-
-                    name =
-                        "رول لیبل";
-
-                }
-
-
-                return {
-
-                    width,
-                    height,
-                    name
-
-                };
-
-            }
-
-
-            /* ============================================================
-               ORIENTATION
-               ============================================================ */
-
-            function getOrientedPaper() {
-
-                const paper =
-                    getPaper();
-
-
-                if (
-                    paper.name ===
-                    "رول لیبل"
-                ) {
-
-                    return paper;
-
-                }
-
-
-                if (
-                    orientation.value ===
-                    "landscape"
-                ) {
-
-                    return {
-
-                        width:
-                            paper.height,
-
-                        height:
-                            paper.width,
+                    const partData = {
 
                         name:
-                            paper.name +
-                            " افقی"
+                            ${JSON.stringify(title)},
+
+                        code:
+                            ${JSON.stringify(code)},
+
+                        barcode:
+                            ${JSON.stringify(value)}
 
                     };
 
-                }
 
-
-                if (
-                    orientation.value ===
-                    "auto"
-                ) {
-
-                    const lw =
-                        Math.max(
-                            1,
-                            Number(
-                                labelWidth.value
-                            ) || 1
+                    const paperType =
+                        document.getElementById(
+                            "paperType"
                         );
 
 
-                    const lh =
-                        Math.max(
-                            1,
-                            Number(
-                                labelHeight.value
-                            ) || 1
+                    const orientation =
+                        document.getElementById(
+                            "orientation"
                         );
 
 
-                    const m =
-                        Math.max(
-                            0,
-                            Number(
-                                margin.value
-                            ) || 0
+                    const labelWidth =
+                        document.getElementById(
+                            "labelWidth"
                         );
 
 
-                    const g =
-                        Math.max(
-                            0,
-                            Number(
-                                gap.value
-                            ) || 0
+                    const labelHeight =
+                        document.getElementById(
+                            "labelHeight"
                         );
 
 
-                    const portraitColumns =
-                        Math.max(
-                            0,
-                            Math.floor(
-                                (
-                                    paper.width -
-                                    m * 2 +
-                                    g
-                                ) /
-                                (
-                                    lw +
-                                    g
-                                )
-                            )
+                    const layoutMode =
+                        document.getElementById(
+                            "layoutMode"
                         );
 
 
-                    const portraitRows =
-                        Math.max(
-                            0,
-                            Math.floor(
-                                (
-                                    paper.height -
-                                    m * 2 +
-                                    g
-                                ) /
-                                (
-                                    lh +
-                                    g
-                                )
-                            )
+                    const manualLayout =
+                        document.getElementById(
+                            "manualLayout"
                         );
 
 
-                    const landscapeColumns =
-                        Math.max(
-                            0,
-                            Math.floor(
-                                (
-                                    paper.height -
-                                    m * 2 +
-                                    g
-                                ) /
-                                (
-                                    lw +
-                                    g
-                                )
-                            )
+                    const columns =
+                        document.getElementById(
+                            "columns"
                         );
 
 
-                    const landscapeRows =
-                        Math.max(
-                            0,
-                            Math.floor(
-                                (
-                                    paper.width -
-                                    m * 2 +
-                                    g
-                                ) /
-                                (
-                                    lh +
-                                    g
-                                )
-                            )
+                    const rows =
+                        document.getElementById(
+                            "rows"
                         );
 
 
-                    const portraitTotal =
-                        portraitColumns *
-                        portraitRows;
+                    const gap =
+                        document.getElementById(
+                            "gap"
+                        );
 
 
-                    const landscapeTotal =
-                        landscapeColumns *
-                        landscapeRows;
+                    const border =
+                        document.getElementById(
+                            "border"
+                        );
 
 
-                    if (
-                        landscapeTotal >
-                        portraitTotal
-                    ) {
+                    const showCode =
+                        document.getElementById(
+                            "showCode"
+                        );
+
+
+                    const showBarcodeNumber =
+                        document.getElementById(
+                            "showBarcodeNumber"
+                        );
+
+
+                    const previewButton =
+                        document.getElementById(
+                            "previewButton"
+                        );
+
+
+                    const printButton =
+                        document.getElementById(
+                            "printButton"
+                        );
+
+
+                    const previewArea =
+                        document.getElementById(
+                            "previewArea"
+                        );
+
+
+                    const layoutInfo =
+                        document.getElementById(
+                            "layoutInfo"
+                        );
+
+
+                    function getPaper() {
+
+                        if (
+                            paperType.value ===
+                            "a5"
+                        ) {
+
+                            return {
+
+                                width: 148,
+
+                                height: 210,
+
+                                name: "A5"
+
+                            };
+
+                        }
+
+
+                        if (
+                            paperType.value ===
+                            "roll"
+                        ) {
+
+                            return {
+
+                                width:
+                                    Number(
+                                        labelWidth.value
+                                    ),
+
+                                height:
+                                    Number(
+                                        labelHeight.value
+                                    ),
+
+                                name:
+                                    "رول لیبل"
+
+                            };
+
+                        }
+
 
                         return {
 
-                            width:
-                                paper.height,
+                            width: 210,
 
-                            height:
-                                paper.width,
+                            height: 297,
 
-                            name:
-                                paper.name +
-                                " افقی"
+                            name: "A4"
 
                         };
 
                     }
 
-                }
 
+                    function getOrientedPaper() {
 
-                return paper;
+                        const paper =
+                            getPaper();
 
-            }
 
+                        if (
+                            orientation.value ===
+                            "landscape" &&
+                            paper.name !==
+                            "رول لیبل"
+                        ) {
 
-            /* ============================================================
-               AUTO LAYOUT
-               ============================================================ */
+                            return {
 
-            function calculateAutoLayout() {
+                                width:
+                                    paper.height,
 
-                const paper =
-                    getOrientedPaper();
+                                height:
+                                    paper.width,
 
+                                name:
+                                    paper.name
 
-                const lw =
-                    Math.max(
-                        1,
-                        Number(
-                            labelWidth.value
-                        ) || 1
-                    );
+                            };
 
+                        }
 
-                const lh =
-                    Math.max(
-                        1,
-                        Number(
-                            labelHeight.value
-                        ) || 1
-                    );
 
+                        return paper;
 
-                const g =
-                    Math.max(
-                        0,
-                        Number(
-                            gap.value
-                        ) || 0
-                    );
+                    }
 
 
-                const m =
-                    paper.name ===
-                    "رول لیبل"
+                    function calculateAutoLayout() {
 
-                        ? 0
+                        const paper =
+                            getOrientedPaper();
 
-                        : Math.max(
-                            0,
-                            Number(
-                                margin.value
-                            ) || 0
-                        );
 
-
-                let cols =
-                    Math.floor(
-                        (
-                            paper.width -
-                            m * 2 +
-                            g
-                        ) /
-                        (
-                            lw +
-                            g
-                        )
-                    );
-
-
-                let rws =
-                    Math.floor(
-                        (
-                            paper.height -
-                            m * 2 +
-                            g
-                        ) /
-                        (
-                            lh +
-                            g
-                        )
-                    );
-
-
-                cols =
-                    Math.max(
-                        1,
-                        cols
-                    );
-
-
-                rws =
-                    Math.max(
-                        1,
-                        rws
-                    );
-
-
-                if (
-                    paper.name ===
-                    "رول لیبل"
-                ) {
-
-                    cols =
-                        1;
-
-                    rws =
-                        1;
-
-                }
-
-
-                return {
-
-                    columns:
-                        cols,
-
-                    rows:
-                        rws,
-
-                    total:
-                        cols *
-                        rws,
-
-                    paperWidth:
-                        paper.width,
-
-                    paperHeight:
-                        paper.height,
-
-                    margin:
-                        m
-
-                };
-
-            }
-
-
-            /* ============================================================
-               LAYOUT INFO
-               ============================================================ */
-
-            function updateLayoutInfo() {
-
-                const paper =
-                    getOrientedPaper();
-
-
-                if (
-                    paper.name ===
-                    "رول لیبل"
-                ) {
-
-                    layoutInfo.textContent =
-                        "رول لیبل: یک لیبل در هر صفحه چاپ می‌شود.";
-
-                    return;
-
-                }
-
-
-                if (
-                    layoutMode.value ===
-                    "manual"
-                ) {
-
-                    const c =
-                        Math.max(
-                            1,
-                            Number(
-                                columns.value
-                            ) || 1
-                        );
-
-
-                    const r =
-                        Math.max(
-                            1,
-                            Number(
-                                rows.value
-                            ) || 1
-                        );
-
-
-                    layoutInfo.textContent =
-                        "چیدمان دستی: " +
-                        c +
-                        " ستون × " +
-                        r +
-                        " ردیف = " +
-                        (
-                            c * r
-                        ) +
-                        " لیبل در هر صفحه.";
-
-                    return;
-
-                }
-
-
-                const result =
-                    calculateAutoLayout();
-
-
-                layoutInfo.textContent =
-                    "چیدمان خودکار: " +
-                    result.columns +
-                    " ستون × " +
-                    result.rows +
-                    " ردیف = " +
-                    result.total +
-                    " لیبل در هر صفحه — " +
-                    paper.name +
-                    ".";
-
-            }
-
-
-            /* ============================================================
-               BUILD LABEL
-               ============================================================ */
-
-            function buildLabel() {
-
-                const lw =
-                    Math.max(
-                        20,
-                        Number(
-                            labelWidth.value
-                        ) || 100
-                    );
-
-
-                const lh =
-                    Math.max(
-                        15,
-                        Number(
-                            labelHeight.value
-                        ) || 40
-                    );
-
-
-                const label =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                label.className =
-                    "label";
-
-
-                label.style.width =
-                    lw +
-                    "mm";
-
-
-                label.style.height =
-                    lh +
-                    "mm";
-
-
-                if (
-                    border.checked
-                ) {
-
-                    label.classList.add(
-                        "cut-border"
-                    );
-
-                }
-
-
-                /* --------------------------------------------------------
-                   NAME
-                   -------------------------------------------------------- */
-
-                const name =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                name.className =
-                    "part-name";
-
-
-                name.textContent =
-                    partData.name;
-
-
-                label.appendChild(
-                    name
-                );
-
-
-                /* --------------------------------------------------------
-                   CODE
-                   -------------------------------------------------------- */
-
-                if (
-                    showCode.checked
-                ) {
-
-                    const code =
-                        document.createElement(
-                            "div"
-                        );
-
-
-                    code.className =
-                        "part-code";
-
-
-                    code.textContent =
-                        "کد قطعه: " +
-                        partData.code;
-
-
-                    label.appendChild(
-                        code
-                    );
-
-                }
-
-
-                /* --------------------------------------------------------
-                   BARCODE
-                   -------------------------------------------------------- */
-
-                const barcodeWrapper =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                barcodeWrapper.className =
-                    "barcode-wrapper";
-
-
-                const barcodeWidth =
-                    Math.max(
-                        30,
-                        Math.min(
-                            lw - 8,
-                            lw * .88
-                        )
-                    );
-
-
-                const barcodeHeight =
-                    Math.max(
-                        8,
-                        Math.min(
-                            lh * .42,
-                            20
-                        )
-                    );
-
-
-                const barcodeSvg =
-                    createBarcodeSvg(
-                        partData.barcode,
-                        barcodeWidth,
-                        barcodeHeight
-                    );
-
-
-                if (
-                    barcodeSvg
-                ) {
-
-                    barcodeSvg.classList.add(
-                        "barcode-svg"
-                    );
-
-
-                    barcodeWrapper.appendChild(
-                        barcodeSvg
-                    );
-
-                }
-
-                else {
-
-                    barcodeWrapper.textContent =
-                        "بارکد نامعتبر";
-
-                }
-
-
-                label.appendChild(
-                    barcodeWrapper
-                );
-
-
-                /* --------------------------------------------------------
-                   BARCODE VALUE
-                   -------------------------------------------------------- */
-
-                if (
-                    showBarcodeNumber.checked
-                ) {
-
-                    const value =
-                        document.createElement(
-                            "div"
-                        );
-
-
-                    value.className =
-                        "barcode-value";
-
-
-                    value.textContent =
-                        partData.barcode;
-
-
-                    label.appendChild(
-                        value
-                    );
-
-                }
-
-
-                return label;
-
-            }
-
-
-            /* ============================================================
-               BUILD PREVIEW
-               ============================================================ */
-
-            function buildPreview() {
-
-                previewArea.innerHTML =
-                    "";
-
-
-                const paper =
-                    getOrientedPaper();
-
-
-                const lw =
-                    Math.max(
-                        20,
-                        Number(
-                            labelWidth.value
-                        ) || 100
-                    );
-
-
-                const lh =
-                    Math.max(
-                        15,
-                        Number(
-                            labelHeight.value
-                        ) || 40
-                    );
-
-
-                const g =
-                    Math.max(
-                        0,
-                        Number(
-                            gap.value
-                        ) || 0
-                    );
-
-
-                const m =
-                    paper.name ===
-                    "رول لیبل"
-
-                        ? 0
-
-                        : Math.max(
-                            0,
-                            Number(
-                                margin.value
-                            ) || 0
-                        );
-
-
-                let cols;
-                let rws;
-
-
-                if (
-                    layoutMode.value ===
-                    "manual"
-                ) {
-
-                    cols =
-                        Math.max(
-                            1,
-                            Number(
-                                columns.value
-                            ) || 1
-                        );
-
-
-                    rws =
-                        Math.max(
-                            1,
-                            Number(
-                                rows.value
-                            ) || 1
-                        );
-
-                }
-
-                else {
-
-                    const auto =
-                        calculateAutoLayout();
-
-
-                    cols =
-                        auto.columns;
-
-
-                    rws =
-                        auto.rows;
-
-                }
-
-
-                const page =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                page.className =
-                    "print-page";
-
-
-                page.style.width =
-                    paper.width +
-                    "mm";
-
-
-                page.style.minHeight =
-                    paper.height +
-                    "mm";
-
-
-                page.style.padding =
-                    m +
-                    "mm";
-
-
-                page.style.gridTemplateColumns =
-                    "repeat(" +
-                    cols +
-                    ", " +
-                    lw +
-                    "mm)";
-
-
-                page.style.gridAutoRows =
-                    lh +
-                    "mm";
-
-
-                page.style.columnGap =
-                    g +
-                    "mm";
-
-
-                page.style.rowGap =
-                    g +
-                    "mm";
-
-
-                let perPage =
-                    cols *
-                    rws;
-
-
-                if (
-                    paper.name ===
-                    "رول لیبل"
-                ) {
-
-                    perPage =
-                        1;
-
-                }
-
-
-                const requestedQuantity =
-                    Math.max(
-                        1,
-                        Number(
-                            quantity.value
-                        ) || 1
-                    );
-
-
-                const pageCount =
-                    paper.name ===
-                    "رول لیبل"
-
-                        ? requestedQuantity
-
-                        : Math.max(
-                            1,
-                            Math.ceil(
-                                requestedQuantity /
-                                perPage
-                            )
-                        );
-
-
-                let printed =
-                    0;
-
-
-                for (
-                    let p = 0;
-                    p < pageCount;
-                    p++
-                ) {
-
-                    const currentPage =
-                        p === 0
-                            ? page
-                            : page.cloneNode(
-                                false
+                        const width =
+                            Math.max(
+                                1,
+                                Number(
+                                    labelWidth.value
+                                ) || 1
                             );
 
 
-                    if (
-                        p > 0
-                    ) {
-
-                        currentPage.innerHTML =
-                            "";
-
-                    }
-
-
-                    const remaining =
-                        requestedQuantity -
-                        printed;
-
-
-                    const countThisPage =
-                        paper.name ===
-                        "رول لیبل"
-
-                            ? 1
-
-                            : Math.min(
-                                perPage,
-                                remaining
+                        const height =
+                            Math.max(
+                                1,
+                                Number(
+                                    labelHeight.value
+                                ) || 1
                             );
 
 
-                    for (
-                        let i = 0;
-                        i < countThisPage;
-                        i++
-                    ) {
+                        const spacing =
+                            Math.max(
+                                0,
+                                Number(
+                                    gap.value
+                                ) || 0
+                            );
 
-                        currentPage.appendChild(
-                            buildLabel()
-                        );
 
-                        printed++;
+                        if (
+                            paper.name ===
+                            "رول لیبل"
+                        ) {
 
-                    }
+                            return {
 
+                                columns: 1,
 
-                    previewArea.appendChild(
-                        currentPage
-                    );
+                                rows: 1,
 
-                }
+                                total: 1,
 
+                                paperWidth:
+                                    paper.width,
 
-                updateLayoutInfo();
+                                paperHeight:
+                                    paper.height
 
-                updatePrintStyle();
+                            };
 
-            }
+                        }
 
 
-            /* ============================================================
-               PRINT CSS
-               ============================================================ */
-
-            function updatePrintStyle() {
-
-                let style =
-                    document.getElementById(
-                        "dynamicPrintStyle"
-                    );
-
-
-                if (!style) {
-
-                    style =
-                        document.createElement(
-                            "style"
-                        );
-
-
-                    style.id =
-                        "dynamicPrintStyle";
-
-
-                    document.head.appendChild(
-                        style
-                    );
-
-                }
-
-
-                const paper =
-                    getOrientedPaper();
-
-
-                if (
-                    paper.name ===
-                    "رول لیبل"
-                ) {
-
-                    style.textContent =
-
-                        "@page {" +
-
-                            "size: " +
-
-                            paper.width +
-
-                            "mm " +
-
-                            paper.height +
-
-                            "mm;" +
-
-                            "margin:0;" +
-
-                        "}" +
-
-                        "@media print {" +
-
-                            "html,body {" +
-
-                                "width:" +
-
-                                paper.width +
-
-                                "mm;" +
-
-                                "height:" +
-
-                                paper.height +
-
-                                "mm;" +
-
-                            "}" +
-
-                            ".print-page {" +
-
-                                "width:" +
-
-                                paper.width +
-
-                                "mm !important;" +
-
-                                "min-height:" +
-
-                                paper.height +
-
-                                "mm !important;" +
-
-                            "}" +
-
-                        "}";
-
-                    return;
-
-                }
-
-
-                const type =
-                    paperType.value ===
-                    "a5"
-                        ? "A5"
-                        : "A4";
-
-
-                const pageOrientation =
-                    paper.width >
-                    paper.height
-
-                        ? "landscape"
-
-                        : "portrait";
-
-
-                style.textContent =
-
-                    "@page {" +
-
-                        "size: " +
-                        type +
-                        " " +
-                        pageOrientation +
-                        ";" +
-
-                        "margin:0;" +
-
-                    "}" +
-
-                    "@media print {" +
-
-                        "html,body {" +
-
-                            "width:100%;" +
-
-                            "height:auto;" +
-
-                            "margin:0;" +
-
-                            "padding:0;" +
-
-                        "}" +
-
-                    "}";
-
-            }
-
-
-            /* ============================================================
-               EVENTS
-               ============================================================ */
-
-            paperType.addEventListener(
-                "change",
-                function () {
-
-                    if (
-                        paperType.value ===
-                        "roll"
-                    ) {
-
-                        orientationRow.style.display =
-                            "none";
-
-                        labelWidth.value =
-                            100;
-
-                        labelHeight.value =
-                            40;
-
-                        gap.value =
-                            0;
-
-                        margin.value =
-                            0;
-
-                    }
-
-                    else {
-
-                        orientationRow.style.display =
-                            "grid";
-
-                        gap.value =
-                            4;
-
-                        margin.value =
+                        const margin =
                             5;
 
+
+                        const usableWidth =
+                            Math.max(
+                                0,
+                                paper.width -
+                                (
+                                    margin * 2
+                                )
+                            );
+
+
+                        const usableHeight =
+                            Math.max(
+                                0,
+                                paper.height -
+                                (
+                                    margin * 2
+                                )
+                            );
+
+
+                        let columnCount =
+                            Math.floor(
+                                (
+                                    usableWidth +
+                                    spacing
+                                ) /
+                                (
+                                    width +
+                                    spacing
+                                )
+                            );
+
+
+                        let rowCount =
+                            Math.floor(
+                                (
+                                    usableHeight +
+                                    spacing
+                                ) /
+                                (
+                                    height +
+                                    spacing
+                                )
+                            );
+
+
+                        columnCount =
+                            Math.max(
+                                1,
+                                columnCount
+                            );
+
+
+                        rowCount =
+                            Math.max(
+                                1,
+                                rowCount
+                            );
+
+
+                        return {
+
+                            columns:
+                                columnCount,
+
+                            rows:
+                                rowCount,
+
+                            total:
+                                columnCount *
+                                rowCount,
+
+                            paperWidth:
+                                paper.width,
+
+                            paperHeight:
+                                paper.height
+
+                        };
+
+                    }
+
+
+                    function updateLayoutMode() {
+
+                        manualLayout.style.display =
+                            layoutMode.value ===
+                            "manual"
+                                ? "block"
+                                : "none";
+
                     }
 
 
-                    updateManualLayout();
+                    function updateLayoutInfo() {
 
-                    buildPreview();
-
-                }
-            );
+                        const paper =
+                            getOrientedPaper();
 
 
-            orientation.addEventListener(
-                "change",
-                function () {
+                        if (
+                            paper.name ===
+                            "رول لیبل"
+                        ) {
 
-                    buildPreview();
+                            layoutInfo.textContent =
+                                "رول لیبل: یک لیبل در هر چاپ.";
 
-                }
-            );
+                            return;
 
-
-            layoutMode.addEventListener(
-                "change",
-                function () {
-
-                    updateManualLayout();
-
-                    buildPreview();
-
-                }
-            );
+                        }
 
 
-            function updateManualLayout() {
+                        if (
+                            layoutMode.value ===
+                            "manual"
+                        ) {
 
-                if (
-                    layoutMode.value ===
-                    "manual"
-                ) {
-
-                    manualLayout.style.display =
-                        "block";
-
-                }
-
-                else {
-
-                    manualLayout.style.display =
-                        "none";
-
-                }
-
-            }
+                            const c =
+                                Math.max(
+                                    1,
+                                    Number(
+                                        columns.value
+                                    ) || 1
+                                );
 
 
-            [
-                labelWidth,
-                labelHeight,
-                columns,
-                rows,
-                gap,
-                margin,
-                quantity,
-                border,
-                showCode,
-                showBarcodeNumber
-            ]
-                .forEach(
-                    element => {
-
-                        element.addEventListener(
-                            "input",
-                            function () {
-
-                                updateLayoutInfo();
-
-                            }
-                        );
+                            const r =
+                                Math.max(
+                                    1,
+                                    Number(
+                                        rows.value
+                                    ) || 1
+                                );
 
 
-                        element.addEventListener(
-                            "change",
-                            function () {
+                            layoutInfo.textContent =
+                                "چیدمان دستی: " +
+                                c +
+                                " ستون × " +
+                                r +
+                                " ردیف = " +
+                                (
+                                    c * r
+                                ) +
+                                " لیبل در هر صفحه.";
 
-                                buildPreview();
+                            return;
 
-                            }
-                        );
+                        }
+
+
+                        const result =
+                            calculateAutoLayout();
+
+
+                        layoutInfo.textContent =
+                            "چیدمان خودکار: " +
+                            result.columns +
+                            " ستون × " +
+                            result.rows +
+                            " ردیف = " +
+                            result.total +
+                            " لیبل در هر صفحه.";
 
                     }
-                );
 
 
-            previewButton.addEventListener(
-                "click",
-                function () {
+                    function buildLabel() {
 
-                    buildPreview();
-
-                }
-            );
+                        const label =
+                            document.createElement(
+                                "div"
+                            );
 
 
-            printButton.addEventListener(
-                "click",
-                function () {
-
-                    buildPreview();
+                        label.className =
+                            "label";
 
 
-                    setTimeout(
+                        label.style.width =
+                            Number(
+                                labelWidth.value
+                            ) +
+                            "mm";
+
+
+                        label.style.height =
+                            Number(
+                                labelHeight.value
+                            ) +
+                            "mm";
+
+
+                        if (
+                            border.checked
+                        ) {
+
+                            label.classList.add(
+                                "cut-border"
+                            );
+
+                        }
+
+
+                        const name =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        name.className =
+                            "part-name";
+
+
+                        name.textContent =
+                            partData.name;
+
+
+                        label.appendChild(
+                            name
+                        );
+
+
+                        if (
+                            showCode.checked &&
+                            partData.code
+                        ) {
+
+                            const code =
+                                document.createElement(
+                                    "div"
+                                );
+
+
+                            code.className =
+                                "part-code";
+
+
+                            code.textContent =
+                                "کد قطعه: " +
+                                partData.code;
+
+
+                            label.appendChild(
+                                code
+                            );
+
+                        }
+
+
+                        const svg =
+                            document.createElementNS(
+                                "http://www.w3.org/2000/svg",
+                                "svg"
+                            );
+
+
+                        svg.classList.add(
+                            "barcode"
+                        );
+
+
+                        label.appendChild(
+                            svg
+                        );
+
+
+                        if (
+                            showBarcodeNumber.checked
+                        ) {
+
+                            const number =
+                                document.createElement(
+                                    "div"
+                                );
+
+
+                            number.className =
+                                "barcode-value";
+
+
+                            number.textContent =
+                                partData.barcode;
+
+
+                            label.appendChild(
+                                number
+                            );
+
+                        }
+
+
+                        try {
+
+                            JsBarcode(
+                                svg,
+                                partData.barcode,
+                                {
+
+                                    format:
+                                        "CODE128",
+
+                                    width:
+                                        2,
+
+                                    height:
+                                        50,
+
+                                    displayValue:
+                                        false,
+
+                                    margin:
+                                        8,
+
+                                    background:
+                                        "#ffffff",
+
+                                    lineColor:
+                                        "#000000"
+
+                                }
+                            );
+
+                        }
+
+                        catch (error) {
+
+                            console.error(
+                                "BARCODE_GENERATION_ERROR",
+                                error
+                            );
+
+                        }
+
+
+                        return label;
+
+                    }
+
+
+                    function buildPreview() {
+
+                        previewArea.innerHTML =
+                            "";
+
+
+                        const paper =
+                            getOrientedPaper();
+
+
+                        const width =
+                            Math.max(
+                                1,
+                                Number(
+                                    labelWidth.value
+                                ) || 1
+                            );
+
+
+                        const height =
+                            Math.max(
+                                1,
+                                Number(
+                                    labelHeight.value
+                                ) || 1
+                            );
+
+
+                        const spacing =
+                            Math.max(
+                                0,
+                                Number(
+                                    gap.value
+                                ) || 0
+                            );
+
+
+                        let columnCount;
+                        let rowCount;
+
+
+                        if (
+                            layoutMode.value ===
+                            "manual"
+                        ) {
+
+                            columnCount =
+                                Math.max(
+                                    1,
+                                    Number(
+                                        columns.value
+                                    ) || 1
+                                );
+
+
+                            rowCount =
+                                Math.max(
+                                    1,
+                                    Number(
+                                        rows.value
+                                    ) || 1
+                                );
+
+                        }
+
+                        else {
+
+                            const auto =
+                                calculateAutoLayout();
+
+
+                            columnCount =
+                                auto.columns;
+
+
+                            rowCount =
+                                auto.rows;
+
+                        }
+
+
+                        const page =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        page.className =
+                            "print-page";
+
+
+                        page.style.width =
+                            paper.width +
+                            "mm";
+
+
+                        page.style.minHeight =
+                            paper.height +
+                            "mm";
+
+
+                        page.style.gridTemplateColumns =
+                            "repeat(" +
+                            columnCount +
+                            ", " +
+                            width +
+                            "mm)";
+
+
+                        page.style.gridAutoRows =
+                            height +
+                            "mm";
+
+
+                        page.style.columnGap =
+                            spacing +
+                            "mm";
+
+
+                        page.style.rowGap =
+                            spacing +
+                            "mm";
+
+
+                        if (
+                            paper.name ===
+                            "رول لیبل"
+                        ) {
+
+                            page.style.padding =
+                                "0";
+
+                        }
+
+                        else {
+
+                            page.style.padding =
+                                "5mm";
+
+                        }
+
+
+                        const total =
+                            paper.name ===
+                            "رول لیبل"
+                                ? 1
+                                : columnCount *
+                                  rowCount;
+
+
+                        for (
+                            let i = 0;
+                            i < total;
+                            i++
+                        ) {
+
+                            page.appendChild(
+                                buildLabel()
+                            );
+
+                        }
+
+
+                        previewArea.appendChild(
+                            page
+                        );
+
+
+                        previewArea.style.display =
+                            "block";
+
+
+                        updateLayoutInfo();
+
+                    }
+
+
+                    function updatePrintStyle() {
+
+                        let style =
+                            document.getElementById(
+                                "dynamicPrintStyle"
+                            );
+
+
+                        if (!style) {
+
+                            style =
+                                document.createElement(
+                                    "style"
+                                );
+
+
+                            style.id =
+                                "dynamicPrintStyle";
+
+
+                            document.head.appendChild(
+                                style
+                            );
+
+                        }
+
+
+                        const paper =
+                            getOrientedPaper();
+
+
+                        if (
+                            paper.name ===
+                            "رول لیبل"
+                        ) {
+
+                            style.textContent =
+
+                                "@page {" +
+
+                                    "size: " +
+                                    paper.width +
+                                    "mm " +
+                                    paper.height +
+                                    "mm;" +
+
+                                    "margin: 0;" +
+
+                                "}" +
+
+                                "@media print {" +
+
+                                    "html,body {" +
+
+                                        "width: " +
+                                        paper.width +
+                                        "mm;" +
+
+                                        "height: " +
+                                        paper.height +
+                                        "mm;" +
+
+                                        "margin: 0;" +
+
+                                        "padding: 0;" +
+
+                                    "}" +
+
+                                    ".print-page {" +
+
+                                        "width: " +
+                                        paper.width +
+                                        "mm !important;" +
+
+                                        "min-height: " +
+                                        paper.height +
+                                        "mm !important;" +
+
+                                    "}" +
+
+                                "}";
+
+                        }
+
+                        else {
+
+                            style.textContent =
+
+                                "@page {" +
+
+                                    "size: " +
+                                    paper.name +
+                                    " " +
+                                    orientation.value +
+                                    ";" +
+
+                                    "margin: 0;" +
+
+                                "}";
+
+                        }
+
+                    }
+
+
+                    paperType.addEventListener(
+                        "change",
                         function () {
 
-                            window.print();
+                            if (
+                                paperType.value ===
+                                "roll"
+                            ) {
 
-                        },
-                        250
+                                orientation.value =
+                                    "portrait";
+
+                                gap.value =
+                                    0;
+
+                            }
+
+                            else {
+
+                                gap.value =
+                                    4;
+
+                            }
+
+
+                            updateLayoutMode();
+
+                            updateLayoutInfo();
+
+                            updatePrintStyle();
+
+                            buildPreview();
+
+                        }
                     );
 
-                }
-            );
+
+                    orientation.addEventListener(
+                        "change",
+                        function () {
+
+                            updateLayoutInfo();
+
+                            updatePrintStyle();
+
+                            buildPreview();
+
+                        }
+                    );
 
 
-            /* ============================================================
-               INITIALIZE
-               ============================================================ */
+                    layoutMode.addEventListener(
+                        "change",
+                        function () {
 
-            orientationRow.style.display =
-                "grid";
+                            updateLayoutMode();
+
+                            updateLayoutInfo();
+
+                            buildPreview();
+
+                        }
+                    );
 
 
-            updateManualLayout();
+                    [
+                        labelWidth,
+                        labelHeight,
+                        columns,
+                        rows,
+                        gap,
+                        border,
+                        showCode,
+                        showBarcodeNumber
+                    ]
+                        .forEach(
+                            element => {
 
-            updateLayoutInfo();
+                                element.addEventListener(
+                                    "input",
+                                    function () {
 
-            buildPreview();
+                                        updateLayoutInfo();
+
+                                    }
+                                );
+
+
+                                element.addEventListener(
+                                    "change",
+                                    function () {
+
+                                        updateLayoutInfo();
+
+                                        buildPreview();
+
+                                    }
+                                );
+
+                            }
+                        );
+
+
+                    previewButton.addEventListener(
+                        "click",
+                        function () {
+
+                            updatePrintStyle();
+
+                            buildPreview();
+
+                        }
+                    );
+
+
+                    printButton.addEventListener(
+                        "click",
+                        function () {
+
+                            updatePrintStyle();
+
+                            buildPreview();
+
+
+                            setTimeout(
+                                function () {
+
+                                    window.print();
+
+                                },
+                                250
+                            );
+
+                        }
+                    );
+
+
+                    updateLayoutMode();
+
+                    updatePrintStyle();
+
+                    buildPreview();
 
 })();
 
@@ -11168,31 +10225,54 @@ button {
 </body>
 
 </html>
+
 `;
 
-
-    /* ============================================================
-       WRITE POPUP WITHOUT EXTERNAL SCRIPT
-       ============================================================ */
 
     printWindow.document.open();
 
     printWindow.document.write(
-        documentHtml
+        html
     );
 
     printWindow.document.close();
 
+}
+/* ============================================================
+   PART BARCODE PRINT
+   ============================================================ */
 
-    /* ============================================================
-       FOCUS
-       ============================================================ */
+function printPartBarcode(part) {
 
-    printWindow.focus();
+    if (
+        !part ||
+        !part.barcode
+    ) {
+
+        showMessage(
+            "برای این قطعه بارکد ثبت نشده است.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    printBarcode({
+
+        value:
+            part.barcode,
+
+        title:
+            part.name,
+
+        code:
+            part.code
+
+    });
 
 }
-
-
 
         /* ============================================================
            DELETE ENTITY
